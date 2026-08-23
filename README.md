@@ -26,8 +26,20 @@ Full framing in [`docs/01-objectives.md`](docs/01-objectives.md).
 | `docs/` | Design documents, one per planning step |
 | `ns3/` | NS-3 simulation source (C++) |
 | `scripts/` | Build and run helpers |
-| `analysis/` | Evidence extraction and metrics |
+| `analysis/` | Evidence extraction, trust model, decision rule |
+| `tests/` | Executable checks on synthetic evidence |
 | `results/` | Simulation output (git-ignored except `.gitkeep`) |
+
+## Running the analysis
+
+```bash
+pip install -r requirements.txt
+python3 tests/test_pipeline.py          # structural checks, ~10 s
+python3 tests/test_superadditivity.py   # fusion-advantage sweep, ~10 min
+```
+
+Both run on synthetic evidence and are code tests, not results. See the warning at
+the top of `analysis/synth.py`.
 
 ## Build status
 
@@ -44,8 +56,8 @@ its own right — see `docs/04-platform-and-setup.md`.
 - [x] Step 5 — Baseline MANET
 - [x] Step 6 — Single false-location beacon
 - [x] Step 7 — Behavioural evidence
-- [ ] Step 8 — Trust model
-- [ ] Step 9 — Three-way decision
+- [x] Step 8 — Trust model
+- [x] Step 9 — Three-way decision
 - [ ] Step 10 — Isolation
 - [ ] Step 11 — Route recovery
 - [ ] Step 12 — Comparative evaluation
