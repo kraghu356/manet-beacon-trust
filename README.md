@@ -1,0 +1,54 @@
+# MBTR-MANET
+
+**Multi-evidence Beacon Trust and Recovery for MANETs**
+
+Verification, isolation and secure-route recovery for malicious beacon nodes in
+mobile ad hoc networks, using combined *behavioural* and *localization-consistency*
+evidence.
+
+This repository is the implementation arm of Paper 2, which consumes the candidate
+malicious beacon nodes produced by Paper 1 and answers the question Paper 1 leaves
+open: *is this candidate actually malicious, and what does the network do about it?*
+
+## Research objectives
+
+3. Develop a multi-evidence trust mechanism for verifying malicious beacon nodes
+   using behavioural and localization consistency.
+4. Isolate confirmed malicious beacon nodes and dynamically recover secure routes
+   while minimizing the impact on network performance.
+
+Full framing in [`docs/01-objectives.md`](docs/01-objectives.md).
+
+## Repository layout
+
+| Path | Contents |
+|---|---|
+| `docs/` | Design documents, one per planning step |
+| `ns3/` | NS-3 simulation source (C++) |
+| `scripts/` | Build and run helpers |
+| `analysis/` | Evidence extraction and metrics |
+| `results/` | Simulation output (git-ignored except `.gitkeep`) |
+
+## Build status
+
+The NS-3 sources in `ns3/` have **not** been compiled against a live NS-3 tree yet.
+They target the NS-3 3.40+ API. Treat the first successful build as a milestone in
+its own right — see `docs/04-platform-and-setup.md`.
+
+## Progress against the plan
+
+- [x] Step 1 — Freeze objectives
+- [x] Step 2 — Define the malicious-beacon attack model
+- [x] Step 3 — Architecture
+- [x] Step 4 — Platform selection (NS-3)
+- [x] Step 5 — Baseline MANET
+- [x] Step 6 — Single false-location beacon
+- [x] Step 7 — Behavioural evidence
+- [ ] Step 8 — Trust model
+- [ ] Step 9 — Three-way decision
+- [ ] Step 10 — Isolation
+- [ ] Step 11 — Route recovery
+- [ ] Step 12 — Comparative evaluation
+- [ ] Step 13 — Metric suite
+- [ ] Step 14 — Dataset strategy
+- [ ] Step 15 — Manuscript

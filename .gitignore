@@ -1,0 +1,8 @@
+results/*
+!results/.gitkeep
+*.pcap
+*.xml
+*.pyc
+__pycache__/
+build/
+.venv/
