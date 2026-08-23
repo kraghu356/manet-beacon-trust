@@ -21,8 +21,12 @@ echo "==> Configuring (optimized build, examples off, tests off)"
 ./ns3 configure --build-profile=optimized --disable-examples --disable-tests
 
 echo "==> Linking simulator into scratch/"
-mkdir -p scratch
-ln -sf "$REPO_DIR/ns3/mbtr-sim.cc" scratch/mbtr-sim.cc
+# A scratch SUBDIRECTORY is built as one program from all sources inside it,
+# which is how mbtr-sim.cc and mbtr-isolation.h stay together. A bare
+# scratch/*.cc file would not find the header.
+mkdir -p scratch/mbtr-sim
+ln -sf "$REPO_DIR/ns3/mbtr-sim.cc" scratch/mbtr-sim/mbtr-sim.cc
+ln -sf "$REPO_DIR/ns3/mbtr-isolation.h" scratch/mbtr-sim/mbtr-isolation.h
 
 echo "==> Building (this takes a while on first run)"
 ./ns3 build
@@ -32,7 +36,7 @@ cat <<EOF
 Done.
 
   NS-3:      $NS3_DIR
-  Simulator: scratch/mbtr-sim.cc -> $REPO_DIR/ns3/mbtr-sim.cc
+  Simulator: scratch/mbtr-sim/ -> $REPO_DIR/ns3/
 
 Smoke test:
   cd "$NS3_DIR" && ./ns3 run "mbtr-sim --help"

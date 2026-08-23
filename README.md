@@ -35,6 +35,7 @@ Full framing in [`docs/01-objectives.md`](docs/01-objectives.md).
 ```bash
 pip install -r requirements.txt
 python3 tests/test_pipeline.py          # structural checks, ~10 s
+python3 tests/test_metrics.py           # metric suite, ~2 s
 python3 tests/test_superadditivity.py   # fusion-advantage sweep, ~10 min
 ```
 
@@ -58,9 +59,9 @@ its own right — see `docs/04-platform-and-setup.md`.
 - [x] Step 7 — Behavioural evidence
 - [x] Step 8 — Trust model
 - [x] Step 9 — Three-way decision
-- [ ] Step 10 — Isolation
-- [ ] Step 11 — Route recovery
-- [ ] Step 12 — Comparative evaluation
-- [ ] Step 13 — Metric suite
+- [x] Step 10 — Isolation
+- [x] Step 11 — Route recovery
+- [x] Step 12 — Comparative evaluation (harness; needs runs)
+- [x] Step 13 — Metric suite
 - [ ] Step 14 — Dataset strategy
 - [ ] Step 15 — Manuscript

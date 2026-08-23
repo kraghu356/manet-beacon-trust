@@ -31,9 +31,13 @@
 #include "ns3/internet-module.h"
 #include "ns3/mobility-module.h"
 #include "ns3/network-module.h"
+#include "ns3/traffic-control-module.h"
 #include "ns3/wifi-module.h"
 
+#include "mbtr-isolation.h"
+
 #include <fstream>
+#include <set>
 #include <iomanip>
 #include <map>
 #include <sstream>
@@ -74,6 +78,8 @@ struct Config
     uint32_t seed = 1;
     uint32_t run = 1;
     std::string outDir = "results";
+    std::string isolationSchedule = "";  // empty = no isolation (Steps 5-7 only)
+    double binS = 1.0;                   // recovery-curve resolution
 };
 
 static Config g_cfg;
@@ -136,6 +142,9 @@ static std::vector<NodeCounters> g_countersPrev;
 
 // Packet uid -> time the node accepted it for forwarding, for relay latency.
 static std::map<std::pair<uint32_t, uint64_t>, double> g_transitEntryTime;
+
+static std::vector<uint64_t> g_rxBytesBin;  // delivered bytes per time bin
+static std::vector<uint64_t> g_rxPktsBin;
 
 static std::ofstream g_beaconRx;
 static std::ofstream g_behaviour;
@@ -513,6 +522,17 @@ PhyMonitorRx(uint32_t rxNodeId,
 }
 
 static void
+SinkRxTrace(Ptr<const Packet> p, const Address&)
+{
+    size_t bin = static_cast<size_t>(Simulator::Now().GetSeconds() / g_cfg.binS);
+    if (bin < g_rxBytesBin.size())
+    {
+        g_rxBytesBin[bin] += p->GetSize();
+        g_rxPktsBin[bin] += 1;
+    }
+}
+
+static void
 UnicastForwardTrace(uint32_t nodeId,
                     const Ipv4Header&,
                     Ptr<const Packet> p,
@@ -605,6 +625,10 @@ main(int argc, char* argv[])
     cmd.AddValue("seed", "RNG seed", g_cfg.seed);
     cmd.AddValue("run", "RNG run number", g_cfg.run);
     cmd.AddValue("outDir", "Output directory", g_cfg.outDir);
+    cmd.AddValue("isolation",
+                 "CSV of isolation events (time_s,observer,target,action); "
+                 "empty disables isolation",
+                 g_cfg.isolationSchedule);
     cmd.Parse(argc, argv);
 
     if (g_cfg.attack != "none" && g_cfg.attack != "A1" && g_cfg.attack != "A2" &&
@@ -682,7 +706,26 @@ main(int argc, char* argv[])
     for (uint32_t i = 0; i < devices.GetN(); ++i)
     {
         Ptr<WifiNetDevice> wd = DynamicCast<WifiNetDevice>(devices.Get(i));
-        g_macToNode[Mac48Address::ConvertFrom(wd->GetAddress())] = nodes.Get(i)->GetId();
+        Mac48Address mac = Mac48Address::ConvertFrom(wd->GetAddress());
+        g_macToNode[mac] = nodes.Get(i)->GetId();
+        IsolationRegistry::Get().RegisterNodeMac(nodes.Get(i)->GetId(), mac);
+    }
+
+    // --- isolation enforcement layer ---------------------------------------
+    // Installed unconditionally, including on clean runs. With an empty
+    // blacklist the qdisc is a plain FIFO, so its queueing behaviour is present
+    // in the baseline too. Installing it only for isolation runs would confound
+    // the recovery measurement with a change in queue discipline.
+    TrafficControlHelper tch;
+    tch.SetRootQueueDisc("BlacklistQueueDisc");
+    QueueDiscContainer qdiscs = tch.Install(devices);
+    for (uint32_t i = 0; i < qdiscs.GetN(); ++i)
+    {
+        Ptr<BlacklistQueueDisc> bq = DynamicCast<BlacklistQueueDisc>(qdiscs.Get(i));
+        if (bq)
+        {
+            bq->SetNodeId(nodes.Get(i)->GetId());
+        }
     }
 
     // --- routing: TransitControlRouting over AODV --------------------------
@@ -826,6 +869,34 @@ main(int argc, char* argv[])
     }
     gt.close();
 
+    // --- recovery instrumentation ------------------------------------------
+    size_t nBins = static_cast<size_t>(g_cfg.simTime / g_cfg.binS) + 1;
+    g_rxBytesBin.assign(nBins, 0);
+    g_rxPktsBin.assign(nBins, 0);
+    for (uint32_t i = 0; i < sinks.GetN(); ++i)
+    {
+        sinks.Get(i)->TraceConnectWithoutContext("Rx", MakeCallback(&SinkRxTrace));
+    }
+
+    // --- isolation schedule --------------------------------------------------
+    std::vector<IsolationEvent> isoEvents;
+    if (!g_cfg.isolationSchedule.empty())
+    {
+        isoEvents = LoadIsolationSchedule(g_cfg.isolationSchedule);
+        if (isoEvents.empty())
+        {
+            NS_FATAL_ERROR("Isolation schedule " << g_cfg.isolationSchedule
+                                                 << " is empty or unreadable");
+        }
+        for (const IsolationEvent& e : isoEvents)
+        {
+            Simulator::Schedule(Seconds(e.timeS),
+                                &ApplyIsolationEvent,
+                                e,
+                                g_cfg.nNodes);
+        }
+    }
+
     Simulator::Schedule(Seconds(g_cfg.window), &SampleWindow);
 
     // --- flow monitor -------------------------------------------------------
@@ -878,6 +949,16 @@ main(int argc, char* argv[])
     }
     flows.close();
 
+    std::ofstream recovery(prefix + "recovery.csv");
+    recovery << "bin_start_s,rx_packets,rx_bytes,throughput_kbps\n";
+    for (size_t b = 0; b < g_rxBytesBin.size(); ++b)
+    {
+        recovery << std::fixed << std::setprecision(3) << b * g_cfg.binS << ','
+                 << g_rxPktsBin[b] << ',' << g_rxBytesBin[b] << ','
+                 << (g_rxBytesBin[b] * 8.0 / g_cfg.binS / 1000.0) << '\n';
+    }
+    recovery.close();
+
     double remainingEnergy = 0.0;
     for (uint32_t i = 0; i < sources_e.GetN(); ++i)
     {
@@ -894,12 +975,14 @@ main(int argc, char* argv[])
 
     std::ofstream summary(prefix + "summary.csv");
     summary << "attack,seed,run,pdr,throughput_kbps,mean_delay_ms,total_tx,total_rx,"
-               "malicious_drops,energy_used_j\n";
+               "malicious_drops,energy_used_j,isolations,blocked_frames\n";
     summary << g_cfg.attack << ',' << g_cfg.seed << ',' << g_cfg.run << ','
             << (totalTx ? static_cast<double>(totalRx) / totalTx : 0.0) << ','
             << totalThroughput << ','
             << (totalRx ? delayWeighted / totalRx : 0.0) << ',' << totalTx << ','
-            << totalRx << ',' << totalMalDrop << ',' << energyUsed << '\n';
+            << totalRx << ',' << totalMalDrop << ',' << energyUsed << ','
+            << IsolationRegistry::Get().IsolationCount() << ','
+            << IsolationRegistry::Get().BlockedFrames() << '\n';
     summary.close();
 
     g_beaconRx.close();
