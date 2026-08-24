@@ -51,7 +51,7 @@ NS_LOG_COMPONENT_DEFINE("MbtrSim");
 // Configuration
 // ---------------------------------------------------------------------------
 
-struct Config
+struct SimConfig
 {
     uint32_t nNodes = 20;
     uint32_t nBeacons = 3;    // beacons are node ids 0 .. nBeacons-1
@@ -83,7 +83,7 @@ struct Config
     double binS = 1.0;                   // recovery-curve resolution
 };
 
-static Config g_cfg;
+static SimConfig g_cfg;
 
 // Effective attack parameters after intensity scaling for A3.
 static double
@@ -754,9 +754,21 @@ main(int argc, char* argv[])
     }
 
     // --- routing: TransitControlRouting over AODV --------------------------
+    // InternetStackHelper does NOT wrap the routing helper in Ipv4ListRouting.
+    // Passing AodvHelper directly makes GetRoutingProtocol() return a bare
+    // aodv::RoutingProtocol, and the DynamicCast<Ipv4ListRouting> below would
+    // yield null -- a runtime abort, invisible to the compiler. The list is
+    // therefore constructed explicitly.
+    //
+    // Ipv4ListRouting sorts protocols by DESCENDING priority (verified in
+    // Ipv4ListRouting::Compare), so TransitControlRouting at 100 is consulted
+    // before AODV at 10, which is what the observer/grey-hole design requires.
     AodvHelper aodv;
+    Ipv4ListRoutingHelper listRouting;
+    listRouting.Add(aodv, 10);
+
     InternetStackHelper stack;
-    stack.SetRoutingHelper(aodv);
+    stack.SetRoutingHelper(listRouting);
     stack.Install(nodes);
 
     Ipv4AddressHelper addr;
@@ -841,15 +853,16 @@ main(int argc, char* argv[])
     }
 
     // --- energy -------------------------------------------------------------
-    // NOTE: NS-3 3.41+ moved these into the ns3::energy namespace. If the build
-    // fails here, qualify with ns3::energy:: rather than deleting the block —
-    // energy consumption is a required metric in Step 13.
+    // VERIFIED against NS-3 3.42: the energy MODEL classes live in ns3::energy
+    // (EnergySourceContainer, DeviceEnergyModelContainer, BasicEnergySource) but
+    // the HELPERS stayed in plain ns3. The split is not guessable and is the kind
+    // of thing that silently costs an afternoon, so it is recorded here.
     BasicEnergySourceHelper energySource;
     energySource.Set("BasicEnergySourceInitialEnergyJ", DoubleValue(100.0));
-    EnergySourceContainer sources_e = energySource.Install(nodes);
+    energy::EnergySourceContainer sources_e = energySource.Install(nodes);
 
     WifiRadioEnergyModelHelper radioEnergy;
-    DeviceEnergyModelContainer deviceModels = radioEnergy.Install(devices, sources_e);
+    energy::DeviceEnergyModelContainer deviceModels = radioEnergy.Install(devices, sources_e);
 
     // --- traces -------------------------------------------------------------
     for (uint32_t i = 0; i < g_cfg.nNodes; ++i)
@@ -987,7 +1000,7 @@ main(int argc, char* argv[])
     double remainingEnergy = 0.0;
     for (uint32_t i = 0; i < sources_e.GetN(); ++i)
     {
-        Ptr<BasicEnergySource> src = DynamicCast<BasicEnergySource>(sources_e.Get(i));
+        Ptr<energy::BasicEnergySource> src = DynamicCast<energy::BasicEnergySource>(sources_e.Get(i));
         remainingEnergy += src->GetRemainingEnergy();
     }
     double energyUsed = 100.0 * g_cfg.nNodes - remainingEnergy;

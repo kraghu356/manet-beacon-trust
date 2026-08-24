@@ -63,7 +63,40 @@ protecting — it is what makes the work reproducible by a reviewer with a stock
 
 ## Build status
 
-**Not yet compiled.** The sources target the 3.40+ API and are unverified against a
-live tree. Expect to spend the first session on build errors rather than results;
-the API surface for `MonitorSnifferRx` and the energy model has shifted across
-releases. Fix them before trusting any number this produces.
+**Compiles to an object file against NS-3 3.42** (`g++ -c -std=c++20 -I build/include`).
+Full link and execution are still outstanding — see the caveat at the end.
+
+Four defects were found and fixed by compiling. They are recorded because three of
+them are not guessable from documentation:
+
+1. **`struct Config` collided with `ns3::Config`**, the attribute/trace namespace.
+   Renamed to `SimConfig`.
+2. **Energy classes are split across two namespaces in 3.42.** The models
+   (`EnergySourceContainer`, `DeviceEnergyModelContainer`, `BasicEnergySource`)
+   moved into `ns3::energy`; the helpers (`BasicEnergySourceHelper`,
+   `WifiRadioEnergyModelHelper`) stayed in plain `ns3`. Half-qualifying either way
+   fails.
+3. **`InternetStackHelper` does not wrap the routing helper in `Ipv4ListRouting`.**
+   Passing `AodvHelper` directly makes `GetRoutingProtocol()` return a bare
+   `aodv::RoutingProtocol`, so the `DynamicCast<Ipv4ListRouting>` returns null and
+   the run aborts. The compiler cannot see this; it is a runtime failure. The list
+   is now built explicitly with AODV at priority 10.
+4. **`Ipv4ListRouting` sorts by descending priority** (verified in
+   `Ipv4ListRouting::Compare`), so `TransitControlRouting` at 100 is consulted
+   before AODV. The design depended on this and it had been assumed, not checked.
+
+Two signatures were verified against the NS-3 source rather than assumed:
+
+- `MonitorSnifferRx` fires
+  `(Ptr<const Packet>, uint16_t, WifiTxVector, MpduInfo, SignalNoiseDbm, uint16_t)`.
+  Trace callbacks are type-checked at *runtime*, so a mismatch here would have
+  aborted mid-simulation with no compile-time warning.
+- `Ipv4L3Protocol::UnicastForward` uses `SentTracedCallback`, and `Drop` uses
+  `DropTracedCallback`. Both match.
+
+### What compiling still does not prove
+
+An object file is not a working simulation. Still unverified: linking, TypeId
+registration at runtime, whether `BlacklistQueueDisc` installs correctly through
+`TrafficControlHelper`, whether beacon receptions actually find a matching RSSI
+sample, and every number the thing produces. Run it before believing any of it.
