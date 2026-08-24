@@ -79,6 +79,7 @@ struct Config
     uint32_t run = 1;
     std::string outDir = "results";
     std::string isolationSchedule = "";  // empty = no isolation (Steps 5-7 only)
+    std::string mobilityTrace = "";      // empty = synthetic Random Waypoint
     double binS = 1.0;                   // recovery-curve resolution
 };
 
@@ -625,6 +626,10 @@ main(int argc, char* argv[])
     cmd.AddValue("seed", "RNG seed", g_cfg.seed);
     cmd.AddValue("run", "RNG run number", g_cfg.run);
     cmd.AddValue("outDir", "Output directory", g_cfg.outDir);
+    cmd.AddValue("mobilityTrace",
+                 "ns-2 movement file (e.g. converted CRAWDAD trace); "
+                 "empty uses Random Waypoint",
+                 g_cfg.mobilityTrace);
     cmd.AddValue("isolation",
                  "CSV of isolation events (time_s,observer,target,action); "
                  "empty disables isolation",
@@ -664,6 +669,25 @@ main(int argc, char* argv[])
             StringValue("ns3::UniformRandomVariable[Min=0.0|Max=" +
                         std::to_string(g_cfg.areaY) + "]"));
 
+    if (!g_cfg.mobilityTrace.empty())
+    {
+        // Real mobility traces replace the synthetic model entirely. Node count
+        // must match the trace; a mismatch leaves the surplus nodes stationary
+        // at the origin, which silently corrupts every localization residual, so
+        // it is checked rather than assumed.
+        Ns2MobilityHelper ns2(g_cfg.mobilityTrace);
+        ns2.Install();
+        for (uint32_t i = 0; i < g_cfg.nNodes; ++i)
+        {
+            Ptr<MobilityModel> m = nodes.Get(i)->GetObject<MobilityModel>();
+            NS_ABORT_MSG_IF(!m,
+                            "Node " << i << " has no mobility model: trace "
+                                    << g_cfg.mobilityTrace
+                                    << " defines fewer nodes than --nNodes");
+        }
+    }
+    else
+    {
     mobility.SetPositionAllocator(posAlloc);
     mobility.SetMobilityModel(
         "ns3::RandomWaypointMobilityModel",
@@ -676,6 +700,7 @@ main(int argc, char* argv[])
         "PositionAllocator",
         PointerValue(posAlloc));
     mobility.Install(nodes);
+    }
 
     // --- wifi 802.11b ad hoc ------------------------------------------------
     WifiHelper wifi;

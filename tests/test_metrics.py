@@ -150,6 +150,7 @@ def main() -> int:
         test_debt_orders_two_mechanisms,
         test_schedules,
         test_aggregate,
+        test_dataset_splits,
     ]:
         fn()
         print(f"  {fn.__name__:<34} {'FAIL' if FAILS else 'ok'}")
@@ -163,6 +164,57 @@ def main() -> int:
         return 1
     print("\nAll metric checks passed.")
     return 0
+
+
+
+
+# ---------------------------------------------------------------------------
+# Step 14 — dataset splitting
+# ---------------------------------------------------------------------------
+
+def test_dataset_splits() -> None:
+    from analysis.dataset import RunKey, assemble, check_leakage, split_by_run, tag_run
+
+    frames = []
+    for attack in ["none", "A3"]:
+        for seed in [1, 2, 3, 4, 5]:
+            ev = pd.DataFrame(
+                {
+                    "time_s": [10.0, 15.0],
+                    "observer": [5, 6],
+                    "target": [2, 2],
+                    "residual_mean": [10.0, 12.0],
+                    "residual_std": [1.0, 1.0],
+                    "residual_n": [4, 4],
+                    "rssi_mean": [-75.0, -76.0],
+                    "transit_rx": [30, 31],
+                    "fwd_ratio": [0.9, 0.9],
+                    "is_attacker": [1 if attack != "none" else 0] * 2,
+                    "malicious_drop": [3, 3],
+                }
+            )
+            frames.append(tag_run(ev, RunKey(attack, seed, 1)))
+
+    df = assemble(frames)
+    check("malicious_drop" not in df.columns, "leaky ground-truth column not dropped")
+
+    train, test = split_by_run(df, test_seeds=[4, 5], calibration_seeds=[1])
+    check(set(test["seed"]) == {4, 5}, "test seeds wrong")
+    check(not (set(train["seed"]) & set(test["seed"])), "seed overlap survived split")
+
+    # Calibration seed leaking into test must be refused.
+    try:
+        split_by_run(df, test_seeds=[1, 2], calibration_seeds=[1])
+        FAILS.append("calibration seed in test set was not rejected")
+    except ValueError:
+        pass
+
+    # A row-level split must be caught.
+    try:
+        check_leakage(df.iloc[::2], df.iloc[1::2])
+        FAILS.append("row-level split was not rejected")
+    except ValueError:
+        pass
 
 
 if __name__ == "__main__":

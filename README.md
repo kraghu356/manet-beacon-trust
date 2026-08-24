@@ -42,6 +42,16 @@ python3 tests/test_superadditivity.py   # fusion-advantage sweep, ~10 min
 Both run on synthetic evidence and are code tests, not results. See the warning at
 the top of `analysis/synth.py`.
 
+## What is blocking everything
+
+Nothing here has been compiled or run against a live NS-3 tree. All 15 planning
+steps have an implementation, but every number they could produce is currently
+hypothetical. The next action is `./scripts/setup_ns3.sh`, then the baseline.
+
+Two open risks are recorded in full in `docs/09-writing-plan.md`: the fusion-only
+detection region (narrow on synthetic data, unverified on real data) and the
+missing literature file behind the EMBN-MANET comparison.
+
 ## Build status
 
 The NS-3 sources in `ns3/` have **not** been compiled against a live NS-3 tree yet.
@@ -63,5 +73,5 @@ its own right — see `docs/04-platform-and-setup.md`.
 - [x] Step 11 — Route recovery
 - [x] Step 12 — Comparative evaluation (harness; needs runs)
 - [x] Step 13 — Metric suite
-- [ ] Step 14 — Dataset strategy
-- [ ] Step 15 — Manuscript
+- [x] Step 14 — Dataset strategy
+- [ ] Step 15 — Manuscript (plan written; blocked on real runs)
