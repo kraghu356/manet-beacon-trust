@@ -40,7 +40,7 @@ class DecisionParams:
     min_observers: int = 3
     min_agreement: float = 0.5  # fraction of observers whose direct trust < theta_low
     persistence: int = 3        # consecutive windows required to change state
-    clear_persistence: int = 6  # consecutive clean windows to leave CONFIRMED
+    clear_persistence: int = 12  # consecutive clean windows to leave CONFIRMED
     extreme_single_branch: float = 0.1  # a lone branch this low can still confirm
 
 
@@ -112,7 +112,15 @@ def decide(trust_df: pd.DataFrame, dp: DecisionParams, mode: str = "fused") -> p
         looks_fine = bool(np.isfinite(tm) and tm >= dp.theta_high)
 
         bad_streak[tgt] = bad_streak.get(tgt, 0) + 1 if looks_bad else 0
-        good_streak[tgt] = good_streak.get(tgt, 0) + 1 if looks_fine else 0
+
+        # Missing evidence must not reset the recovery counter. A node with no
+        # transit traffic has not failed to forward, and treating silence as
+        # guilt makes CONFIRMED permanent for any lightly loaded node.
+        usable = bool(np.isfinite(tm)) and enough_observers
+        if looks_fine:
+            good_streak[tgt] = good_streak.get(tgt, 0) + 1
+        elif usable:
+            good_streak[tgt] = 0
 
         if prev == CONFIRMED:
             verdict = NORMAL if good_streak[tgt] >= dp.clear_persistence else CONFIRMED

@@ -50,7 +50,7 @@ class TrustParams:
     logistic_softness: float = 1.0
     # Confidence saturation constants (samples needed for half weight).
     n_half_localization: float = 5.0
-    n_half_behaviour: float = 20.0
+    n_half_behaviour: float = 45.0
     # Asymmetric history.
     lambda_decay_down: float = 0.5   # trust falls fast
     lambda_decay_up: float = 0.9     # trust recovers slowly
@@ -61,7 +61,8 @@ class TrustParams:
     combine: str = "stouffer"  # geometric | arithmetic
     score_floor: float = 1e-3   # bounds the geometric mean away from zero
     peer_relative: bool = True  # score behaviour against contemporaneous peers
-    min_peers: int = 8          # below this, fall back to static calibration
+    min_peers: int = 8
+    min_transit_for_evidence: int = 5          # below this, fall back to static calibration
 
     def effective_base_weights(self) -> tuple[float, float]:
         if self.mode == "behaviour":
@@ -206,7 +207,7 @@ def compute_direct(evidence: pd.DataFrame, cal: Calibration, params: TrustParams
 
     loc_available = np.isfinite(ev["residual_mean"].to_numpy())
     beh_available = np.isfinite(ev["fwd_ratio"].to_numpy()) & (
-        ev["transit_rx"].to_numpy() > 0
+        ev["transit_rx"].to_numpy() >= params.min_transit_for_evidence
     )
 
     w_l = wl_base * _confidence(ev["residual_n"].to_numpy(), params.n_half_localization)

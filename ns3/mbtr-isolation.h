@@ -197,6 +197,8 @@ class BlacklistQueueDisc : public QueueDisc
     uint32_t m_nodeId = 0;
 };
 
+NS_OBJECT_ENSURE_REGISTERED(BlacklistQueueDisc);
+
 // ---------------------------------------------------------------------------
 // Schedule loading
 // ---------------------------------------------------------------------------

@@ -36,6 +36,7 @@
 
 #include "mbtr-isolation.h"
 
+#include <filesystem>
 #include <fstream>
 #include <set>
 #include <iomanip>
@@ -53,16 +54,17 @@ NS_LOG_COMPONENT_DEFINE("MbtrSim");
 
 struct SimConfig
 {
-    uint32_t nNodes = 20;
+    uint32_t nNodes = 25;
     uint32_t nBeacons = 3;    // beacons are node ids 0 .. nBeacons-1
-    uint32_t attacker = 2;    // must be < nBeacons
+    uint32_t attacker = 2;
+    uint32_t nAttackers = 1;    // must be < nBeacons
     std::string attack = "none";
     double offsetM = 300.0;   // A1 magnitude
     double dropProb = 0.6;    // A2 magnitude
     double attackStart = 30.0;
     double simTime = 200.0;
-    double areaX = 1000.0;
-    double areaY = 1000.0;
+    double areaX = 500.0;
+    double areaY = 500.0;
     double minSpeed = 1.0;
     double maxSpeed = 5.0;
     double pause = 2.0;
@@ -72,15 +74,20 @@ struct SimConfig
     double beaconInterval = 1.0;
     double window = 10.0;     // observation window
     double windowStep = 5.0;  // 50% overlap
-    double txPowerDbm = 16.0206;
+    double txPowerDbm = 30.0;
     double pathLossExp = 3.0;
     double refLossDb = 46.6777; // loss at 1 m, LogDistance default
+    std::string dataMode = "DsssRate11Mbps";
     uint32_t seed = 1;
     uint32_t run = 1;
     std::string outDir = "results";
     std::string isolationSchedule = "";  // empty = no isolation (Steps 5-7 only)
     std::string mobilityTrace = "";      // empty = synthetic Random Waypoint
     double binS = 1.0;                   // recovery-curve resolution
+    bool useQdisc = true;
+    bool useWrapper = true;
+    double shadowingDb = 0.0;
+    double rssiNoiseDb = 4.0;
 };
 
 static SimConfig g_cfg;
@@ -104,6 +111,12 @@ EffectiveDropProb()
     if (g_cfg.attack == "A3")
         return g_cfg.dropProb * 0.5;
     return 0.0;
+}
+
+static bool
+IsAttackerNode(uint32_t id)
+{
+    return id >= g_cfg.attacker && id < g_cfg.attacker + g_cfg.nAttackers;
 }
 
 static bool
@@ -143,6 +156,8 @@ static std::vector<NodeCounters> g_countersPrev;
 
 // Packet uid -> time the node accepted it for forwarding, for relay latency.
 static std::map<std::pair<uint32_t, uint64_t>, double> g_transitEntryTime;
+
+static Ptr<NormalRandomVariable> g_rssiNoise;
 
 static std::vector<uint64_t> g_rxBytesBin;  // delivered bytes per time bin
 static std::vector<uint64_t> g_rxPktsBin;
@@ -207,6 +222,8 @@ BeaconApp::GetTypeId()
         TypeId("BeaconApp").SetParent<Application>().AddConstructor<BeaconApp>();
     return tid;
 }
+
+NS_OBJECT_ENSURE_REGISTERED(BeaconApp);
 
 void
 BeaconApp::Setup(uint32_t beaconId, bool liesAboutPosition, double offsetM)
@@ -292,6 +309,8 @@ BeaconMonitor::GetTypeId()
     return tid;
 }
 
+NS_OBJECT_ENSURE_REGISTERED(BeaconMonitor);
+
 void
 BeaconMonitor::StartApplication()
 {
@@ -354,7 +373,7 @@ BeaconMonitor::HandleRead(Ptr<Socket> socket)
         double trueD = std::sqrt(std::pow(txPos.x - rxPos.x, 2) +
                                  std::pow(txPos.y - rxPos.y, 2));
 
-        bool isAttacker = AttackActive() && txId == g_cfg.attacker &&
+        bool isAttacker = AttackActive() && IsAttackerNode(txId) &&
                           Simulator::Now().GetSeconds() >= g_cfg.attackStart;
 
         g_beaconRx << std::fixed << std::setprecision(4)
@@ -419,6 +438,8 @@ TransitControlRouting::GetTypeId()
                             .AddConstructor<TransitControlRouting>();
     return tid;
 }
+
+NS_OBJECT_ENSURE_REGISTERED(TransitControlRouting);
 
 TransitControlRouting::TransitControlRouting()
 {
@@ -519,7 +540,12 @@ PhyMonitorRx(uint32_t rxNodeId,
     {
         return;
     }
-    g_rssi[{rxNodeId, it->second}] = {Simulator::Now().GetSeconds(), signalNoise.signal};
+    double rssi = signalNoise.signal;
+    if (g_rssiNoise)
+    {
+        rssi += g_rssiNoise->GetValue();
+    }
+    g_rssi[{rxNodeId, it->second}] = {Simulator::Now().GetSeconds(), rssi};
 }
 
 static void
@@ -590,7 +616,7 @@ SampleWindow()
         double meanDelay = dDelayN ? dDelaySum / dDelayN : -1.0;
 
         bool isBeacon = i < g_cfg.nBeacons;
-        bool isAttacker = AttackActive() && i == g_cfg.attacker && now >= g_cfg.attackStart;
+        bool isAttacker = AttackActive() && IsAttackerNode(i) && now >= g_cfg.attackStart;
 
         g_behaviour << std::fixed << std::setprecision(6) << now << ',' << i << ','
                     << (isBeacon ? 1 : 0) << ',' << dTransit << ',' << dFwd << ','
@@ -616,13 +642,25 @@ main(int argc, char* argv[])
     CommandLine cmd(__FILE__);
     cmd.AddValue("nNodes", "Total nodes", g_cfg.nNodes);
     cmd.AddValue("nBeacons", "Beacon nodes (ids 0..n-1)", g_cfg.nBeacons);
-    cmd.AddValue("attacker", "Attacker node id, must be a beacon", g_cfg.attacker);
+    cmd.AddValue("attacker", "First attacker node id", g_cfg.attacker);
+    cmd.AddValue("nAttackers", "Number of malicious beacons", g_cfg.nAttackers);
     cmd.AddValue("attack", "none | A1 | A2 | A3", g_cfg.attack);
     cmd.AddValue("offset", "A1 location offset in metres", g_cfg.offsetM);
     cmd.AddValue("dropProb", "A2 grey-hole drop probability", g_cfg.dropProb);
     cmd.AddValue("attackStart", "Attack activation time (s)", g_cfg.attackStart);
     cmd.AddValue("simTime", "Simulation duration (s)", g_cfg.simTime);
     cmd.AddValue("nFlows", "Number of CBR flows", g_cfg.nFlows);
+    cmd.AddValue("pktRate", "Packets per second per flow", g_cfg.pktRate);
+    cmd.AddValue("pktSize", "Payload bytes per packet", g_cfg.pktSize);
+    cmd.AddValue("qdisc", "Install BlacklistQueueDisc (0 to disable)", g_cfg.useQdisc);
+    cmd.AddValue("wrapper", "Install TransitControlRouting (0 = plain AODV)", g_cfg.useWrapper);
+    cmd.AddValue("rssiNoise", "RSSI measurement error std dev, dB", g_cfg.rssiNoiseDb);
+    cmd.AddValue("shadowing", "Log-normal shadowing std dev in dB", g_cfg.shadowingDb);
+    cmd.AddValue("areaX", "Field width in metres", g_cfg.areaX);
+    cmd.AddValue("areaY", "Field height in metres", g_cfg.areaY);
+    cmd.AddValue("txPower", "Transmit power in dBm", g_cfg.txPowerDbm);
+    cmd.AddValue("pathLossExp", "Log-distance path loss exponent", g_cfg.pathLossExp);
+    cmd.AddValue("dataMode", "802.11b rate, lower = longer range", g_cfg.dataMode);
     cmd.AddValue("seed", "RNG seed", g_cfg.seed);
     cmd.AddValue("run", "RNG run number", g_cfg.run);
     cmd.AddValue("outDir", "Output directory", g_cfg.outDir);
@@ -641,7 +679,7 @@ main(int argc, char* argv[])
     {
         NS_FATAL_ERROR("Unknown attack: " << g_cfg.attack);
     }
-    if (AttackActive() && g_cfg.attacker >= g_cfg.nBeacons)
+    if (AttackActive() && g_cfg.attacker + g_cfg.nAttackers > g_cfg.nBeacons)
     {
         NS_FATAL_ERROR("Attacker " << g_cfg.attacker << " is not a beacon node");
     }
@@ -651,6 +689,11 @@ main(int argc, char* argv[])
 
     std::string tag = g_cfg.attack + "-seed" + std::to_string(g_cfg.seed) + "-run" +
                       std::to_string(g_cfg.run);
+
+    g_rssiNoise = CreateObject<NormalRandomVariable>();
+    g_rssiNoise->SetAttribute("Mean", DoubleValue(0.0));
+    g_rssiNoise->SetAttribute("Variance",
+                              DoubleValue(g_cfg.rssiNoiseDb * g_cfg.rssiNoiseDb));
 
     // --- nodes -------------------------------------------------------------
     NodeContainer nodes;
@@ -707,7 +750,7 @@ main(int argc, char* argv[])
     wifi.SetStandard(WIFI_STANDARD_80211b);
     wifi.SetRemoteStationManager("ns3::ConstantRateWifiManager",
                                  "DataMode",
-                                 StringValue("DsssRate11Mbps"),
+                                 StringValue(g_cfg.dataMode),
                                  "ControlMode",
                                  StringValue("DsssRate1Mbps"));
 
@@ -718,6 +761,16 @@ main(int argc, char* argv[])
                                DoubleValue(g_cfg.pathLossExp),
                                "ReferenceLoss",
                                DoubleValue(g_cfg.refLossDb));
+
+    if (g_cfg.shadowingDb > 0.0)
+    {
+        channel.AddPropagationLoss("ns3::RandomPropagationLossModel",
+                                   "Variable",
+                                   StringValue("ns3::NormalRandomVariable[Mean=0.0|Variance=" +
+                                               std::to_string(g_cfg.shadowingDb *
+                                                              g_cfg.shadowingDb) +
+                                               "]"));
+    }
 
     YansWifiPhyHelper phy;
     phy.SetChannel(channel.Create());
@@ -734,23 +787,6 @@ main(int argc, char* argv[])
         Mac48Address mac = Mac48Address::ConvertFrom(wd->GetAddress());
         g_macToNode[mac] = nodes.Get(i)->GetId();
         IsolationRegistry::Get().RegisterNodeMac(nodes.Get(i)->GetId(), mac);
-    }
-
-    // --- isolation enforcement layer ---------------------------------------
-    // Installed unconditionally, including on clean runs. With an empty
-    // blacklist the qdisc is a plain FIFO, so its queueing behaviour is present
-    // in the baseline too. Installing it only for isolation runs would confound
-    // the recovery measurement with a change in queue discipline.
-    TrafficControlHelper tch;
-    tch.SetRootQueueDisc("BlacklistQueueDisc");
-    QueueDiscContainer qdiscs = tch.Install(devices);
-    for (uint32_t i = 0; i < qdiscs.GetN(); ++i)
-    {
-        Ptr<BlacklistQueueDisc> bq = DynamicCast<BlacklistQueueDisc>(qdiscs.Get(i));
-        if (bq)
-        {
-            bq->SetNodeId(nodes.Get(i)->GetId());
-        }
     }
 
     // --- routing: TransitControlRouting over AODV --------------------------
@@ -771,6 +807,27 @@ main(int argc, char* argv[])
     stack.SetRoutingHelper(listRouting);
     stack.Install(nodes);
 
+    // --- isolation enforcement layer ---------------------------------------
+    // Installed unconditionally, including on clean runs. With an empty
+    // blacklist the qdisc is a plain FIFO, so its queueing behaviour is present
+    // in the baseline too. Installing it only for isolation runs would confound
+    // the recovery measurement with a change in queue discipline.
+    if (g_cfg.useQdisc)
+    {
+        TrafficControlHelper tch;
+        tch.SetRootQueueDisc("BlacklistQueueDisc");
+        QueueDiscContainer qdiscs = tch.Install(devices);
+        for (uint32_t i = 0; i < qdiscs.GetN(); ++i)
+        {
+            Ptr<BlacklistQueueDisc> bq = DynamicCast<BlacklistQueueDisc>(qdiscs.Get(i));
+            if (bq)
+            {
+                bq->SetNodeId(nodes.Get(i)->GetId());
+            }
+        }
+    }
+
+
     Ipv4AddressHelper addr;
     addr.SetBase("10.1.1.0", "255.255.255.0");
     Ipv4InterfaceContainer ifaces = addr.Assign(devices);
@@ -781,7 +838,7 @@ main(int argc, char* argv[])
     }
 
     double attackerDrop = EffectiveDropProb();
-    for (uint32_t i = 0; i < g_cfg.nNodes; ++i)
+    for (uint32_t i = 0; g_cfg.useWrapper && i < g_cfg.nNodes; ++i)
     {
         Ptr<Ipv4> ipv4 = nodes.Get(i)->GetObject<Ipv4>();
         Ptr<Ipv4ListRouting> list = DynamicCast<Ipv4ListRouting>(ipv4->GetRoutingProtocol());
@@ -790,7 +847,7 @@ main(int argc, char* argv[])
         Ptr<TransitControlRouting> tcr = CreateObject<TransitControlRouting>();
         tcr->SetNodeId(i);
         tcr->SetIpv4(ipv4);
-        if (AttackActive() && i == g_cfg.attacker)
+        if (AttackActive() && IsAttackerNode(i))
         {
             tcr->SetDropProbability(attackerDrop);
         }
@@ -838,7 +895,7 @@ main(int argc, char* argv[])
     for (uint32_t i = 0; i < g_cfg.nBeacons; ++i)
     {
         Ptr<BeaconApp> app = CreateObject<BeaconApp>();
-        app->Setup(i, lies && AttackActive() && i == g_cfg.attacker, EffectiveOffset());
+        app->Setup(i, lies && AttackActive() && IsAttackerNode(i), EffectiveOffset());
         nodes.Get(i)->AddApplication(app);
         app->SetStartTime(Seconds(1.0));
         app->SetStopTime(Seconds(g_cfg.simTime));
@@ -881,6 +938,7 @@ main(int argc, char* argv[])
     }
 
     // --- output files -------------------------------------------------------
+    std::filesystem::create_directories(g_cfg.outDir);
     std::string prefix = g_cfg.outDir + "/" + tag + "-";
 
     g_beaconRx.open(prefix + "beacon_rx.csv");
@@ -897,7 +955,7 @@ main(int argc, char* argv[])
           "param_drop_prob\n";
     for (uint32_t i = 0; i < g_cfg.nNodes; ++i)
     {
-        bool isAtk = AttackActive() && i == g_cfg.attacker;
+        bool isAtk = AttackActive() && IsAttackerNode(i);
         gt << i << ',' << (i < g_cfg.nBeacons ? 1 : 0) << ','
            << (isAtk ? g_cfg.attack : "none") << ','
            << (isAtk ? g_cfg.attackStart : 0.0) << ','
