@@ -1,0 +1,2 @@
+attack,seed,run,pdr,throughput_kbps,mean_delay_ms,total_tx,total_rx,malicious_drops,energy_used_j,isolations,blocked_frames
+A3,1,1,0.728149,383.194,31.8899,46680,33990,241,1822.89,0,0
