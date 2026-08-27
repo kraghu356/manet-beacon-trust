@@ -44,3 +44,17 @@ throughput_debt_kbit is not trustworthy yet: nonzero on clean runs (12184 kbit),
 A1 and none recovery curves are byte-identical (cmp confirms, all seeds).
 A1 is pure false-location: attacker forwards honestly. Report A1 against localization
   error, not PDR. Yesterday's isolation-PDR null on A1 measured an effect that cannot exist.
+
+## EMBN-MANET (Kuriakose, Joshi, Bairwa; Ad Hoc Networks 140:103063, 2023)
+Read from SSRN preprint 4148530 on Aug 27.
+Evidence: RSSI + trilateration only, k-polytopes centroids. No behavioural component.
+Attack model: beacon spoofs false location coordinates. NO forwarding attack considered.
+  => A2 and A3 are outside their threat model, not failures of their method.
+Response: reputation value assigned; beacon excluded from LOCALIZATION COORDINATION.
+  => NOT packet-forwarding blacklisting. Arm D is NOT EMBN. Relabel arm D as
+  'immediate isolation on suspicion', a policy of our own design.
+Accuracy: 100% when fewer than 4 malicious beacons per neighbourhood, >85% above four.
+  The abstract's flat 90% is the less precise figure; cite the conditional one.
+Their stated limitation: static beacon nodes only; mobile beacons named as future work.
+  Our beacons are mobile. Clean differentiator, in their own framing.
+Fair comparison axis: detection coverage (our E2 models their evidence class; E2 = 0/5 on A2).
