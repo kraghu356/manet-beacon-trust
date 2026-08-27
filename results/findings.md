@@ -17,3 +17,10 @@ No fusion detection advantage.
 Fusion FP advantage reverses with clear_persistence.
 Isolation: no measurable PDR effect.
 Arm D matches or beats arm E everywhere tested.
+
+## Clean-network false isolation (5 seeds, no attacker, 400s)
+D isolates 3/3 honest nodes in 5/5 seeds, never releases: 15/15 node-seeds.
+E isolates 1/15 node-seeds (seed1 node1, t=110, released t=355).
+Isolation-seconds on honest nodes: D mean 1054, E mean 49 (21.5x reduction).
+No isolate-release churn in E; the schedules are correct, not buggy.
+Fused detector false-confirmed once on a clean network (seed1 node1, t=110).

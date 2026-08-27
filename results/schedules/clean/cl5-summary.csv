@@ -1,0 +1,4 @@
+target,is_attacker,ever_confirmed,first_confirmation_s,detection_latency_s,confirmed_windows,total_windows
+0,0,0,,,0,76
+1,0,0,,,0,79
+2,0,0,,,0,79
