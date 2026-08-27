@@ -58,3 +58,14 @@ Accuracy: 100% when fewer than 4 malicious beacons per neighbourhood, >85% above
 Their stated limitation: static beacon nodes only; mobile beacons named as future work.
   Our beacons are mobile. Clean differentiator, in their own framing.
 Fair comparison axis: detection coverage (our E2 models their evidence class; E2 = 0/5 on A2).
+
+## Arm comparison under attack (Aug 27, 45 runs, A1/A2/A3 x C/D/E x 5 seeds)
+Detection identical across arms within each attack (fp 0.20/0.00/0.25), as expected:
+  arms differ only in post-verdict policy, so any arm difference is isolation policy alone.
+D isolates at ~20s mean, BEFORE the attack starts at 30s, in all three attacks.
+  D's fast recovery_time (4.5-6.2s) is therefore an artifact of isolating pre-attack.
+E isolates at 45s (A1, A3) and 54s (A2), zero variance: confirmation is deterministic.
+throughput_debt shows no consistent ordering across attacks and CIs exceed differences.
+  Combined with nonzero debt on clean runs, this metric is not usable. Excluded.
+Conclusion: no throughput advantage for either arm survives its CI.
+  Objective 4 rests on false-isolation cost (clean network: D 15/15, E 1/15), not throughput.
