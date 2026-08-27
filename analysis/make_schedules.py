@@ -4,7 +4,7 @@ Three arms are generated from the SAME verdict stream, so the comparison in
 Step 12 varies one thing only: what the network does with the verdict.
 
     C  detection only        verdicts produced, nothing isolated
-    D  EMBN-style            isolate on first *suspicion*, never release
+    D  immediate-isolation    isolate on first *suspicion*, never release (our design, NOT EMBN)
     E  proposed              isolate on *confirmation*, release if cleared
 
 D is the closest prior work's behaviour as this project models it, and modelling
