@@ -64,7 +64,7 @@ notification step.
 | A | Clean AODV | ceiling |
 | B | AODV + malicious beacon, no defence | damage floor |
 | C | Detection only, no isolation | shows detection alone is insufficient |
-| D | EMBN-style: isolate on first suspicion, never release | closest prior work |
+| D | Immediate isolation on first suspicion, never release | our design, not a model of prior work |
 | E | Proposed: confirm, isolate, release if cleared | contribution |
 
 C, D and E consume the **same verdict stream** and differ only in what the network
