@@ -69,3 +69,9 @@ throughput_debt shows no consistent ordering across attacks and CIs exceed diffe
   Combined with nonzero debt on clean runs, this metric is not usable. Excluded.
 Conclusion: no throughput advantage for either arm survives its CI.
   Objective 4 rests on false-isolation cost (clean network: D 15/15, E 1/15), not throughput.
+
+## A3 is not a fusion-only region (Aug 27)
+At half intensity on both axes, all three modes detect the attacker 5/5:
+  behaviour 11111, localization 11111, fused 11111.
+Fusion adds nothing on A3. The coverage claim rests on A1/A2 blindness (structural),
+  not on sensitivity to weak signals. Sensitivity advantage tested and not found.
