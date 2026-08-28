@@ -75,3 +75,11 @@ At half intensity on both axes, all three modes detect the attacker 5/5:
   behaviour 11111, localization 11111, fused 11111.
 Fusion adds nothing on A3. The coverage claim rests on A1/A2 blindness (structural),
   not on sensitivity to weak signals. Sensitivity advantage tested and not found.
+
+## A1 offset is diagonal and clamped (Aug 28)
+mbtr-sim.cc:276-277 adds the same offset d to BOTH x and y, then clamps to the field.
+Nominal d=300m therefore gives displacement d*sqrt(2)=424m before clamping,
+and 267m measured mean after clamping (p95 299m, median 271m).
+Effective attack strength depends on the beacon's position in the field.
+Table 4 must say: per-axis offset 300m, applied diagonally, clamped; measured mean 267m.
+Sweep x-axis must be plotted against MEASURED displacement, not nominal f.
