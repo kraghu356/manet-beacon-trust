@@ -83,3 +83,11 @@ and 267m measured mean after clamping (p95 299m, median 271m).
 Effective attack strength depends on the beacon's position in the field.
 Table 4 must say: per-axis offset 300m, applied diagonally, clamped; measured mean 267m.
 Sweep x-axis must be plotted against MEASURED displacement, not nominal f.
+
+## Paper 3 baseline (Aug 29)
+manet-gen: 80211b DsssRate11Mbps, plExp=2.5, txPower=23dBm, 10 flows @ 4pkt/s, 512B
+100 nodes @ 1500x1500m: PDR 0.824, hops 2.18, delay 43ms
+50 nodes @ 1060x1060m:  PDR 0.824, hops 2.50
+802.11g breaks AODV multi-hop entirely: hops=1.0 in every config tested.
+Distance-based flow pairing FAILED: positions are zero at app-setup time.
+150 nodes still single-hop; unresolved, affects scalability test only.
