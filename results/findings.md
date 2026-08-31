@@ -156,3 +156,18 @@ Drop rate exact: 2561/5094 at p=0.5. Forge alone does no damage.
 Seed variance is large: same config gave PDR 0.532/0.672/0.692 across 3 seeds.
 parallel -j3 on the raw binary: 2.4x speedup, ~95s per 300s run.
 Campaign estimate: 120 runs at 900s ~= 3.3 h with -j3.
+
+## Paper 3: feature extractor working (Aug 29)
+Per-node per-10s-window CSV: fwd_seen, fwd_ok, fwd_drop, no_route, fwd_ratio,
+  rreq_recv, speed, is_malicious, label. All nodes run aodvatk (honest with
+  EnableBlackHole=false) so counters are collected uniformly.
+fwd_ratio = fwd_ok / (fwd_ok + fwd_drop): excludes no-route failures, which are
+  routing conditions rather than misbehaviour. Honest nodes now read exactly 1.000.
+Forge and drop split into separate attributes (ForgeRrep, DropProb).
+  BHA (forge, p=1.0):        attacker ratio 0.000, F1 1.000
+  GHA hijacking (forge,0.5): attacker ratio 0.141, F1 0.985 -- forge causes
+    20.7 no-route events/window, so the attack is detected via route failure.
+  GHA pure (no forge, 0.5):  attacker ratio 0.517, F1 0.981 -- honest detection.
+Note: fwd_drop and fwd_ok leak the label for BHA (definitionally 0). Exclude
+  from the feature set; fwd_ratio alone gives F1 0.95, without it 0.70.
+Single-run CV: leaks across windows. Real evaluation needs run-level splits.
