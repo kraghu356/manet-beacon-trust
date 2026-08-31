@@ -171,3 +171,12 @@ Forge and drop split into separate attributes (ForgeRrep, DropProb).
 Note: fwd_drop and fwd_ok leak the label for BHA (definitionally 0). Exclude
   from the feature set; fwd_ratio alone gives F1 0.95, without it 0.70.
 Single-run CV: leaks across windows. Real evaluation needs run-level splits.
+
+## Paper 3: sinkhole (Aug 29)
+Sinkhole = forge RREPs, drop nothing (--forge=1 --dropProb=0.0).
+attacker fwd_ratio 1.000 (identical to honest); detected via no_route 33.1 vs 1.1
+and fwd_seen 38.7 vs 13.6. F1 0.886.
+=> Distinct signature from BHA/GHA: the sinkhole advertises routes it cannot
+   serve, so it fails to forward rather than refusing to. Three attacks now
+   have three different feature signatures, which is what the multi-class
+   problem needs.
