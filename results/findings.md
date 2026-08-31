@@ -137,3 +137,14 @@ Rename gotchas: NS_LOG_COMPONENT_DEFINE strings and the AodvHelper class name
 src/aodvatk = private AODV clone. Forged RREP in RecvRequest, drop in Forwarding().
 100 nodes, 1500x1500m, 80211b, plExp 2.5, txP 23dBm: 0 mal PDR 0.824 hops 2.18,
   5 mal PDR 0.532 hops 1.28, 10 mal PDR 0.568 hops 1.19.
+
+## Paper 3: BHA and GHA verified (Aug 29)
+src/aodvatk: forged RREP in RecvRequest, probabilistic drop in Forwarding().
+100 nodes, 1500x1500m, 80211b, plExp 2.5, txP 23dBm, 5 malicious:
+  dropProb 0.0: PDR 0.867 (forge alone does no damage; attackers relay honestly)
+  dropProb 0.5: PDR 0.826, 2561/5094 dropped (50.3%, matches target)
+  dropProb 1.0: PDR 0.532, 5583/5583 dropped
+Non-linear: 50% drop costs 4 PDR points, 100% costs 33. AODV keeps a lossy
+  route alive but tears down a dead one, triggering rediscovery.
+=> GHA is near-invisible in network PDR but obvious in per-node forwarding
+  ratio. Confirms per-node-window is the right dataset unit.
