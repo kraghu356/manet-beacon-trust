@@ -110,3 +110,14 @@ Attributes: EnableBlackHole (bool), DropProb (0-1; 1.0=BHA, 0.3-0.8=GHA).
 Hop count drop confirms the forge: attackers advertise 1-hop routes to everything.
 Module rename gotchas: NS_LOG_COMPONENT_DEFINE names and the helper class
   (AodvHelper -> AodvAtkHelper) both collide with stock aodv if not renamed.
+
+## Paper 3: black hole verified (Aug 29)
+src/aodvatk = private AODV clone. Forged RREP in RecvRequest, drop in Forwarding().
+Attributes: EnableBlackHole, DropProb (1.0=BHA, 0.3-0.8=GHA).
+100 nodes, 1500x1500m, 80211b, plExp 2.5, txP 23dBm, 10 flows @ 4pkt/s:
+  0 malicious:  PDR 0.824 hops 2.18
+  5 malicious:  PDR 0.532 hops 1.28
+  10 malicious: PDR 0.568 hops 1.19
+Hop drop 2.18->1.28 confirms the forge is working.
+Rename gotchas: NS_LOG_COMPONENT_DEFINE strings and AodvHelper class name
+  both collide with stock aodv.
