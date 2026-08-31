@@ -132,3 +132,8 @@ Attributes: EnableBlackHole, DropProb (1.0=BHA, 0.3-0.8=GHA).
 Hop drop 2.18->1.28 confirms the forge works.
 Rename gotchas: NS_LOG_COMPONENT_DEFINE strings and the AodvHelper class name
   both collide with stock aodv and must be renamed.
+
+## Paper 3: black hole verified (Aug 29)
+src/aodvatk = private AODV clone. Forged RREP in RecvRequest, drop in Forwarding().
+100 nodes, 1500x1500m, 80211b, plExp 2.5, txP 23dBm: 0 mal PDR 0.824 hops 2.18,
+  5 mal PDR 0.532 hops 1.28, 10 mal PDR 0.568 hops 1.19.
