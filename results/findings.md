@@ -99,3 +99,14 @@ manet-gen: 80211b DsssRate11Mbps, plExp=2.5, txPower=23dBm, 10 flows @ 4pkt/s, 5
 802.11g breaks AODV multi-hop: hops=1.0 in every configuration tested.
 Distance-based flow pairing failed: node positions are zero at app-setup time.
 150 nodes still single-hop; affects scalability test only, not the main experiment.
+
+## Paper 3: black hole implemented and verified (Aug 29)
+src/aodvatk = private AODV clone; forged RREP in RecvRequest + drop in Forwarding().
+Attributes: EnableBlackHole (bool), DropProb (0-1; 1.0=BHA, 0.3-0.8=GHA).
+100 nodes, 1500x1500m, 80211b, plExp 2.5, txPower 23dBm, 10 flows @ 4pkt/s:
+  0 malicious:  PDR 0.824  hops 2.18
+  5 malicious:  PDR 0.532  hops 1.28
+  10 malicious: PDR 0.568  hops 1.19
+Hop count drop confirms the forge: attackers advertise 1-hop routes to everything.
+Module rename gotchas: NS_LOG_COMPONENT_DEFINE names and the helper class
+  (AodvHelper -> AodvAtkHelper) both collide with stock aodv if not renamed.
