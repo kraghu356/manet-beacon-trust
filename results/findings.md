@@ -148,3 +148,11 @@ Non-linear: 50% drop costs 4 PDR points, 100% costs 33. AODV keeps a lossy
   route alive but tears down a dead one, triggering rediscovery.
 => GHA is near-invisible in network PDR but obvious in per-node forwarding
   ratio. Confirms per-node-window is the right dataset unit.
+
+## Paper 3: BHA/GHA verified, parallel confirmed (Aug 29)
+src/aodvatk: forged RREP in RecvRequest, probabilistic drop in Forwarding().
+5 malicious of 100, dropProb 0.0/0.5/1.0 -> PDR 0.867/0.826/0.532.
+Drop rate exact: 2561/5094 at p=0.5. Forge alone does no damage.
+Seed variance is large: same config gave PDR 0.532/0.672/0.692 across 3 seeds.
+parallel -j3 on the raw binary: 2.4x speedup, ~95s per 300s run.
+Campaign estimate: 120 runs at 900s ~= 3.3 h with -j3.
