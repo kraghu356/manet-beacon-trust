@@ -91,3 +91,11 @@ manet-gen: 80211b DsssRate11Mbps, plExp=2.5, txPower=23dBm, 10 flows @ 4pkt/s, 5
 802.11g breaks AODV multi-hop entirely: hops=1.0 in every config tested.
 Distance-based flow pairing FAILED: positions are zero at app-setup time.
 150 nodes still single-hop; unresolved, affects scalability test only.
+
+## Paper 3 baseline (Aug 29)
+manet-gen: 80211b DsssRate11Mbps, plExp=2.5, txPower=23dBm, 10 flows @ 4pkt/s, 512B
+100 nodes @ 1500x1500m: PDR 0.824, hops 2.18, delay 43ms
+50 nodes @ 1060x1060m:  PDR 0.824, hops 2.50
+802.11g breaks AODV multi-hop: hops=1.0 in every configuration tested.
+Distance-based flow pairing failed: node positions are zero at app-setup time.
+150 nodes still single-hop; affects scalability test only, not the main experiment.
