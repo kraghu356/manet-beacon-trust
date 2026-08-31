@@ -198,6 +198,8 @@ class RoutingProtocol : public Ipv4RoutingProtocol
   public:
     /// Forge route replies claiming a fresh 1-hop route to any destination.
     bool m_blackHole{false};
+    /// Forge RREPs to hijack routes. Independent of dropping.
+    bool m_forgeRrep{true};
     /// Probability of discarding a data packet this node agreed to forward.
     /// 1.0 = black hole, 0.3-0.8 = grey hole.
     double m_dropProb{1.0};

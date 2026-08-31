@@ -10,8 +10,42 @@
 #include <fstream>
 #include <iomanip>
 #include <sys/stat.h>
+#include <map>
+#include <array>
+#include <cmath>
 using namespace ns3;
-namespace ns3 { namespace aodvatk { uint64_t GetBhDrops(); uint64_t GetBhSeen(); } }
+namespace ns3 { namespace aodvatk {
+uint64_t GetBhDrops(); uint64_t GetBhSeen();
+uint64_t CtrFwdSeen(uint32_t); uint64_t CtrFwdOk(uint32_t);
+uint64_t CtrFwdDrop(uint32_t); uint64_t CtrRreqRecv(uint32_t);
+uint64_t CtrNoRoute(uint32_t);
+} }
+static std::ofstream g_feat;
+static std::map<uint32_t, std::array<uint64_t,5>> g_prev;
+static void EmitWindow(NodeContainer nodes, uint32_t nMal, double win) {
+  double t = Simulator::Now().GetSeconds();
+  for (uint32_t i = 0; i < nodes.GetN(); ++i) {
+    uint64_t a = aodvatk::CtrFwdSeen(i), b = aodvatk::CtrFwdOk(i);
+    uint64_t c = aodvatk::CtrFwdDrop(i), d = aodvatk::CtrRreqRecv(i);
+    uint64_t e = aodvatk::CtrNoRoute(i);
+    auto& pv = g_prev[i];
+    uint64_t ds=a-pv[0], dok=b-pv[1], ddr=c-pv[2], drq=d-pv[3], dnr=e-pv[4];
+    pv = {a,b,c,d,e};
+    Ptr<MobilityModel> mm = nodes.Get(i)->GetObject<MobilityModel>();
+    Vector v = mm->GetVelocity();
+    // Ratio excludes packets that could not be forwarded for lack of a
+    // route: that is a routing failure, not misbehaviour, and honest nodes
+    // experience it constantly under mobility.
+    uint64_t den = dok + ddr;
+    double fr = den ? (double)dok/den : 1.0;
+    bool mal = (i >= nodes.GetN() - nMal);
+    g_feat << t << "," << i << "," << ds << "," << dok << "," << ddr << ","
+           << fr << "," << drq << "," << dnr << "," << std::sqrt(v.x*v.x+v.y*v.y) << ","
+           << (mal?1:0) << "," << (mal?"BHA":"Normal") << "\n";
+  }
+  g_feat.flush();
+  Simulator::Schedule(Seconds(win), &EmitWindow, nodes, nMal, win);
+}
 struct Cfg {
   uint32_t nNodes = 50;
   double areaX = 700.0, areaY = 700.0;
@@ -28,6 +62,7 @@ struct Cfg {
   double routeTimeout = 10.0;
   uint32_t nMalicious = 0;
   double dropProb = 1.0;
+  bool forgeRrep = true;
   uint32_t seed = 1;
   std::string outDir = "out";
 };
@@ -52,6 +87,7 @@ int main(int argc, char* argv[]) {
   cmd.AddValue("hello", "aodv hello", g.enableHello);
   cmd.AddValue("routeTimeout", "active route timeout s", g.routeTimeout);
   cmd.AddValue("nMalicious", "number of black hole nodes", g.nMalicious);
+  cmd.AddValue("forge", "forge RREPs (0=drop only)", g.forgeRrep);
   cmd.AddValue("dropProb", "drop probability for malicious nodes", g.dropProb);
   cmd.AddValue("seed", "rng seed", g.seed);
   cmd.AddValue("outDir", "output dir", g.outDir);
@@ -104,13 +140,20 @@ int main(int argc, char* argv[]) {
   atk.Set("ActiveRouteTimeout", TimeValue(Seconds(g.routeTimeout)));
   atk.Set("EnableBlackHole", BooleanValue(true));
   atk.Set("DropProb", DoubleValue(g.dropProb));
+  atk.Set("ForgeRrep", BooleanValue(g.forgeRrep));
   NodeContainer honest, malicious;
   for (uint32_t i = 0; i < g.nNodes; ++i) {
     if (i >= g.nNodes - g.nMalicious) malicious.Add(nodes.Get(i));
     else honest.Add(nodes.Get(i));
   }
+  // Every node runs the instrumented module so that per-node counters are
+  // collected uniformly. Honest nodes simply have the attack disabled.
+  AodvAtkHelper honestStack;
+  honestStack.Set("EnableHello", BooleanValue(g.enableHello));
+  honestStack.Set("ActiveRouteTimeout", TimeValue(Seconds(g.routeTimeout)));
+  honestStack.Set("EnableBlackHole", BooleanValue(false));
   InternetStackHelper internet;
-  internet.SetRoutingHelper(aodv);
+  internet.SetRoutingHelper(honestStack);
   internet.Install(honest);
   if (g.nMalicious > 0) {
     InternetStackHelper atkStack;
@@ -137,6 +180,9 @@ int main(int argc, char* argv[]) {
     app.Start(Seconds(1.0 + rv->GetValue(0.0, 5.0)));
     app.Stop(Seconds(g.simTime));
   }
+  g_feat.open(g.outDir + "/features.csv");
+  g_feat << "time_s,node_id,fwd_seen,fwd_ok,fwd_drop,fwd_ratio,rreq_recv,no_route,speed,is_malicious,label\n";
+  Simulator::Schedule(Seconds(10.0), &EmitWindow, nodes, g.nMalicious, 10.0);
   FlowMonitorHelper fmh;
   Ptr<FlowMonitor> mon = fmh.InstallAll();
   Simulator::Stop(Seconds(g.simTime));
@@ -168,6 +214,7 @@ int main(int argc, char* argv[]) {
             << std::setprecision(4) << pdr << "  delay=" << std::setprecision(1)
             << delay << "ms  hops=" << std::setprecision(2) << hops
             << "  tx=" << tx << " rx=" << rx << std::endl;
+  g_feat.close();
   Simulator::Destroy();
   return 0;
 }

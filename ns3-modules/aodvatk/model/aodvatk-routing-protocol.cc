@@ -14,6 +14,7 @@
  *          Pavel Boyko <boyko@iitp.ru>
  */
 
+#include <map>
 #include "aodvatk-routing-protocol.h"
 
 #include "ns3/adhoc-wifi-mac.h"
@@ -49,6 +50,18 @@ NS_LOG_COMPONENT_DEFINE("AodvAtkRoutingProtocol");
 namespace aodvatk
 {
 
+struct NodeCounters {
+  uint64_t fwdSeen = 0, fwdOk = 0, fwdDrop = 0;
+  uint64_t rreqRecv = 0, rrepSent = 0, noRoute = 0;
+};
+std::map<uint32_t, NodeCounters> g_ctr;
+NodeCounters& Ctr(uint32_t id) { return g_ctr[id]; }
+uint64_t CtrFwdSeen(uint32_t i) { return g_ctr[i].fwdSeen; }
+uint64_t CtrFwdOk(uint32_t i)   { return g_ctr[i].fwdOk; }
+uint64_t CtrFwdDrop(uint32_t i) { return g_ctr[i].fwdDrop; }
+uint64_t CtrRreqRecv(uint32_t i){ return g_ctr[i].rreqRecv; }
+uint64_t CtrRrepSent(uint32_t i){ return g_ctr[i].rrepSent; }
+uint64_t CtrNoRoute(uint32_t i){ return g_ctr[i].noRoute; }
 uint64_t g_bhDrops = 0;
 uint64_t g_bhFwdSeen = 0;
 uint64_t GetBhDrops() { return g_bhDrops; }
@@ -188,6 +201,11 @@ RoutingProtocol::GetTypeId()
             .SetParent<Ipv4RoutingProtocol>()
             .SetGroupName("Aodv")
             .AddConstructor<RoutingProtocol>()
+            .AddAttribute("ForgeRrep",
+                          "Forge route replies to attract traffic",
+                          BooleanValue(true),
+                          MakeBooleanAccessor(&RoutingProtocol::m_forgeRrep),
+                          MakeBooleanChecker())
             .AddAttribute("EnableBlackHole",
                           "Forge RREPs and discard forwarded data",
                           BooleanValue(false),
@@ -656,6 +674,10 @@ RoutingProtocol::Forwarding(Ptr<const Packet> p,
     // is what makes the forwarding ratio collapse, which is the signal the
     // behavioural features detect. m_dropProb = 1.0 is a black hole;
     // 0.3-0.8 is a grey hole.
+    {
+        uint32_t nid = m_ipv4->GetObject<Node>()->GetId();
+        Ctr(nid).fwdSeen++;
+    }
     if (m_blackHole)
     {
         g_bhFwdSeen++;
@@ -666,6 +688,7 @@ RoutingProtocol::Forwarding(Ptr<const Packet> p,
         if (m_dropRv->GetValue(0.0, 1.0) < m_dropProb)
         {
             g_bhDrops++;
+            Ctr(m_ipv4->GetObject<Node>()->GetId()).fwdDrop++;
             return true;
         }
     }
@@ -704,6 +727,7 @@ RoutingProtocol::Forwarding(Ptr<const Packet> p,
             m_nb.Update(route->GetGateway(), m_activeRouteTimeout);
             m_nb.Update(toOrigin.GetNextHop(), m_activeRouteTimeout);
 
+            Ctr(m_ipv4->GetObject<Node>()->GetId()).fwdOk++;
             ucb(route, p, header);
             return true;
         }
@@ -712,7 +736,7 @@ RoutingProtocol::Forwarding(Ptr<const Packet> p,
             if (toDst.GetValidSeqNo())
             {
                 SendRerrWhenNoRouteToForward(dst, toDst.GetSeqNo(), origin);
-                NS_LOG_DEBUG("Drop packet " << p->GetUid() << " because no route to forward it.");
+                Ctr(m_ipv4->GetObject<Node>()->GetId()).noRoute++;
                 return false;
             }
         }
@@ -720,6 +744,7 @@ RoutingProtocol::Forwarding(Ptr<const Packet> p,
     NS_LOG_LOGIC("route not found to " << dst << ". Send RERR message.");
     NS_LOG_DEBUG("Drop packet " << p->GetUid() << " because no route to forward it.");
     SendRerrWhenNoRouteToForward(dst, 0, origin);
+    Ctr(m_ipv4->GetObject<Node>()->GetId()).noRoute++;
     return false;
 }
 
@@ -1371,13 +1396,14 @@ RoutingProtocol::RecvRequest(Ptr<Packet> p, Ipv4Address receiver, Ipv4Address sr
      * and RREQ ID. If such a RREQ has been received, the node silently discards the newly received
      * RREQ.
      */
+    Ctr(m_ipv4->GetObject<Node>()->GetId()).rreqRecv++;
     if (m_rreqIdCache.IsDuplicate(origin, id))
     {
         NS_LOG_DEBUG("Ignoring RREQ due to duplicate");
         return;
     }
 
-    if (m_blackHole)
+    if (m_blackHole && m_forgeRrep)
     {
         RoutingTableEntry toOrigin;
         if (!m_routingTable.LookupRoute(origin, toOrigin))
