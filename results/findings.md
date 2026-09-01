@@ -263,3 +263,15 @@ Sinkhole and wormhole are mutually confused: both show high no_route with
   normal fwd_ratio. A per-node classifier cannot separate them.
   => the concrete gap a graph model must close.
 Imbalance: 7314 Normal vs 47 GHA windows. Motivates focal loss.
+
+## Paper 3: temporal features (Aug 29)
+EWMA(alpha=0.3) of fwd_ratio, no_route, nb_max_dist, rreq_sent, plus slope.
+Binary grey hole, run-level split: F1 0.9805 -> 0.9981.
+Multi-class macro F1 0.898 -> 0.924. Per class:
+  Flood 0.990 | BHA 0.975 | GHA 0.957 | Normal 0.998 | Sink 0.823 | Worm 0.800
+GOTCHA: EWMA must be grouped by (run, node_id). Grouping by (class, node_id)
+  pools honest nodes from different runs and destroyed flooding precision
+  (1.000 -> 0.581).
+Sink/Worm remain the hard pair (recall 0.78 / 0.68): both show high no_route
+  with normal fwd_ratio. Temporal smoothing does not separate them, which
+  confirms the distinction is structural and motivates the graph model.
