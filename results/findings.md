@@ -190,3 +190,15 @@ CAUTION: rreq_sent currently counts only flood RREQs, so honest nodes read
   exactly 0 -- label leakage. Hook SendRequest() to count all originated RREQs.
 Four attacks, four distinct signatures:
   BHA fwd_ratio 0.000 | GHA 0.517 | Sinkhole no_route 33.1 | Flood rreq_sent 48.4
+
+## Paper 3: flooding attack (Aug 29)
+FloodRate attribute: bogus RREQs/s to random unreachable 10.1.1.x addresses.
+rreq_recv does NOT discriminate (1479 vs 1439): a broadcast storm is heard by
+  everyone, so it cannot separate source from bystander. F1 0.678.
+rreq_sent does: 48.4/window vs 0.00. F1 0.989.
+CAUTION: rreq_sent counted only flood RREQs, so honest nodes read exactly 0.
+  Label leakage, same class of defect as fwd_drop. Fix pending: hook
+  SendRequest() to count all originated RREQs.
+Four attacks, four distinct signatures:
+  BHA fwd_ratio 0.000 | GHA 0.517 | Sinkhole no_route 33.1 | Flood rreq_sent 48.4
+Remaining: wormhole, time-varying GHA, run-level splitting, campaign.
