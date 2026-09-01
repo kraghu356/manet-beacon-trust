@@ -235,3 +235,13 @@ Macro F1 0.9805 vs 0.981 single-run CV: NO meaningful leakage.
   0 false positives across 2927 honest windows; 10 of 139 attacker windows missed.
 Misses are likely windows where a p=0.5 grey hole forwarded most traffic by
   chance. Temporal features (EWMA of fwd_ratio) should recover them.
+
+## Paper 3: multi-class baseline (Aug 29)
+Six classes, random forest, 5-fold CV. Macro F1 0.898, accuracy 0.992.
+  Flooding 0.990 | BHA 0.981 | Normal 0.996 | GHA 0.933 | Sink 0.777 | Worm 0.709
+Sinkhole and wormhole are mutually confused: both show high no_route (33 vs 40)
+  with normal fwd_ratio. A per-node classifier cannot separate them.
+  => this is the concrete gap the graph model must close. The distinction is
+  structural: sinkhole attracts unservable routes; wormhole creates a fake
+  adjacency between two specific nodes.
+Severe imbalance: 7314 Normal vs 47 GHA windows. Motivates focal loss.
