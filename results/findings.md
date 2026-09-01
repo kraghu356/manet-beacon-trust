@@ -213,3 +213,16 @@ Four attacks, four leak-free signatures:
   GHA  fwd_ratio 0.517 vs 1.000  F1 0.98
   Sink no_route  33.1  vs 1.1    F1 0.89
   Flood rreq_sent 307.6 vs 1.52  F1 0.99
+
+## Paper 3: wormhole implemented, all five attacks done (Aug 29)
+WormPartner attribute + registry; RREQ heard by one endpoint replayed by the
+other with no hop increment. Recursion guard needed; replay must use the
+receiving node's OWN interface address or GetNetDevice segfaults.
+Effect: hops 2.18 -> 1.67, PDR 0.841 (unharmed). Endpoints forward honestly.
+Detection with behavioural features only: F1 0.611.
+  fwd_ratio 1.0 both classes; no_route LOWER for attackers; rreq_sent ~equal.
+  Only weak signal is fwd_seen 40.6 vs 24.6 (traffic converges on the tunnel).
+=> Behavioural features cannot detect a topological attack. This is the
+   justification for neighbour-distance / neighbour-churn features and for
+   the graph component of the teacher.
+Difficulty spread: BHA 1.00, Flood 0.99, GHA 0.98, Sink 0.89, Worm 0.61.
