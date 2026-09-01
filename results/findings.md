@@ -226,3 +226,12 @@ Detection with behavioural features only: F1 0.611.
    justification for neighbour-distance / neighbour-churn features and for
    the graph component of the teacher.
 Difficulty spread: BHA 1.00, Flood 0.99, GHA 0.98, Sink 0.89, Worm 0.61.
+
+## Paper 3: run-level split validated (Aug 29)
+10 grey-hole runs, train seeds 1-7 (4801 rows), test 8-10 (3066 rows).
+No window from a test run appears in training (spec section 22).
+Macro F1 0.9805 vs 0.981 single-run CV: NO meaningful leakage.
+  precision 1.000, recall 0.928 on the malicious class.
+  0 false positives across 2927 honest windows; 10 of 139 attacker windows missed.
+Misses are likely windows where a p=0.5 grey hole forwarded most traffic by
+  chance. Temporal features (EWMA of fwd_ratio) should recover them.
