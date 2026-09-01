@@ -202,3 +202,14 @@ CAUTION: rreq_sent counted only flood RREQs, so honest nodes read exactly 0.
 Four attacks, four distinct signatures:
   BHA fwd_ratio 0.000 | GHA 0.517 | Sinkhole no_route 33.1 | Flood rreq_sent 48.4
 Remaining: wormhole, time-varying GHA, run-level splitting, campaign.
+
+## Paper 3: flooding, leak fixed (Aug 29)
+rreq_sent now hooks SendRequest(), counting ALL originated RREQs.
+Honest nodes: 1.52/window (real AODV discovery). Attackers: 307.6.
+F1 0.9946, up from 0.9886 with the leaky version.
+307.6 vs a floodRate of 5/s: AODV retries each bogus RREQ with expanding TTL.
+Four attacks, four leak-free signatures:
+  BHA  fwd_ratio 0.000 vs 1.000  F1 1.00
+  GHA  fwd_ratio 0.517 vs 1.000  F1 0.98
+  Sink no_route  33.1  vs 1.1    F1 0.89
+  Flood rreq_sent 307.6 vs 1.52  F1 0.99
