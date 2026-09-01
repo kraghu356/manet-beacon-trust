@@ -19,18 +19,20 @@ uint64_t GetBhDrops(); uint64_t GetBhSeen();
 uint64_t CtrFwdSeen(uint32_t); uint64_t CtrFwdOk(uint32_t);
 uint64_t CtrFwdDrop(uint32_t); uint64_t CtrRreqRecv(uint32_t);
 uint64_t CtrNoRoute(uint32_t);
+uint64_t CtrRrepSent(uint32_t);
 } }
 static std::ofstream g_feat;
-static std::map<uint32_t, std::array<uint64_t,5>> g_prev;
+static std::map<uint32_t, std::array<uint64_t,6>> g_prev;
 static void EmitWindow(NodeContainer nodes, uint32_t nMal, double win) {
   double t = Simulator::Now().GetSeconds();
   for (uint32_t i = 0; i < nodes.GetN(); ++i) {
     uint64_t a = aodvatk::CtrFwdSeen(i), b = aodvatk::CtrFwdOk(i);
     uint64_t c = aodvatk::CtrFwdDrop(i), d = aodvatk::CtrRreqRecv(i);
     uint64_t e = aodvatk::CtrNoRoute(i);
+    uint64_t f = aodvatk::CtrRrepSent(i);
     auto& pv = g_prev[i];
-    uint64_t ds=a-pv[0], dok=b-pv[1], ddr=c-pv[2], drq=d-pv[3], dnr=e-pv[4];
-    pv = {a,b,c,d,e};
+    uint64_t ds=a-pv[0], dok=b-pv[1], ddr=c-pv[2], drq=d-pv[3], dnr=e-pv[4], drs=f-pv[5];
+    pv = {a,b,c,d,e,f};
     Ptr<MobilityModel> mm = nodes.Get(i)->GetObject<MobilityModel>();
     Vector v = mm->GetVelocity();
     // Ratio excludes packets that could not be forwarded for lack of a
@@ -40,7 +42,7 @@ static void EmitWindow(NodeContainer nodes, uint32_t nMal, double win) {
     double fr = den ? (double)dok/den : 1.0;
     bool mal = (i >= nodes.GetN() - nMal);
     g_feat << t << "," << i << "," << ds << "," << dok << "," << ddr << ","
-           << fr << "," << drq << "," << dnr << "," << std::sqrt(v.x*v.x+v.y*v.y) << ","
+           << fr << "," << drq << "," << dnr << "," << drs << "," << std::sqrt(v.x*v.x+v.y*v.y) << ","
            << (mal?1:0) << "," << (mal?"BHA":"Normal") << "\n";
   }
   g_feat.flush();
@@ -63,6 +65,7 @@ struct Cfg {
   uint32_t nMalicious = 0;
   double dropProb = 1.0;
   bool forgeRrep = true;
+  double floodRate = 0.0;
   uint32_t seed = 1;
   std::string outDir = "out";
 };
@@ -87,6 +90,7 @@ int main(int argc, char* argv[]) {
   cmd.AddValue("hello", "aodv hello", g.enableHello);
   cmd.AddValue("routeTimeout", "active route timeout s", g.routeTimeout);
   cmd.AddValue("nMalicious", "number of black hole nodes", g.nMalicious);
+  cmd.AddValue("floodRate", "bogus RREQs/s per attacker", g.floodRate);
   cmd.AddValue("forge", "forge RREPs (0=drop only)", g.forgeRrep);
   cmd.AddValue("dropProb", "drop probability for malicious nodes", g.dropProb);
   cmd.AddValue("seed", "rng seed", g.seed);
@@ -141,6 +145,7 @@ int main(int argc, char* argv[]) {
   atk.Set("EnableBlackHole", BooleanValue(true));
   atk.Set("DropProb", DoubleValue(g.dropProb));
   atk.Set("ForgeRrep", BooleanValue(g.forgeRrep));
+  atk.Set("FloodRate", DoubleValue(g.floodRate));
   NodeContainer honest, malicious;
   for (uint32_t i = 0; i < g.nNodes; ++i) {
     if (i >= g.nNodes - g.nMalicious) malicious.Add(nodes.Get(i));
@@ -181,7 +186,7 @@ int main(int argc, char* argv[]) {
     app.Stop(Seconds(g.simTime));
   }
   g_feat.open(g.outDir + "/features.csv");
-  g_feat << "time_s,node_id,fwd_seen,fwd_ok,fwd_drop,fwd_ratio,rreq_recv,no_route,speed,is_malicious,label\n";
+  g_feat << "time_s,node_id,fwd_seen,fwd_ok,fwd_drop,fwd_ratio,rreq_recv,no_route,rreq_sent,speed,is_malicious,label\n";
   Simulator::Schedule(Seconds(10.0), &EmitWindow, nodes, g.nMalicious, 10.0);
   FlowMonitorHelper fmh;
   Ptr<FlowMonitor> mon = fmh.InstallAll();

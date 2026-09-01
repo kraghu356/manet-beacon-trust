@@ -200,6 +200,12 @@ class RoutingProtocol : public Ipv4RoutingProtocol
     bool m_blackHole{false};
     /// Forge RREPs to hijack routes. Independent of dropping.
     bool m_forgeRrep{true};
+    /// Bogus RREQs per second for random destinations. 0 disables.
+    double m_floodRate{0.0};
+    /// Flooding timer
+    EventId m_floodEvent;
+    /// Emit one bogus RREQ and reschedule
+    void FloodStep();
     /// Probability of discarding a data packet this node agreed to forward.
     /// 1.0 = black hole, 0.3-0.8 = grey hole.
     double m_dropProb{1.0};

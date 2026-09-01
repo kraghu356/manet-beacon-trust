@@ -201,6 +201,11 @@ RoutingProtocol::GetTypeId()
             .SetParent<Ipv4RoutingProtocol>()
             .SetGroupName("Aodv")
             .AddConstructor<RoutingProtocol>()
+            .AddAttribute("FloodRate",
+                          "Bogus RREQs per second (0 = off)",
+                          DoubleValue(0.0),
+                          MakeDoubleAccessor(&RoutingProtocol::m_floodRate),
+                          MakeDoubleChecker<double>(0.0, 1000.0))
             .AddAttribute("ForgeRrep",
                           "Forge route replies to attract traffic",
                           BooleanValue(true),
@@ -425,6 +430,13 @@ RoutingProtocol::AssignStreams(int64_t stream)
 void
 RoutingProtocol::Start()
 {
+    if (m_floodRate > 0.0)
+    {
+        // Stagger the start so flooders do not synchronise.
+        Ptr<UniformRandomVariable> jr = CreateObject<UniformRandomVariable>();
+        m_floodEvent = Simulator::Schedule(Seconds(5.0 + jr->GetValue(0.0, 5.0)),
+                                           &RoutingProtocol::FloodStep, this);
+    }
     NS_LOG_FUNCTION(this);
     if (m_enableHello)
     {
@@ -1089,8 +1101,22 @@ RoutingProtocol::LoopbackRoute(const Ipv4Header& hdr, Ptr<NetDevice> oif) const
 }
 
 void
+RoutingProtocol::FloodStep()
+{
+    if (m_floodRate <= 0.0) return;
+    // Random destination in 10.1.1.0/24 that is unlikely to exist.
+    Ptr<UniformRandomVariable> rv = CreateObject<UniformRandomVariable>();
+    uint32_t last = 200 + (uint32_t)rv->GetValue(0, 54);
+    Ipv4Address bogus(("10.1.1." + std::to_string(last)).c_str());
+    SendRequest(bogus);
+    m_floodEvent = Simulator::Schedule(Seconds(1.0 / m_floodRate),
+                                       &RoutingProtocol::FloodStep, this);
+}
+
+void
 RoutingProtocol::SendRequest(Ipv4Address dst)
 {
+    Ctr(m_ipv4->GetObject<Node>()->GetId()).rrepSent++;  // RREQs originated
     NS_LOG_FUNCTION(this << dst);
     // A node SHOULD NOT originate more than RREQ_RATELIMIT RREQ messages per second.
     if (m_rreqCount == m_rreqRateLimit)
