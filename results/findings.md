@@ -419,3 +419,14 @@ GHA is the only usable AUROC because BHA remains in training as a near neighbour
 => The autoencoder catches exactly the three that collapse to normal:
    flood 1.000, sink 1.000, worm 0.996. The two models are complementary by
    construction, not coincidence.
+
+## Paper 3: hybrid operating point (Aug 30)
+AE gate threshold = 95th pct of validation-normal reconstruction error (21.92).
+Novel attacks caught as unknown, at 5.4% false-unknown on honest nodes:
+  flood 19/19 | sink 20/20 | worm 7/7 | bha 0/20 | gha 0/19
+Exactly complementary to the classifier (bha 0.996, gha 0.990; flood/sink/worm
+  collapse to 'normal').
+Mechanism, not coincidence: suppression attacks reconstruct well because a
+  quiet node resembles a normal one; additive attacks reconstruct badly.
+=> Hybrid covers all five. Cost is 5.4% of honest nodes flagged for review,
+   the same availability trade-off Paper 2 quantified as Phi.
