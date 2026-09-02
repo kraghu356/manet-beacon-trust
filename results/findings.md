@@ -404,3 +404,18 @@ GHA consistently BELOW chance (0.444, sd 0.004): a node forwarding half its
   packets reconstructs better than average normal traffic. Systematic, not noise.
 CAVEATS: variance is over training seeds, not data. Same 2300 test sequences,
   worm still only 7 of them. Full leave-one-attack-out (5 models) still to do.
+
+## Paper 3: full leave-one-attack-out (Aug 30)
+Five classifiers, each blind to one attack. Softmax AUROC for unseen-vs-seen:
+  gha 0.926 (called bha 18/19) | sink 0.613 (normal 20/20)
+  worm 0.420 (normal 7/7) | bha 0.290 (called gha 20/20) | flood 0.230 (normal 19/19)
+Classifier macro-F1 on KNOWN classes stays 0.823-0.988 throughout: the blind
+  spot is invisible in reported metrics.
+Two failure modes: bha<->gha are mistaken for each other (benign, node still
+  isolated); flood/sink/worm collapse UNANIMOUSLY to 'normal' (no alarm).
+GHA is the only usable AUROC because BHA remains in training as a near neighbour.
+=> Discriminative IDS silently passes novel attacks unless a close relative is
+   in the training set.
+=> The autoencoder catches exactly the three that collapse to normal:
+   flood 1.000, sink 1.000, worm 0.996. The two models are complementary by
+   construction, not coincidence.
