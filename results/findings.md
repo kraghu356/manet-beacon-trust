@@ -362,3 +362,16 @@ Mean energy: flood -8.68, sink -7.80, gha -7.76, bha -7.75, worm -6.53,
 => Points to a normality model (autoencoder / one-class on normal traffic)
    rather than confidence gating on a classifier.
 CAVEAT: 7 wormhole sequences, single training run. Repeat across seeds.
+
+## Paper 3: normality model for open-set (Aug 30)
+GRU autoencoder trained on NORMAL traffic only (1122 sequences, no attacks).
+Reconstruction-error AUROC vs normal:
+  flood 1.000 | sink 0.991 | worm 0.906 | bha 0.648 | gha 0.396
+Wormhole 0.906 from a model that never saw any attack, vs 0.277 for the
+  energy score on the discriminative model. The signature IS anomalous;
+  a classifier trained on other attacks had no reason to encode it.
+COMPLEMENTARY: the attacks the classifier handles best (bha, gha) are the
+  ones the autoencoder handles worst, and vice versa. Suggests classifier
+  for known attacks + normality model for novel ones.
+CAVEAT: recon error spans 5.1 to 82906, dominated by unbounded rreq_sent.
+  Re-check AUROCs after log-transforming that feature.
