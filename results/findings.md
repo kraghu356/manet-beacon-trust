@@ -288,3 +288,18 @@ Holds from 5 runs (0.924) to 20 runs (0.918): features generalise across topolog
 Residual error is entirely sink/worm, which trade errors with each other.
   sink precision 0.810 recall 0.944; worm precision 0.653 recall 0.694.
 => Any model must beat 0.918, and can only do so by exploiting structure.
+
+## Paper 3: GRU sequence model (Aug 30)
+2-layer GRU, hidden 64, masked mean pooling, class-weighted CE, 30 epochs.
+Node-level predictions broadcast to windows so the comparison matches the
+  random forest exactly: same 34676 test windows, same seed split.
+  macro F1 0.918 (RF) -> 0.983 (GRU)
+  worm 0.672 -> 1.000 | sink 0.872 -> 0.928 | flood 0.983 -> 1.000
+  gha 0.990 -> 0.975 (slight loss)
+=> The sink/worm error was TEMPORAL, not structural. nb_max_dist spikes only
+   when the tunnel endpoints are far apart; a per-window classifier sees an
+   intermittent signal, a sequence model sees the pattern.
+=> The earlier justification for a graph model does not hold. A GATv2 must
+   now beat 0.983 and would be a stronger model, not a necessary one.
+CAUTION: node-level report showed worm 1.000 on only 7 sequences. The
+  per-window broadcast (111 rows) is the trustworthy number.
