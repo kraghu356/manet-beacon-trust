@@ -375,3 +375,15 @@ COMPLEMENTARY: the attacks the classifier handles best (bha, gha) are the
   for known attacks + normality model for novel ones.
 CAVEAT: recon error spans 5.1 to 82906, dominated by unbounded rreq_sent.
   Re-check AUROCs after log-transforming that feature.
+
+## Paper 3: open-set with log-scaled features (Aug 30)
+log1p on unbounded count features before scaling. AUROC vs normal:
+  flood 1.000 | sink 1.000 | worm 0.996 | bha 0.723 | gha 0.442
+Wormhole 0.906 -> 0.996. Recon errors now 6-218, not 5-82906: a learned
+  representation rather than one runaway feature.
+Zero-day wormhole AUROC 0.996 from a model that saw NO attacks.
+COMPLEMENTARITY (measured):
+  autoencoder wins on flood/sink/worm - attacks that ADD activity
+  classifier wins on bha/gha (0.996/0.990) - attacks that SUPPRESS it
+=> Architecture: classifier for suppression attacks, normality model for
+   additive and novel ones. Neither alone covers all five.
