@@ -275,3 +275,16 @@ GOTCHA: EWMA must be grouped by (run, node_id). Grouping by (class, node_id)
 Sink/Worm remain the hard pair (recall 0.78 / 0.68): both show high no_route
   with normal fwd_ratio. Temporal smoothing does not separate them, which
   confirms the distinction is structural and motivates the graph model.
+
+## Paper 3: full dataset and classical baseline (Aug 30)
+120 runs, 20 seeds x 6 conditions, 347900 rows, 157945 with forwarding activity.
+Imbalance after filtering: normal 150250, sink 2490, bha 2030, flood 1439,
+  gha 1227, worm 509. Worst ratio 295:1.
+Split by seed: train 1-12, val 13-16, test 17-20. No run in two partitions.
+Random forest, 300 trees, balanced class weights, 13 features incl. 4 EWMA:
+  macro F1 0.918, accuracy 0.993
+  normal 0.997 | bha 0.996 | gha 0.990 | flood 0.983 | sink 0.872 | worm 0.672
+Holds from 5 runs (0.924) to 20 runs (0.918): features generalise across topology.
+Residual error is entirely sink/worm, which trade errors with each other.
+  sink precision 0.810 recall 0.944; worm precision 0.653 recall 0.694.
+=> Any model must beat 0.918, and can only do so by exploiting structure.
