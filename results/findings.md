@@ -440,3 +440,14 @@ Wormhole per fold: 0.996, 0.987, 1.000, 0.870. The single-split 0.996 was the
 GHA below chance in ALL folds (0.317-0.442): a half-forwarding node
   reconstructs better than average normal traffic. Systematic property of the
   attack, and the clearest justification for the hybrid.
+
+## Paper 3: 4-fold CV of the GRU classifier (Aug 30)
+macro F1 0.894 +/- 0.053 across rotating held-out seeds.
+  folds: 0.952, 0.941, 0.843, 0.840 -- seeds 17-20 was the BEST split.
+  bha 0.987+/-0.013 | normal 0.989+/-0.011 | flood 0.976+/-0.017
+  sink 0.946+/-0.066 | worm 0.773+/-0.164 | gha 0.693+/-0.279
+CORRECTION: the single-split 0.983 with worm 1.000 was optimistic. Across
+  folds the GRU does NOT reliably solve wormhole (0.773, sd 0.164).
+Hybrid case is stronger, not weaker: AE gets worm 0.963+/-0.054 (better mean,
+  one third the variance) and fails on gha; classifier is the reverse.
+Variance driven by small support: 7-8 worm and 19-20 gha sequences per fold.
