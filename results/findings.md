@@ -430,3 +430,13 @@ Mechanism, not coincidence: suppression attacks reconstruct well because a
   quiet node resembles a normal one; additive attacks reconstruct badly.
 => Hybrid covers all five. Cost is 5.4% of honest nodes flagged for review,
    the same availability trade-off Paper 2 quantified as Phi.
+
+## Paper 3: 4-fold data cross-validation of the AE (Aug 30)
+Rotating held-out seeds, not just training seeds. AUROC vs normal:
+  flood 0.996 +/- 0.005 | sink 0.996 +/- 0.004 | worm 0.963 +/- 0.054
+  bha   0.811 +/- 0.053 | gha  0.374 +/- 0.046
+Wormhole per fold: 0.996, 0.987, 1.000, 0.870. The single-split 0.996 was the
+  optimistic end; 0.963 +/- 0.054 is the honest figure (7-8 test sequences/fold).
+GHA below chance in ALL folds (0.317-0.442): a half-forwarding node
+  reconstructs better than average normal traffic. Systematic property of the
+  attack, and the clearest justification for the hybrid.
