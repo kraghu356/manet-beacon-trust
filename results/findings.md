@@ -303,3 +303,11 @@ Node-level predictions broadcast to windows so the comparison matches the
    now beat 0.983 and would be a stronger model, not a necessary one.
 CAUTION: node-level report showed worm 1.000 on only 7 sequences. The
   per-window broadcast (111 rows) is the trustworthy number.
+
+## Paper 3: GRU sequence model (Aug 30)
+2-layer GRU, hidden 64, masked mean pooling, class-weighted CE, 30 epochs.
+Node predictions broadcast to windows: same 34676 test windows as the RF.
+  macro F1 0.918 (RF) -> 0.983 (GRU)
+  worm 0.672 -> 1.000 | sink 0.872 -> 0.928 | flood 0.983 -> 1.000
+=> The sink/worm error was TEMPORAL, not structural. A GATv2 must now beat
+   0.983 and would be a stronger model, not a necessary one.
