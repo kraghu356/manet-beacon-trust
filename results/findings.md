@@ -387,3 +387,10 @@ COMPLEMENTARITY (measured):
   classifier wins on bha/gha (0.996/0.990) - attacks that SUPPRESS it
 => Architecture: classifier for suppression attacks, normality model for
    additive and novel ones. Neither alone covers all five.
+
+## Paper 3: open-set with log-scaled features (Aug 30)
+log1p on unbounded counts before scaling. AUROC vs normal:
+  flood 1.000 | sink 1.000 | worm 0.996 | bha 0.723 | gha 0.442
+Zero-day wormhole AUROC 0.996 from a model that saw NO attacks.
+COMPLEMENTARITY: autoencoder wins on flood/sink/worm (attacks that ADD
+  activity); classifier wins on bha/gha 0.996/0.990 (attacks that SUPPRESS).
