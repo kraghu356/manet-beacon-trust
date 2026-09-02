@@ -311,3 +311,15 @@ Node predictions broadcast to windows: same 34676 test windows as the RF.
   worm 0.672 -> 1.000 | sink 0.872 -> 0.928 | flood 0.983 -> 1.000
 => The sink/worm error was TEMPORAL, not structural. A GATv2 must now beat
    0.983 and would be a stronger model, not a necessary one.
+
+## Paper 3: detection latency curve (Aug 30)
+GRU macro-F1 against observation window (node-level, 2300 test sequences):
+   5 windows ( 50s): F1 0.660  precision 0.615  recall 0.922
+  10 windows (100s): F1 0.802  precision 0.765  recall 0.945
+  15 windows (150s): F1 0.841  precision 0.792  recall 0.987
+  20 windows (200s): F1 0.900  precision 0.836  recall 0.989
+  29 windows (290s): F1 0.949  precision 0.928  recall 0.982
+Recall is high from the start; PRECISION is what improves with observation.
+=> Attackers are spotted quickly; distinguishing them from honest nodes is
+   what takes time. Mirrors Paper 2's false-isolation cost result.
+Flooding stays at F1 1.000 even at 10 windows; sink/worm need the full run.
