@@ -336,3 +336,17 @@ GRU F1 by attack and observation window (node-level, small support):
    statistical or intermittent signatures need observation time.
 CAVEATS: worm has only 7 test sequences. bha is non-monotonic (0.833 at 20
   windows) which is likely training noise; rerun over seeds before publishing.
+
+## Paper 3: zero-day / open-set failure (Aug 30)
+Trained on 4 attacks + normal, wormhole held out entirely (no train or val).
+All 7 held-out wormhole nodes classified NORMAL with confidence 1.000.
+Mean max-softmax by true class: worm 1.000, sink 1.000, flood 1.000,
+  bha 0.989, gha 0.982, normal 0.967 -- the UNSEEN class is the most confident.
+Thresholding max-softmax: 0/7 wormholes flagged unknown at 0.9, 0.95 or 0.99,
+  while 213-400 of 2293 known-class nodes were falsely flagged.
+=> Max-softmax gives no novelty signal; the network is overconfident OOD.
+=> Failure direction is toward 'normal', not toward a similar attack. A novel
+   attack passes silently with no anomaly reported.
+=> Motivates an explicit open-set mechanism (energy score, Mahalanobis,
+   reconstruction error) rather than confidence gating on softmax.
+CAVEAT: only 7 wormhole test sequences.
