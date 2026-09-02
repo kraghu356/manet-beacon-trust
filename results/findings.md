@@ -323,3 +323,16 @@ Recall is high from the start; PRECISION is what improves with observation.
 => Attackers are spotted quickly; distinguishing them from honest nodes is
    what takes time. Mirrors Paper 2's false-isolation cost result.
 Flooding stays at F1 1.000 even at 10 windows; sink/worm need the full run.
+
+## Paper 3: per-attack detection latency (Aug 30)
+GRU F1 by attack and observation window (node-level, small support):
+  attack   50s    100s   200s   290s
+  flood   1.000  1.000  1.000  1.000   (immediate: 307 RREQ/window)
+  bha     0.889  0.919  0.833  0.974   (fast: fwd_ratio -> 0 at once)
+  gha     0.345  0.865  0.857  0.923   (needs packets for the ratio to settle)
+  sink    0.435  0.541  0.784  0.800   (route failures accumulate slowly)
+  worm    0.326  0.500  0.933  1.000   (only visible when endpoints drift apart)
+=> Attacks that change behaviour instantly are caught instantly; attacks with
+   statistical or intermittent signatures need observation time.
+CAVEATS: worm has only 7 test sequences. bha is non-monotonic (0.833 at 20
+  windows) which is likely training noise; rerun over seeds before publishing.
