@@ -394,3 +394,13 @@ log1p on unbounded counts before scaling. AUROC vs normal:
 Zero-day wormhole AUROC 0.996 from a model that saw NO attacks.
 COMPLEMENTARITY: autoencoder wins on flood/sink/worm (attacks that ADD
   activity); classifier wins on bha/gha 0.996/0.990 (attacks that SUPPRESS).
+
+## Paper 3: zero-day AUROC across 3 training seeds (Aug 30)
+GRU autoencoder on normal traffic only, log1p on unbounded counts.
+  flood 1.000 +/- 0.000 | sink 1.000 +/- 0.000 | worm 0.996 +/- 0.000
+  bha   0.713 +/- 0.025 | gha  0.444 +/- 0.004
+Wormhole 0.996 with zero variance over independent training runs.
+GHA consistently BELOW chance (0.444, sd 0.004): a node forwarding half its
+  packets reconstructs better than average normal traffic. Systematic, not noise.
+CAVEATS: variance is over training seeds, not data. Same 2300 test sequences,
+  worm still only 7 of them. Full leave-one-attack-out (5 models) still to do.
