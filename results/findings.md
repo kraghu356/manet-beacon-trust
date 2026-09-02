@@ -350,3 +350,15 @@ Thresholding max-softmax: 0/7 wormholes flagged unknown at 0.9, 0.95 or 0.99,
 => Motivates an explicit open-set mechanism (energy score, Mahalanobis,
    reconstruction error) rather than confidence gating on softmax.
 CAVEAT: only 7 wormhole test sequences.
+
+## Paper 3: post-hoc OOD scoring also fails (Aug 30)
+Energy score and max-softmax on the 4-attack model, wormhole held out:
+  AUROC unseen-vs-seen: energy 0.277, max-softmax 0.323 -- both BELOW chance.
+Mean energy: flood -8.68, sink -7.80, gha -7.76, bha -7.75, worm -6.53,
+  normal -5.89. The unseen attack sits nearer NORMAL than the known attacks.
+=> A discriminative model learns what attacks look like; an unseen attack
+   that matches none of them falls into the normal region. No post-hoc score
+   can recover this -- the representation does not encode it as unusual.
+=> Points to a normality model (autoencoder / one-class on normal traffic)
+   rather than confidence gating on a classifier.
+CAVEAT: 7 wormhole sequences, single training run. Repeat across seeds.
