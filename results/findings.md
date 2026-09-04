@@ -460,3 +460,11 @@ Replaced with RSSI-derived and neighbour-table features:
   rssi_dist_max 215.0 vs 214.7 - correctly blind to the tunnel.
   nb_count 8.16 vs 5.36 - inflated neighbour table, secondary signal.
 All observable from a node's own PHY and routing state.
+
+## Paper 3: observable wormhole features (Aug 30)
+nb_max_dist was a simulator oracle: zero-day AUROC 0.995 -> 0.447 without it.
+Replaced with features a real node can compute:
+  nb_no_rssi = routing neighbours never heard on air. Endpoints 1.63, honest 0.00.
+    The tunnel is out-of-band, so the partner never transmits a decodable frame.
+  rssi_dist_max 215.0 vs 214.7 - correctly blind to the tunnel, as it should be.
+  nb_count 8.16 vs 5.36 - inflated neighbour table, secondary signal.
