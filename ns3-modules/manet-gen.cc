@@ -13,6 +13,11 @@
 #include <map>
 #include <array>
 #include <cmath>
+#include <set>
+#include <set>
+#include <set>
+#include "ns3/integer.h"
+
 using namespace ns3;
 namespace ns3 { namespace aodvatk {
 uint64_t GetBhDrops(); uint64_t GetBhSeen();
@@ -20,34 +25,12 @@ uint64_t CtrFwdSeen(uint32_t); uint64_t CtrFwdOk(uint32_t);
 uint64_t CtrFwdDrop(uint32_t); uint64_t CtrRreqRecv(uint32_t);
 uint64_t CtrNoRoute(uint32_t);
 uint64_t CtrRrepSent(uint32_t);
+const std::vector<uint32_t>& NbAddresses(uint32_t);
 } }
-static std::ofstream g_feat;
-static std::map<uint32_t, std::array<uint64_t,6>> g_prev;
-static void EmitWindow(NodeContainer nodes, uint32_t nMal, double win) {
-  double t = Simulator::Now().GetSeconds();
-  for (uint32_t i = 0; i < nodes.GetN(); ++i) {
-    uint64_t a = aodvatk::CtrFwdSeen(i), b = aodvatk::CtrFwdOk(i);
-    uint64_t c = aodvatk::CtrFwdDrop(i), d = aodvatk::CtrRreqRecv(i);
-    uint64_t e = aodvatk::CtrNoRoute(i);
-    uint64_t f = aodvatk::CtrRrepSent(i);
-    auto& pv = g_prev[i];
-    uint64_t ds=a-pv[0], dok=b-pv[1], ddr=c-pv[2], drq=d-pv[3], dnr=e-pv[4], drs=f-pv[5];
-    pv = {a,b,c,d,e,f};
-    Ptr<MobilityModel> mm = nodes.Get(i)->GetObject<MobilityModel>();
-    Vector v = mm->GetVelocity();
-    // Ratio excludes packets that could not be forwarded for lack of a
-    // route: that is a routing failure, not misbehaviour, and honest nodes
-    // experience it constantly under mobility.
-    uint64_t den = dok + ddr;
-    double fr = den ? (double)dok/den : 1.0;
-    bool mal = (i >= nodes.GetN() - nMal);
-    g_feat << t << "," << i << "," << ds << "," << dok << "," << ddr << ","
-           << fr << "," << drq << "," << dnr << "," << drs << "," << std::sqrt(v.x*v.x+v.y*v.y) << ","
-           << (mal?1:0) << "," << (mal?"BHA":"Normal") << "\n";
-  }
-  g_feat.flush();
-  Simulator::Schedule(Seconds(win), &EmitWindow, nodes, nMal, win);
-}
+
+
+
+
 struct Cfg {
   uint32_t nNodes = 50;
   double areaX = 700.0, areaY = 700.0;
@@ -66,10 +49,104 @@ struct Cfg {
   double dropProb = 1.0;
   bool forgeRrep = true;
   double floodRate = 0.0;
+  bool wormhole = false;
   uint32_t seed = 1;
   std::string outDir = "out";
 };
 static Cfg g;
+
+static std::ofstream g_feat;
+static std::map<uint32_t, std::array<uint64_t,6>> g_prev;
+// Per-node RSSI statistics, gathered from the PHY monitor trace. A node can
+// measure received signal strength; it cannot measure geometric distance.
+struct RssiStat { double sum=0, mn=1e9, mx=-1e9; uint64_t n=0; };
+static std::map<uint32_t, RssiStat> g_rssi;
+static std::map<Mac48Address, uint32_t> g_macToNode;
+static std::map<uint32_t, std::set<uint32_t>> g_heard;   // nodes heard on air
+static void SnifferRx(std::string ctx, Ptr<const Packet> p, uint16_t freq,
+                      WifiTxVector tx, MpduInfo mpdu, SignalNoiseDbm sn,
+                      uint16_t staId) {
+  size_t a=ctx.find("/NodeList/")+10; size_t b=ctx.find("/",a);
+  uint32_t id=std::stoul(ctx.substr(a,b-a));
+  auto& r=g_rssi[id];
+  r.sum+=sn.signal; r.n++;
+  if (sn.signal<r.mn) r.mn=sn.signal;
+  if (sn.signal>r.mx) r.mx=sn.signal;
+  WifiMacHeader hdr;
+  Ptr<Packet> c=p->Copy();
+  if (c->PeekHeader(hdr)) {
+    auto it=g_macToNode.find(hdr.GetAddr2());
+    if (it!=g_macToNode.end()) g_heard[id].insert(it->second);
+  }
+}
+// Per-node RSSI statistics, gathered from the PHY monitor trace. A node can
+// measure received signal strength; it cannot measure geometric distance.
+
+// Per-node RSSI statistics, gathered from the PHY monitor trace. A node can
+// measure received signal strength; it cannot measure geometric distance.
+
+static void EmitWindow(NodeContainer nodes, uint32_t nMal, double win) {
+  double t = Simulator::Now().GetSeconds();
+  for (uint32_t i = 0; i < nodes.GetN(); ++i) {
+    uint64_t a = aodvatk::CtrFwdSeen(i), b = aodvatk::CtrFwdOk(i);
+    uint64_t c = aodvatk::CtrFwdDrop(i), d = aodvatk::CtrRreqRecv(i);
+    uint64_t e = aodvatk::CtrNoRoute(i);
+    uint64_t f = aodvatk::CtrRrepSent(i);
+    auto& pv = g_prev[i];
+    uint64_t ds=a-pv[0], dok=b-pv[1], ddr=c-pv[2], drq=d-pv[3], dnr=e-pv[4], drs=f-pv[5];
+    pv = {a,b,c,d,e,f};
+    // Topology features. A wormhole endpoint lists neighbours far beyond
+    // radio range, which no honest node and no other attack produces.
+    Ptr<MobilityModel> mm = nodes.Get(i)->GetObject<MobilityModel>();
+    Vector myp = mm->GetPosition();
+    const std::vector<uint32_t>& nbs = aodvatk::NbAddresses(i);
+    double dsum = 0.0, dmax = 0.0;
+    for (uint32_t nb : nbs) {
+      if (nb >= nodes.GetN()) continue;
+      Vector q = nodes.Get(nb)->GetObject<MobilityModel>()->GetPosition();
+      double dd = CalculateDistance(myp, q);
+      dsum += dd; if (dd > dmax) dmax = dd;
+    }
+    double dmean = nbs.empty() ? 0.0 : dsum / nbs.size();
+
+    // Observable substitutes for geometric distance.
+    // rssi_dist_max: farthest neighbour by RSSI-inverted path loss, using the
+    //   same constants a node would be configured with.
+    // nb_no_rssi: neighbours in the routing table never actually heard on the
+    //   air. A wormhole partner is reachable through the tunnel but is not a
+    //   radio neighbour, so this is non-zero only for tunnel endpoints.
+    // nb_churn: neighbours entering or leaving the set since the last window.
+    const RssiStat& rs = g_rssi[i];
+    double rssiMin = (rs.n ? rs.mn : -100.0);
+    double rssiDistMax = std::pow(10.0,
+        (g.txPowerDbm - g.refLoss - rssiMin) / (10.0 * g.plExp));
+    uint32_t noRssi = 0;
+    for (uint32_t nb : nbs)
+      if (g_heard[i].find(nb) == g_heard[i].end()) noRssi++;
+    static std::map<uint32_t, std::set<uint32_t>> prevNb;
+    std::set<uint32_t> cur(nbs.begin(), nbs.end());
+    uint32_t churn = 0;
+    for (uint32_t x : cur) if (!prevNb[i].count(x)) churn++;
+    for (uint32_t x : prevNb[i]) if (!cur.count(x)) churn++;
+    prevNb[i] = cur;
+
+
+    Vector v = mm->GetVelocity();
+    // Ratio excludes packets that could not be forwarded for lack of a
+    // route: that is a routing failure, not misbehaviour, and honest nodes
+    // experience it constantly under mobility.
+    uint64_t den = dok + ddr;
+    double fr = den ? (double)dok/den : 1.0;
+    bool mal = (i >= nodes.GetN() - nMal);
+    g_feat << t << "," << i << "," << ds << "," << dok << "," << ddr << ","
+           << fr << "," << drq << "," << dnr << "," << drs << "," << nbs.size() << "," << dmean << "," << dmax << ","
+           << rssiDistMax << "," << noRssi << "," << churn << "," << rssiMin << ","
+           << std::sqrt(v.x*v.x+v.y*v.y) << ","
+           << (mal?1:0) << "," << (mal?"BHA":"Normal") << "\n";
+  }
+  g_feat.flush();
+  Simulator::Schedule(Seconds(win), &EmitWindow, nodes, nMal, win);
+}
 int main(int argc, char* argv[]) {
   CommandLine cmd(__FILE__);
   cmd.AddValue("nNodes", "nodes", g.nNodes);
@@ -90,6 +167,7 @@ int main(int argc, char* argv[]) {
   cmd.AddValue("hello", "aodv hello", g.enableHello);
   cmd.AddValue("routeTimeout", "active route timeout s", g.routeTimeout);
   cmd.AddValue("nMalicious", "number of black hole nodes", g.nMalicious);
+  cmd.AddValue("wormhole", "pair the two attackers as a tunnel", g.wormhole);
   cmd.AddValue("floodRate", "bogus RREQs/s per attacker", g.floodRate);
   cmd.AddValue("forge", "forge RREPs (0=drop only)", g.forgeRrep);
   cmd.AddValue("dropProb", "drop probability for malicious nodes", g.dropProb);
@@ -119,6 +197,22 @@ int main(int argc, char* argv[]) {
   WifiMacHelper mac;
   mac.SetType("ns3::AdhocWifiMac");
   NetDeviceContainer devices = wifi.Install(phy, mac, nodes);
+  for (uint32_t i = 0; i < devices.GetN(); ++i) {
+    Ptr<WifiNetDevice> wd = DynamicCast<WifiNetDevice>(devices.Get(i));
+    if (wd) g_macToNode[Mac48Address::ConvertFrom(wd->GetAddress())] =
+              devices.Get(i)->GetNode()->GetId();
+  }
+  Config::Connect("/NodeList/*/DeviceList/*/$ns3::WifiNetDevice/Phy/MonitorSnifferRx",
+                  MakeCallback(&SnifferRx));
+
+  for (uint32_t i = 0; i < devices.GetN(); ++i) {
+    Ptr<WifiNetDevice> wd = DynamicCast<WifiNetDevice>(devices.Get(i));
+    if (wd) g_macToNode[Mac48Address::ConvertFrom(wd->GetAddress())] =
+              devices.Get(i)->GetNode()->GetId();
+  }
+  Config::Connect("/NodeList/*/DeviceList/*/$ns3::WifiNetDevice/Phy/MonitorSnifferRx",
+                  MakeCallback(&SnifferRx));
+
   std::string xs = "ns3::UniformRandomVariable[Min=0.0|Max=" + std::to_string(g.areaX) + "]";
   std::string ys = "ns3::UniformRandomVariable[Min=0.0|Max=" + std::to_string(g.areaY) + "]";
   Ptr<RandomRectanglePositionAllocator> pa =
@@ -161,9 +255,26 @@ int main(int argc, char* argv[]) {
   internet.SetRoutingHelper(honestStack);
   internet.Install(honest);
   if (g.nMalicious > 0) {
-    InternetStackHelper atkStack;
-    atkStack.SetRoutingHelper(atk);
-    atkStack.Install(malicious);
+    if (g.wormhole && g.nMalicious >= 2) {
+      // Two endpoints only, each naming the other. Installed one at a time
+      // because the partner id differs per node.
+      uint32_t a = g.nNodes - g.nMalicious;
+      uint32_t b = g.nNodes - 1;
+      AodvAtkHelper wa = atk, wb = atk;
+      wa.Set("WormPartner", IntegerValue((int32_t)b));
+      wb.Set("WormPartner", IntegerValue((int32_t)a));
+      InternetStackHelper sa; sa.SetRoutingHelper(wa); sa.Install(nodes.Get(a));
+      InternetStackHelper sb; sb.SetRoutingHelper(wb); sb.Install(nodes.Get(b));
+      NodeContainer rest;
+      for (uint32_t i = a + 1; i < b; ++i) rest.Add(nodes.Get(i));
+      if (rest.GetN() > 0) {
+        InternetStackHelper sr; sr.SetRoutingHelper(atk); sr.Install(rest);
+      }
+    } else {
+      InternetStackHelper atkStack;
+      atkStack.SetRoutingHelper(atk);
+      atkStack.Install(malicious);
+    }
   }
   Ipv4AddressHelper addr;
   addr.SetBase("10.1.1.0", "255.255.255.0");
@@ -186,7 +297,7 @@ int main(int argc, char* argv[]) {
     app.Stop(Seconds(g.simTime));
   }
   g_feat.open(g.outDir + "/features.csv");
-  g_feat << "time_s,node_id,fwd_seen,fwd_ok,fwd_drop,fwd_ratio,rreq_recv,no_route,rreq_sent,speed,is_malicious,label\n";
+  g_feat << "time_s,node_id,fwd_seen,fwd_ok,fwd_drop,fwd_ratio,rreq_recv,no_route,rreq_sent,nb_count,nb_mean_dist,nb_max_dist,rssi_dist_max,nb_no_rssi,nb_churn,rssi_min,speed,is_malicious,label\n";
   Simulator::Schedule(Seconds(10.0), &EmitWindow, nodes, g.nMalicious, 10.0);
   FlowMonitorHelper fmh;
   Ptr<FlowMonitor> mon = fmh.InstallAll();

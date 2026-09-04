@@ -451,3 +451,12 @@ CORRECTION: the single-split 0.983 with worm 1.000 was optimistic. Across
 Hybrid case is stronger, not weaker: AE gets worm 0.963+/-0.054 (better mean,
   one third the variance) and fails on gha; classifier is the reverse.
 Variance driven by small support: 7-8 worm and 19-20 gha sequences per fold.
+
+## Paper 3: observable wormhole features (Aug 30)
+nb_max_dist was a simulator oracle: AUROC 0.995 -> 0.447 without it.
+Replaced with RSSI-derived and neighbour-table features:
+  nb_no_rssi = routing neighbours never heard on air. Tunnel endpoints 1.63,
+    honest nodes 0.00. The tunnel is out-of-band so the partner has no RSSI.
+  rssi_dist_max 215.0 vs 214.7 - correctly blind to the tunnel.
+  nb_count 8.16 vs 5.36 - inflated neighbour table, secondary signal.
+All observable from a node's own PHY and routing state.
