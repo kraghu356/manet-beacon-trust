@@ -468,3 +468,17 @@ Replaced with features a real node can compute:
     The tunnel is out-of-band, so the partner never transmits a decodable frame.
   rssi_dist_max 215.0 vs 214.7 - correctly blind to the tunnel, as it should be.
   nb_count 8.16 vs 5.36 - inflated neighbour table, secondary signal.
+
+## Paper 3: wormhole detection restored on observable features (Aug 30)
+New campaign in ~/manet-data2, 120 runs, 23 columns incl. rssi_dist_max,
+  nb_no_rssi, nb_churn, rssi_min.
+nb_no_rssi = routing neighbours never heard on air. Across 120 runs:
+  worm mean 1.65 (max 2), every other class exactly 0.00.
+Node-level AUROC on nb_no_rssi ALONE, threshold not model:
+  1.0000 in all four folds (n=7,8,8,7 wormhole nodes).
+Autoencoder on the same observable features reaches only 0.571 because
+  nb_no_rssi is CONSTANT at zero in normal traffic: a reconstruction model
+  learns to output the constant and the residual is swamped by 15 varying
+  features. Reconstruction detection needs variance in the discriminating
+  feature; where normality is a hard zero, a threshold wins.
+Geometric nb_max_dist gave 0.950 but is a simulator oracle. Withdrawn.
