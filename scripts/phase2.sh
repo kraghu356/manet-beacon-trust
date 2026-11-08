@@ -16,16 +16,28 @@ NS3_DIR="${NS3_DIR:-$HOME/ns-3-dev}"
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 R="$REPO/results"
 BASE="--nFlows=10 --pktRate=12 --simTime=400"
-STAGE="${STAGE:?set STAGE=phi|low|pair2|seeds|shadow|eval}"
+STAGE="${STAGE:?set STAGE=phi|low|pair2|seeds|shadow|all|eval}"
+# Parallel runs: ns-3 is single-threaded, so run one simulation per spare core.
+JOBS="${JOBS:-$(( $(nproc) > 2 ? $(nproc) - 1 : 1 ))}"
 cd "$REPO"
 
-sim() {  # sim <outdir> <args...> ; skips if beacon_rx already present
+# A run counts as finished only when .done exists: an interrupted run leaves
+# partial CSVs behind, and those must be re-run, not skipped.
+sim() {  # sim <outdir> <args...>
   local out="$1"; shift
   mkdir -p "$out"
-  if ls "$out"/*-run1-beacon_rx.csv >/dev/null 2>&1; then return 0; fi
-  (cd "$NS3_DIR" && ./ns3 run "mbtr-sim $BASE $* --outDir=$out") >> "$R/phase2.log" 2>&1 \
-    || echo "FAILED: $out $*" | tee -a "$R/phase2.log"
-  echo "[$(date +%H:%M)] $out" >> "$R/phase2-progress.log"
+  [ -f "$out/.done" ] && return 0
+  while [ "$(jobs -rp | wc -l)" -ge "$JOBS" ]; do wait -n; done
+  (
+    rm -f "$out"/*.csv
+    if (cd "$NS3_DIR" && ./ns3 run --no-build "mbtr-sim $BASE $* --outDir=$out") \
+         >> "$out/sim.log" 2>&1; then
+      touch "$out/.done"
+      echo "[$(date +%H:%M)] $out" >> "$R/phase2-progress.log"
+    else
+      echo "FAILED: $out $*" | tee -a "$R/phase2.log"
+    fi
+  ) &
 }
 
 campaign() {  # campaign <dir> <shadowing dB> <first seed> <last seed>
@@ -65,6 +77,11 @@ case "$STAGE" in
     done ;;
   seeds)   campaign "$R/seeds30" 0 1 30 ;;
   shadow)  campaign "$R/shadow4" 4 1 20; campaign "$R/shadow8" 8 1 20 ;;
+  all)
+    # Every ns-3 stage, interleaved across $JOBS cores; then score.
+    for st in low pair2 seeds shadow; do STAGE=$st JOBS=$JOBS "$0"; done
+    STAGE=eval "$0"
+    ;;
   eval)
     mkdir -p "$R/tables"
     [ -d "$R/sweep" ] && python3 -m analysis.sweep_eval --root "$R/sweep" \
@@ -78,3 +95,5 @@ case "$STAGE" in
     python3 -m analysis.fusion_region ;;
   *) echo "unknown STAGE=$STAGE"; exit 2 ;;
 esac
+
+wait
