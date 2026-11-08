@@ -1,0 +1,379 @@
+%% =====================================================================
+%% Paper 2 (p1_2) -- drop-in revisions, keyed to the section numbers of
+%% the 41-page PDF. The LaTeX source of p1_2 is not in this repository,
+%% so each block below REPLACES the named passage in your source.
+%%
+%% Paste this preamble line once into your main file:
+\newcommand{\PENDING}[1]{\textcolor{red}{[PENDING: #1]}}
+%% (needs \usepackage{xcolor}). Every \PENDING marks a number that the
+%% Phase 2 runs (scripts/phase2.sh) will supply. Delete the macro and all
+%% markers before submission; `grep -n PENDING` must return nothing.
+%%
+%% Citation keys used below that are NOT in your current .bib are defined
+%% in paper/paper2_refs_additions.bib:
+%%   liu2005detecting, capkun2006secure, lazos2004serloc, whitlock2005weighted
+%% Replace [1], [25] etc. with your existing keys where marked.
+%% =====================================================================
+
+
+%% ---------------------------------------------------------------------
+%% TITLE  (replace)
+%% ---------------------------------------------------------------------
+\title{Evidence Coverage and the Cost of False Isolation: Verifying
+Malicious Beacon Nodes in Mobile Ad Hoc Networks}
+
+
+%% ---------------------------------------------------------------------
+%% ABSTRACT  (replace whole abstract; 240 words)
+%% ---------------------------------------------------------------------
+\begin{abstract}
+Malicious beacon nodes corrupt the position estimates of nodes that never
+exchange traffic with them. Prior defences detect them from localisation
+evidence and remove them permanently. We study the decision that precedes
+removal and what an error costs. A two-stage pipeline fuses behavioural and
+localisation evidence into per-observer trust and resolves it into a
+three-state verdict; isolation policies are compared across
+\PENDING{N} ns-3 runs. First, evidence coverage: each single-evidence
+detector confirmed the attacker in 0 of \PENDING{n} trials of the attack
+that leaves no signature in its class, while using both confirmed it in
+every trial. Second, we introduce cumulative false isolation~$\Phi$, in
+node-seconds, which measures how long a mechanism's errors persist. On an
+uncontested network, confirmation-gated isolation with release withdrew
+\PENDING{x}\% of honest-beacon service against \PENDING{y}\% for the
+strongest immediate-isolation policy, at a cost of 15--24\,s of attacker
+activity after onset. Third, we derive when weighted Stouffer fusion can
+detect what neither branch detects alone: the branches' detection
+thresholds must lie within a factor of $1+\sqrt{2}$ for equal weights. Our
+measured ratio is at least 2.38, at the boundary, and an 80-run intensity
+sweep found no case in which fusion outperformed a disjunctive rule. The
+aggregation stage changed no verdict and neither isolation policy produced
+a throughput difference exceeding its confidence interval. The campaign is
+a proof of concept on one dense topology; Section~8.1 lists the
+experiments required before the findings generalise.
+\end{abstract}
+
+
+%% ---------------------------------------------------------------------
+%% Sec 1, para 3  ("Elimination of malicious beacons ...")  (replace)
+%% Fixes the reversed "settled" sentence and adds the closest prior work.
+%% ---------------------------------------------------------------------
+Elimination of malicious beacons from localisation evidence is well studied
+for static beacons. Liu, Ning and Du detect a beacon whose RSSI-implied
+distance disagrees with the distance implied by its declared position, and
+revoke it once enough alerts accumulate~\cite{liu2005detecting}. Kuriakose
+et al.~\cite{embn2023} address the same problem in EMBN-MANET, a UWB-based
+mobile ad hoc network, using RSSI and trilateration residuals, and report
+complete identification when fewer than four malicious beacons share a
+neighbourhood. Both establish that detection from localisation evidence is
+tractable. What neither settles is the decision that precedes removal, and
+what happens to the network when that decision is wrong: revocation in
+both is permanent.
+
+
+%% ---------------------------------------------------------------------
+%% Sec 1.1, Contribution 2  (replace)
+%% ---------------------------------------------------------------------
+\item We show that a fused statistic must be calibrated against its own
+      null distribution before a fusion claim can be tested. A combined
+      score thresholded at the single-branch threshold can never detect an
+      attacker that both branches miss, and tables built this way report a
+      fusion advantage that is a property of the comparison. Weighted
+      Stouffer combination~\cite{stouffer1949,whitlock2005weighted} is unit
+      variance under the null, so one threshold serves every
+      configuration.
+
+%% Sec 1.1, Contribution 3  (replace; trimmed)
+\item We report a coverage result and keep it separate from a fusion
+      claim. Each single-evidence detector is completely blind to the
+      attack that leaves no signature in its class; collecting both classes
+      removes both blind spots. A disjunctive rule over the two branches
+      achieves the same coverage, so the result concerns evidence
+      collection, not the combination rule.
+
+%% Sec 1.1, Contribution 4  (replace; numbers pending Phase 2)
+\item We introduce cumulative false isolation~$\Phi$, in node-seconds, and
+      its normalised form~$\bar{\Phi}$, as complements to the
+      false-positive rate. Against three immediate-isolation policies,
+      including one that waits for a single window of malicious evidence
+      and one with a warm-up guard, confirmation-gated isolation with
+      release reduced~$\Phi$ on a clean network from \PENDING{D-variant
+      range} to \PENDING{E} node-seconds (paired bootstrap 95\% CI
+      \PENDING{CI}), and on attacked networks from \PENDING{} to
+      \PENDING{}.
+
+%% Sec 1.1, Contribution 5  (replace)
+\item We derive the condition under which weighted Stouffer fusion has a
+      fusion-only detection region: with equal effective weights, the two
+      branches' detection thresholds must lie within a factor of
+      $1+\sqrt{2}\approx 2.414$; unequal weights move the bound in a
+      direction we give. The condition is checkable from single-branch
+      detection curves before any fusion experiment. Our measured ratio is
+      at least 2.38, so the condition is at its boundary, and an 80-run
+      sweep found no intensity at which fusion outperformed disjunction.
+
+
+%% ---------------------------------------------------------------------
+%% Sec 2.3, append after the first paragraph  (new paragraph)
+%% ---------------------------------------------------------------------
+Secure localisation has a longer history in sensor networks. SeRLoc bounds
+a node's position using directional beacons without range
+measurements~\cite{lazos2004serloc}; verifiable multilateration rejects
+position claims inconsistent with distance bounds~\cite{capkun2006secure};
+and Liu, Ning and Du detect malicious beacons by the inconsistency between
+measured and declared range, revoking a beacon once a base station has
+received enough independent alerts~\cite{liu2005detecting}. Our
+localisation branch uses the same residual as the last of these. What
+differs is the setting --- mobile beacons and commodity 802.11 RSSI rather
+than static beacons or UWB ranging --- and the decision rule: our
+confirmation is reversible, and we measure what a false confirmation costs
+while it persists.
+
+
+%% ---------------------------------------------------------------------
+%% Sec 4.3.3 "Why not a weighted mean"  (replace whole subsection body)
+%% ---------------------------------------------------------------------
+\subsubsection{Calibrating the fused statistic}
+
+The combination rule matters less than how its output is thresholded.
+Let $s_B, s_L \in [0,1]$ be evidence scores and $C = \omega_B s_B +
+\omega_L s_L$ with $\omega_B + \omega_L = 1$. Then
+\begin{equation}
+\label{eq:convex}
+\min(s_B, s_L) \le C \le \max(s_B, s_L),
+\end{equation}
+so if both scores lie on the benign side of a threshold~$\tau$, so does~$C$.
+A detector that applies the single-branch threshold to a convex combination
+therefore cannot confirm an attacker that both branches miss. Tables built
+this way will still show the fused row ahead of the weaker branch, because
+a mean of a strong score and a weak one exceeds the weak one; the apparent
+advantage is a property of the comparison, not of the mechanism.
+
+The bound is a consequence of reusing~$\tau$, not of averaging as such.
+For two independent standardised branches the arithmetic mean
+$\bar{z} = (z_B + z_L)/2$ has standard deviation $1/\sqrt{2}$ under the
+null, so a threshold recalibrated to the same false-positive rate is
+$\tau/\sqrt{2}$, and the rule ``$\bar{z} > \tau/\sqrt{2}$'' is identical to
+the equal-weight Stouffer rule ``$(z_B + z_L)/\sqrt{2} > \tau$''. What the
+fusion hypothesis requires is a combined statistic calibrated against its
+own null distribution. Weighted Stouffer combination,
+\eqref{eq:stouffer}, is unit variance under the null whatever the weights,
+so a single threshold serves every configuration and the hypothesis becomes
+falsifiable: two branches each at $z=1.5$ combine, with equal weights, to
+$Z=2.12$.
+
+This argument disqualifies uncalibrated combination; it does not make
+Stouffer's method the best calibrated rule, and we do not claim that it is.
+Fisher's method, likelihood-ratio and Bayesian fusion, Dempster--Shafer
+combination~\cite{singh2020}, and learned rules can all be calibrated in
+the same sense. We chose Stouffer's method because it accepts continuous
+evidence without a likelihood model for either branch, admits per-branch
+weights directly~\cite{whitlock2005weighted}, and degrades gracefully when
+one branch has no observations in a window, which is frequent under
+mobility. Section~6.5 compares it against a disjunctive rule; the remaining
+rules are listed in Section~9.1.
+
+%% (keep the existing independence-assumption paragraph that follows)
+
+
+%% ---------------------------------------------------------------------
+%% Sec 6.1, para "The scope of the claim ..." last sentence  (replace)
+%% ---------------------------------------------------------------------
+%%   OLD: "... The coverage result is a result about evidence collection;
+%%         the fusion-rule question is settled for this detector."
+The coverage result is a result about evidence collection; the fusion-rule
+question is taken up in Section~6.5.
+
+%% Sec 6.1, after "with zero variance across seeds in each case."  (insert)
+The zero variance reflects the decision grid as much as the evidence. With
+a 5\,s window step and a persistence requirement of $K=3$ windows, 15\,s is
+the shortest latency the design permits, so A1 and A3 are confirmed at the
+first opportunity in every seed.
+
+
+%% ---------------------------------------------------------------------
+%% Sec 6.3 "Attack Intensity and the Fusion Region"  (replace from
+%% "Under that assumption, let theta ..." to the end of the subsection)
+%% ---------------------------------------------------------------------
+Under that assumption, let $\theta_B$ and $\theta_L$ be the intensities at
+which each branch alone reaches the decision threshold, so that branch~$X$
+has anomaly $\theta f/\theta_X$ at intensity~$f$. With effective weights
+$\tilde\omega_B, \tilde\omega_L$ the fused statistic of
+\eqref{eq:stouffer} crosses the threshold at
+\begin{equation}
+\label{eq:ffused}
+f_F = \frac{\sqrt{\tilde\omega_B^{2} + \tilde\omega_L^{2}}}
+           {\tilde\omega_B/\theta_B + \tilde\omega_L/\theta_L},
+\end{equation}
+and a fusion-only region --- an intensity at which fusion confirms and
+neither branch does --- exists precisely when
+\begin{equation}
+\label{eq:region}
+f_F < \min(\theta_B, \theta_L).
+\end{equation}
+When the branches are equally sensitive, $\theta_B = \theta_L = \theta/a$,
+the region is $\theta/(\sqrt{2}a) < f < \theta/a$: a factor of $\sqrt{2}$ in
+intensity, half an octave, and the widest it can be.
+
+Our A3 configuration used $f = 0.5$ and found no fusion advantage, so a
+single branch at half intensity already crosses the threshold there. Any
+fusion-only region must lie below the intensity we tested, which
+Section~6.5 examines directly.
+
+
+%% ---------------------------------------------------------------------
+%% Sec 6.5.1 "No fusion-only region, and why"  (replace whole body)
+%% ---------------------------------------------------------------------
+The predicted region does not appear at any sampled intensity. The reason
+is visible in Fig.~4: the two branches are not comparably sensitive.
+Behavioural evidence already reaches 8 of 10 detections at the weakest
+attack tested, where the attacker drops only 3\% of transit traffic.
+Localisation evidence reaches half detection at about 36\,m of displacement
+(35.7\,m, interpolated on log intensity).
+
+Writing $r = \max(\theta_B,\theta_L)/\min(\theta_B,\theta_L)$ for the
+sensitivity ratio, \eqref{eq:region} with equal effective weights reduces to
+\begin{equation}
+\label{eq:ratio}
+\frac{\sqrt{2}\,r}{1+r} < 1
+\quad\Longleftrightarrow\quad
+r < 1 + \sqrt{2} \approx 2.414 .
+\end{equation}
+With unequal weights, let $\tilde\omega_s$ weight the more sensitive branch
+and $\tilde\omega_w$ the less sensitive one; the region exists iff
+$r < \tilde\omega_w / \bigl(\sqrt{\tilde\omega_s^2 + \tilde\omega_w^2} -
+\tilde\omega_s\bigr)$, which falls below $1+\sqrt{2}$ when the less
+sensitive branch carries more weight (1.618 at twice the weight) and rises
+when it carries less, although the region then narrows towards zero width.
+In our configuration the less sensitive branch is localisation, whose
+confidence factor saturates nine times faster \eqref{eq:conf}, so the
+effective bound is at or below 2.414.
+
+The behavioural branch has not fallen to 50\% at the lowest intensity we
+swept, so its threshold is known only to lie below 15\,m and the measured
+ratio is a lower bound, $r > 2.38$. The data are therefore consistent with
+the absence of a fusion-only region but do not establish it: $r$ sits at
+the boundary of \eqref{eq:ratio}, and locating $\theta_B$ requires the
+extension below 15\,m in Section~9.1 \PENDING{replace this sentence with
+the measured $r$ and its bootstrap CI once STAGE=low has run}. The ratio
+also depends on how the sweep couples the two intensities: we scaled
+$\delta$ and $p$ by a common factor from $\delta = 300$\,m and $p = 0.6$,
+and a different pairing moves both curves along the intensity axis
+\PENDING{report the second pairing, STAGE=pair2}. Equation~\eqref{eq:ratio}
+is a condition on a configuration, not on the evidence classes in general,
+and it can be checked from single-branch detection curves before any
+fusion experiment is run.
+
+The seed-level data agree. At the weakest intensity, two of ten seeds
+produced failure in both single-evidence branches, and fusion failed on
+both as well.
+
+
+%% ---------------------------------------------------------------------
+%% Sec 6.9 "False Isolation on an Uncontested Network"  (insert after the
+%% first paragraph; numbers from STAGE=phi and STAGE=seeds)
+%% ---------------------------------------------------------------------
+Policy D as defined isolates on the first suspicious window, and in every
+seed that window falls at $t = 20$\,s, before any attacker is active. To
+test whether the comparison rests on a start-up transient, we evaluated
+two stronger immediate policies on the same verdict streams: D$_w$, which
+ignores each beacon's first three usable windows, and D$_1$, which isolates
+on the first window of malicious evidence (trust below $\tau_M$ with
+enough observers in agreement) but without the persistence requirement.
+On the clean network D$_w$ isolated \PENDING{a/b} honest node-seeds and
+D$_1$ \PENDING{c/d}, with $\Phi$ of \PENDING{} and \PENDING{} node-seconds
+against \PENDING{} for policy E (paired bootstrap 95\% CI of the difference
+\PENDING{}). Under attack the same ordering held: \PENDING{table}.
+%% IF D_w / D_1 do NOT isolate most honest beacons, rewrite this section:
+%% the advantage then comes from the warm-up, not from confirmation.
+
+
+%% ---------------------------------------------------------------------
+%% Sec 6.10, para 3  (replace the two sentences on indirect-only)
+%% ---------------------------------------------------------------------
+The components are not inert in the underlying computation. On A2 seed~1,
+direct-only aggregation yields mean trust 0.7148 with 50 window-level
+confirmations, while direct plus indirect yields 0.7548 with 70.
+%% CHECK: your notes call the second configuration "indirect-only", which
+%% is not a Table 10 row. Confirm which configuration produced 0.7548.
+
+
+%% ---------------------------------------------------------------------
+%% Sec 7.2, para 1  (replace)
+%% ---------------------------------------------------------------------
+Fusion did not improve sensitivity in any configuration we ran. Stouffer
+combination matched a disjunctive rule at seven of eight intensities and
+lost one detection at the eighth. Equation~\eqref{eq:ratio} explains why
+an advantage was unlikely: the branches' sensitivity ratio is at least
+2.38, at or beyond the bound for equal weights. Whether a narrow
+fusion-only region exists below our weakest intensity remains open until
+the behavioural threshold is located. Comparable branch sensitivity is a
+prerequisite for fusion to contribute, and no system we surveyed reports
+checking it.
+
+%% Sec 7.2, para 2, first sentence  (typo fix)
+%%   OLD: "The aggregation stage changed no verdict anywhere, It belongs ..."
+The aggregation stage changed no verdict anywhere. It belongs ...
+
+
+%% ---------------------------------------------------------------------
+%% Sec 9, Conclusion para 2  (replace)
+%% ---------------------------------------------------------------------
+For the two attack classes evaluated, single-evidence detection is blind to
+attacks outside its evidence class, completely rather than partially, and
+collecting both behavioural and localisation evidence removes the observed
+blind spots. Confirmation-gated isolation with release reduced cumulative
+false isolation of honest beacons \PENDING{by a factor / to x\% against
+y\%} relative to the strongest immediate-isolation policy, at a cost of
+15--24\,s of attacker activity after onset. Weighted Stouffer fusion has a
+fusion-only region only when the branches' detection thresholds lie within
+a factor of $1+\sqrt{2}$; ours are at least 2.38 apart, and an 80-run sweep
+found no case in which fusion outperformed a disjunctive rule. The trust
+aggregation layer changed no verdict, and neither isolation policy produced
+a throughput difference exceeding its confidence interval.
+
+
+%% ---------------------------------------------------------------------
+%% DECLARATIONS  (new section, before References)
+%% ---------------------------------------------------------------------
+\section*{Declarations}
+
+\textbf{Funding.} No funding was received for this work.
+
+\textbf{Competing interests.} The authors declare no competing interests.
+
+\textbf{Author contributions.} A.V.\ designed and implemented the
+simulator, verification pipeline and experiments, and drafted the
+manuscript. D.V.C.\ supervised the work, contributed to the experimental
+design and revised the manuscript. Both authors read and approved the final
+version.
+
+\textbf{Data and code availability.} Simulation sources, the analysis
+pipeline, per-run outputs, isolation schedules, the exact command lines and
+figure-generation code are available at
+\url{https://github.com/kraghu356/manet-beacon-trust}.
+
+\textbf{Ethics approval.} Not applicable. This study involves neither human
+participants nor animals.
+
+
+%% ---------------------------------------------------------------------
+%% ONE-LINE FIXES  (apply directly in your source)
+%% ---------------------------------------------------------------------
+%% p13 Sec 4.3.3  "above threshold"            -> covered by rewrite above
+%% p24 Sec 6.3    "roughly one octave"         -> covered by rewrite above
+%% Throughout     "NS-3"                       -> "ns-3"  (incl. Table 3)
+%% p26 Fig 4      y label "Detection rate (\%)" -> regenerate with "Detection rate (%)"
+%%                (matplotlib: use r"Detection rate (%)" without the backslash)
+%% p21            delete Fig 2 (duplicates Table 5) or delete Table 5
+%% p10 Sec 4.1    delete "and in early development it produced false
+%%                confirmations under load with no attacker present"
+%% p14 Sec 4.4.1  delete the sentence beginning "An earlier formulation of
+%%                this model applied ..."
+%% p19 Sec 5      move the paragraph "One caution applies to anyone
+%%                reproducing ..." into Sec 5.1
+%% p20 Sec 5.1    state the null quantiles behind tau_M = 0.40, tau_N = 0.70
+%% p28 Sec 6.7    "at a mean of 20.0 s" -> "at 20.0 s in every seed"
+%% p33 Table 10   caption: add "Counts include false confirmations: A1 6/15
+%%                is the attacker in 5 seeds plus one honest beacon."
+%% p34 Sec 7.1    "gating is clearly preferable" -> "gating is preferable"
+%% Fig 5          label the attack-onset marker "attack onset (30 s)"
