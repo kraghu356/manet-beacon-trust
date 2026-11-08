@@ -37,18 +37,53 @@ def _write(path: str, rows: list[tuple]) -> None:
             fh.write(f"{t},{obs},{tgt},{act}\n")
 
 
-def build_schedules(verdicts: pd.DataFrame) -> dict[str, list[tuple]]:
+def _usable(g: pd.DataFrame, min_observers: int) -> pd.Series:
+    """Windows in which a verdict rests on real evidence (finite trust, enough observers)."""
+    tm = pd.to_numeric(g["trust_median"], errors="coerce")
+    return tm.notna() & (g["n_observers"] >= min_observers)
+
+
+def build_schedules(
+    verdicts: pd.DataFrame,
+    warmup_windows: int = 3,
+    min_observers: int = 3,
+) -> dict[str, list[tuple]]:
+    """Build every arm from one verdict stream.
+
+    D   isolate on first SUSPICIOUS window, never release (original arm; it fires on
+        start-up transients, which is why D-variants exist).
+    Dw  D with a warm-up guard: a target's first `warmup_windows` usable windows are
+        ignored before suspicion can isolate it. Attack-agnostic: the guard is counted
+        per target from its own first usable window, never from the attack start.
+    D1  isolate on the first single window of malicious evidence (bad_streak >= 1:
+        trust < theta_low with enough observers and agreement), never release. This is
+        'confirmation without persistence', the strongest honest immediate policy.
+    E   isolate on CONFIRMED, release when the verdict returns to normal.
+    """
     v = verdicts.sort_values("time_s")
 
-    d_rows, e_rows = [], []
+    d_rows, dw_rows, d1_rows, e_rows = [], [], [], []
 
     for target, g in v.groupby("target", sort=True):
         g = g.sort_values("time_s")
+        flagged_mask = g["verdict"].isin([SUSPICIOUS, CONFIRMED])
 
         # D: first time the node looks bad at all.
-        flagged = g[g["verdict"].isin([SUSPICIOUS, CONFIRMED])]
+        flagged = g[flagged_mask]
         if len(flagged):
             d_rows.append((float(flagged["time_s"].iloc[0]), "all", int(target), "isolate"))
+
+        # Dw: same rule after the target's own warm-up.
+        usable_rank = _usable(g, min_observers).cumsum()
+        dw = g[flagged_mask & (usable_rank > warmup_windows)]
+        if len(dw):
+            dw_rows.append((float(dw["time_s"].iloc[0]), "all", int(target), "isolate"))
+
+        # D1: first window of malicious evidence, no persistence requirement.
+        if "bad_streak" in g.columns:
+            d1 = g[g["bad_streak"] >= 1]
+            if len(d1):
+                d1_rows.append((float(d1["time_s"].iloc[0]), "all", int(target), "isolate"))
 
         # E: confirmation only, with release when the verdict is revised.
         state = "out"
@@ -60,17 +95,24 @@ def build_schedules(verdicts: pd.DataFrame) -> dict[str, list[tuple]]:
                 e_rows.append((float(row["time_s"]), "all", int(target), "release"))
                 state = "out"
 
-    return {"C": [], "D": sorted(d_rows), "E": sorted(e_rows)}
+    return {
+        "C": [],
+        "D": sorted(d_rows),
+        "Dw": sorted(dw_rows),
+        "D1": sorted(d1_rows),
+        "E": sorted(e_rows),
+    }
 
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="analysis.make_schedules")
     ap.add_argument("--verdicts", required=True)
     ap.add_argument("--outdir", required=True)
+    ap.add_argument("--warmup-windows", type=int, default=3)
     args = ap.parse_args(argv)
 
     v = pd.read_csv(args.verdicts)
-    sched = build_schedules(v)
+    sched = build_schedules(v, warmup_windows=args.warmup_windows)
     for arm, rows in sched.items():
         path = os.path.join(args.outdir, f"{arm}.csv")
         _write(path, rows)

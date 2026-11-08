@@ -52,6 +52,23 @@ Two open risks are recorded in full in `docs/09-writing-plan.md`: the fusion-onl
 detection region (narrow on synthetic data, unverified on real data) and the
 missing literature file behind the EMBN-MANET comparison.
 
+## Phase 2 (review, Nov 2026)
+
+Runs requested by the internal review of the Paper 2 draft. One stage at a time:
+
+| Stage | ns-3? | What it answers |
+|---|---|---|
+| `STAGE=phi ./scripts/phase2.sh` | no | Is Policy D a warm-up strawman? Adds arms Dw (warm-up guard) and D1 (one window of malicious evidence) and computes Phi on clean **and** attacked runs, with paired bootstrap CIs |
+| `STAGE=low` | 30 runs | Locates the behavioural 50% crossing below 15 m / 3% drop |
+| `STAGE=pair2` | 80 runs | Shows how the sensitivity ratio depends on the delta-p pairing (p = 0.3 f) |
+| `STAGE=seeds` | 105 runs | 30 seeds, sigma = 0: coverage, latency, Phi with paired CIs |
+| `STAGE=shadow` | 170 runs | sigma = 4 and 8 dB: does the localisation branch survive? |
+| `STAGE=eval` | no | Scores all of the above into `results/tables/` |
+
+`python3 -m analysis.fusion_region` prints the corrected fusion-region bound
+(r < 1 + sqrt(2) for equal weights; the draft's sqrt(2) was the region's width, not
+the condition) and the Table 6 crossings. `tests/test_fusion_region.py` checks it.
+
 ## Build status
 
 The NS-3 sources in `ns3/` have **not** been compiled against a live NS-3 tree yet.
