@@ -43,10 +43,10 @@ uncontested network, confirmation-gated isolation with release withdrew
 immediate-isolation policy \PENDING{update to 30 seeds}, at a cost of 15--24\,s of attacker
 activity after onset. Third, we derive when weighted Stouffer fusion can
 detect what neither branch detects alone: the branches' detection
-thresholds must lie within a factor of $1+\sqrt{2}$ for equal weights. Ours
-differ by a factor of 3.63 (95\% CI 2.67--5.47), and across a 110-run
-intensity sweep fusion never outperformed a disjunctive rule and lost
-detections near the behavioural threshold. The
+thresholds must lie within a factor of $1+\sqrt{2}$ for equal weights. The
+condition predicted the outcome of two intensity sweeps (190 runs): where
+the ratio was 3.63, fusion lost detections to a disjunctive rule; where it
+was 1.87, fusion matched it and gained one detection. The
 aggregation stage changed no verdict and neither isolation policy produced
 a throughput difference exceeding its confidence interval. The campaign is
 a proof of concept on one dense topology; Section~8.1 lists the
@@ -108,11 +108,11 @@ both is permanent.
       branches' detection thresholds must lie within a factor of
       $1+\sqrt{2}\approx 2.414$; unequal weights move the bound in a
       direction we give. The condition is checkable from single-branch
-      detection curves before any fusion experiment. Our branches differ
-      by a factor of 3.63 (95\% CI 2.67--5.47), and a 110-run sweep found
-      no intensity at which fusion outperformed disjunction; near the
-      behavioural threshold fusion confirmed fewer attackers (3 of 10
-      against 6).
+      detection curves before any fusion experiment, and it predicted the
+      outcome of two sweeps: at a ratio of 3.63 (95\% CI 2.67--5.47)
+      fusion confirmed fewer attackers than a disjunctive rule near the
+      behavioural threshold (3 of 10 against 6); at 1.87 (95\% CI
+      1.41--2.21) it never confirmed fewer and confirmed one more.
 
 
 %% ---------------------------------------------------------------------
@@ -264,13 +264,54 @@ localisation branch dilutes it. At 11.25\,m fusion confirmed the attacker in
 3 of 10 seeds against 6 for the disjunctive rule, and at 15\,m in 7 against
 8; at every stronger intensity both confirmed it in all ten.
 
-The ratio depends on how the sweep couples the two intensities: we scaled
-$\delta$ and $p$ by a common factor from $\delta = 300$\,m and $p = 0.6$,
-and a different pairing moves both curves along the intensity axis
-\PENDING{report the second pairing, STAGE=pair2}. Equation~\eqref{eq:ratio}
-is a condition on a configuration, not on the evidence classes in general,
-and it can be checked from single-branch detection curves before any
-fusion experiment is run.
+The ratio depends on how the sweep couples the two intensities, and a
+second sweep tests whether \eqref{eq:ratio} predicts the consequence. We
+repeated eight levels with the drop probability halved relative to
+displacement ($0.15f$ instead of $0.3f$; 80 runs, Table~\ref{tab:sweep2}).
+The behavioural curve moved exactly as drop probability dictates: 3, 6 and
+8 of 10 at drops of 1.5, 2.25 and 3\% in both sweeps, so behavioural
+detection depends on the drop rate alone. Localisation, which depends on
+displacement alone, stayed put at $\theta_L = 36.7$\,m. With
+$\theta_B = 19.7$\,m the ratio falls to $r = 1.87$ (bootstrap 95\%
+interval [1.41, 2.21]), inside the equal-weight bound in every resample.
+
+The outcome changed as the condition predicts. Fusion never confirmed
+fewer attackers than the disjunctive rule, and at $f = 0.15$, where the
+behavioural branch alone confirmed 6 of 10, fusion confirmed 7: one seed
+in which neither branch crossed its threshold but their combined evidence
+did. One seed is weak evidence and we do not report it as a fusion
+benefit. What the two sweeps establish is that the same pipeline dilutes
+or helps depending on a ratio measurable before fusion is applied. The
+effective weights vary by window through \eqref{eq:conf}; if localisation
+carries twice the weight of behaviour, the bound tightens to 1.618, which
+17\% of resamples satisfy. Equation~\eqref{eq:ratio} is therefore a
+condition on a configuration, not on the evidence classes in general, and
+it can be checked from single-branch detection curves before any fusion
+experiment is run.
+
+\begin{table}[!t]
+\caption{Second pairing: attacker confirmed (of 10 seeds) with drop
+probability $0.15f$, half the rate of Table~\ref{tab:sweep}, at the same
+displacement $150f$\,m.}
+\label{tab:sweep2}
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}rrrrrrrr@{}}
+\hline
+$f$ & Displ.\ (m) & Drop & Beh. & Loc. & OR & Fused & FP (OR / fused) \\
+\hline
+0.10 & 15.0 & 0.015 & 3 & 0 & 3 & 3 & 5 / 4 \\
+0.15 & 22.5 & 0.0225 & 6 & 1 & 6 & \textbf{7} & 1 / 1 \\
+0.20 & 30.0 & 0.03 & 8 & 0 & 8 & 8 & 5 / 4 \\
+0.30 & 45.0 & 0.045 & 10 & 10 & 10 & 10 & 5 / 5 \\
+0.40 & 60.0 & 0.06 & 10 & 10 & 10 & 10 & 4 / 1 \\
+0.50 & 75.0 & 0.075 & 10 & 10 & 10 & 10 & 2 / 2 \\
+0.70 & 105.0 & 0.105 & 10 & 10 & 10 & 10 & 3 / 2 \\
+1.00 & 150.0 & 0.15 & 10 & 10 & 10 & 10 & 3 / 2 \\
+\hline
+\end{tabular}
+\end{table}
 
 \begin{table}[!t]
 \caption{Attacker confirmed (of 10 seeds) across the extended A3 intensity
@@ -370,14 +411,15 @@ confirmations, while direct plus indirect yields 0.7548 with 70.
 %% ---------------------------------------------------------------------
 %% Sec 7.2, para 1  (replace)
 %% ---------------------------------------------------------------------
-Fusion did not improve sensitivity in any configuration we ran. Stouffer
-combination matched a disjunctive rule at nine of eleven intensities and
-confirmed fewer attackers at the two closest to the behavioural threshold.
-Equation~\eqref{eq:ratio} explains why: the branches' sensitivity ratio is
-3.63, well beyond the bound of 2.414 for equal weights, so averaging in the
-weaker branch can only dilute the stronger one. Comparable branch
-sensitivity is a prerequisite for fusion to contribute, and no system we
-surveyed reports checking it.
+Whether fusion helps was decided by the configuration, not by the
+combination rule. In the primary sweep the branches' sensitivity ratio was
+3.63, beyond the bound of 2.414, and Stouffer combination confirmed fewer
+attackers than a disjunctive rule at the two intensities nearest the
+behavioural threshold. Halving the drop rate relative to displacement
+brought the ratio to 1.87, inside the bound, and fusion then never
+confirmed fewer and confirmed one more. Comparable branch sensitivity is a
+prerequisite for fusion to contribute, it can be measured before fusion is
+applied, and no system we surveyed reports checking it.
 
 %% Sec 7.2, para 2, first sentence  (typo fix)
 %%   OLD: "The aggregation stage changed no verdict anywhere, It belongs ..."
@@ -395,8 +437,9 @@ false isolation of honest beacons to 4.1\% of available service against
 73.5\% for the strongest immediate-isolation policy, at a cost of
 15--24\,s of attacker activity after onset. Weighted Stouffer fusion has a
 fusion-only region only when the branches' detection thresholds lie within
-a factor of $1+\sqrt{2}$; ours are 3.63 apart, and across a 110-run sweep
-fusion never outperformed a disjunctive rule. The trust
+a factor of $1+\sqrt{2}$, and across two sweeps that condition predicted
+whether fusion diluted ($r = 3.63$) or matched and marginally exceeded
+($r = 1.87$) a disjunctive rule. The trust
 aggregation layer changed no verdict, and neither isolation policy produced
 a throughput difference exceeding its confidence interval.
 
