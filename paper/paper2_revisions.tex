@@ -32,15 +32,15 @@ exchange traffic with them. Prior defences detect them from localisation
 evidence and remove them permanently. We study the decision that precedes
 removal and what an error costs. A two-stage pipeline fuses behavioural and
 localisation evidence into per-observer trust and resolves it into a
-three-state verdict; isolation policies are compared across
-\PENDING{N} ns-3 runs. First, evidence coverage: each single-evidence
-detector confirmed the attacker in 0 of \PENDING{n} trials of the attack
-that leaves no signature in its class, while using both confirmed it in
-every trial. Second, we introduce cumulative false isolation~$\Phi$, in
+three-state verdict; isolation policies are compared across 315 ns-3 runs,
+including a 30-seed campaign. First, evidence coverage: against the attack
+that leaves no signature in its evidence class, the localisation branch
+confirmed the attacker in 0 of 30 seeds and the behavioural branch in 3 of
+30, near its chance rate, while using both confirmed it in all 30. Second, we introduce cumulative false isolation~$\Phi$, in
 node-seconds, which measures how long a mechanism's errors persist. On an
 uncontested network, confirmation-gated isolation with release withdrew
-4.1\% of honest-beacon service against 73.5\% for the strongest
-immediate-isolation policy \PENDING{update to 30 seeds}, at a cost of 15--24\,s of attacker
+3.9\% of honest-beacon service against 74.8\% for the strongest
+immediate-isolation policy, at a cost of a mean 20--42\,s of attacker
 activity after onset. Third, we derive when weighted Stouffer fusion can
 detect what neither branch detects alone: the branches' detection
 thresholds must lie within a factor of $1+\sqrt{2}$ for equal weights. The
@@ -97,10 +97,11 @@ both is permanent.
       false-positive rate. Against three immediate-isolation policies,
       including one that waits for a single window of malicious evidence
       and one with a warm-up guard, confirmation-gated isolation with
-      release reduced~$\Phi$ on a clean network from 882--1054 to 49
-      node-seconds (strongest immediate policy minus E: 833 node-seconds,
-      paired bootstrap 95\% CI [744, 937]), and on attacked networks from
-      522--729 to 0--49 node-seconds \PENDING{update to 30 seeds}.
+      release reduced~$\Phi$ over 30 seeds on a clean network from
+      897--1052 to 47 node-seconds (strongest immediate policy minus E:
+      851 node-seconds, paired bootstrap 95\% CI [785, 911]), and on
+      attacked networks from 586--716 to 15--47 node-seconds, with every
+      paired interval excluding zero.
 
 %% Sec 1.1, Contribution 5  (replace)
 \item We derive the condition under which weighted Stouffer fusion has a
@@ -186,11 +187,25 @@ rules are listed in Section~9.1.
 The coverage result is a result about evidence collection; the fusion-rule
 question is taken up in Section~6.5.
 
-%% Sec 6.1, after "with zero variance across seeds in each case."  (insert)
-The zero variance reflects the decision grid as much as the evidence. With
-a 5\,s window step and a persistence requirement of $K=3$ windows, 15\,s is
-the shortest latency the design permits, so A1 and A3 are confirmed at the
-first opportunity in every seed.
+%% Sec 6.1, REPLACE the five-seed latency sentence ("15.0 s ... with zero
+%% variance across seeds") with:
+Over 30 seeds, the fused pipeline confirmed the attacker in every seed of
+every attack, with mean latency 20.0\,s (SD 17.1) for A1, 41.7\,s (SD 39.2)
+for A2 and 20.7\,s (SD 16.3) for A3. With a 5\,s window step and a
+persistence requirement of $K=3$ windows, 15\,s is the shortest latency the
+design permits; the five-seed campaign reached it in every seed, and the
+larger campaign shows a tail of slower confirmations, longest for the
+behavioural-only attack A2.
+
+%% Sec 6.1, coverage sentence: REPLACE "0/5" for behaviour on A1 with:
+Behavioural evidence alone confirmed the A1 attacker in 3 of 30 seeds. The
+attacker forwards honestly, so these confirmations carry no attack signal:
+the fused pipeline confirms honest beacons at a similar rate on a clean
+network (9 of 90 node-seeds). Localisation evidence alone confirmed the A2
+attacker in 0 of 30.
+%% CHECK: report the behaviour-only false-positive rate on clean runs
+%% (column behaviour_fp in results/tables/seeds30/coverage_per_run.csv)
+%% if you prefer it to the fused rate.
 
 
 %% ---------------------------------------------------------------------
@@ -355,44 +370,48 @@ both as well.
 %% Sec 6.9 "False Isolation on an Uncontested Network"  (insert after the
 %% first paragraph; numbers from STAGE=phi and STAGE=seeds)
 %% ---------------------------------------------------------------------
-Policy D as defined isolates on the first suspicious window, and in every
-seed that window falls at $t = 20$\,s, before any attacker is active. To
+Policy D as defined isolates on the first suspicious window, and in each
+of the original five seeds that window fell at $t = 20$\,s, before any
+attacker was active. To
 test whether the comparison rests on a start-up transient, we evaluated
 two stronger immediate policies on the same verdict streams: D$_w$, which
 ignores each beacon's first three usable windows, and D$_1$, which isolates
 on the first window of malicious evidence (trust below $\tau_M$ with
 enough observers in agreement) but without the persistence requirement.
-On the clean network both still isolated every honest beacon in every
-seed (15/15 node-seeds each), with mean $\Phi$ of 1039 and 882
-node-seconds against 49 for policy E. The paired difference between D$_1$
-and E is 833 node-seconds (bootstrap 95\% CI [744, 937]); in normalised
-form D$_1$ withdraws 73.5\% of honest-beacon service and E 4.1\%. The
-advantage therefore does not come from the start-up transient: removing the
-persistence requirement alone is enough to isolate every honest beacon.
+Over 30 seeds on the clean network, D$_w$ isolated all 90 honest
+node-seeds and D$_1$ 88 of 90, with mean $\Phi$ of 1018 and 897
+node-seconds against 47 for policy E, which isolated 9 of 90. The paired
+difference between D$_1$ and E is 851 node-seconds (bootstrap 95\% CI
+[785, 911]); in normalised form D$_1$ withdraws 74.8\% of honest-beacon
+service and E 3.9\%. The advantage therefore does not come from the
+start-up transient: removing the persistence requirement alone is enough to
+isolate nearly every honest beacon.
 Table~\ref{tab:phivariants} gives the same comparison under attack, where
 every paired interval excludes zero.
 
 \begin{table}[!t]
 \caption{Cumulative false isolation $\Phi$ (node-seconds) of honest beacons
-by policy, five seeds \PENDING{update to 30 seeds}. Honest isolated counts
-node-seeds; 95\% intervals are percentile bootstrap.}
+by policy, 30 seeds. Honest isolated counts node-seeds; 95\% intervals
+are percentile bootstrap over seeds. The final column is the paired
+difference from policy E.}
 \label{tab:phivariants}
 \centering
 \small
-\begin{tabular}{@{}llcrc@{}}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llcrcc@{}}
 \hline
-Network & Policy & Honest isolated & $\Phi$ mean & 95\% CI \\
+Network & Policy & Honest isolated & $\Phi$ & 95\% CI & $\Phi - \Phi_E$ [95\% CI] \\
 \hline
-Clean & D   & 15/15 & 1054 & [984, 1100] \\
-      & D$_w$ & 15/15 & 1039 & [976, 1090] \\
-      & D$_1$ & 15/15 & 882 & [795, 969] \\
-      & E   & 1/15 & 49 & [0, 147] \\
-A1    & D$_1$ & 10/10 & 630 & [576, 687] \\
-      & E   & 1/10 & 49 & [0, 147] \\
-A2    & D$_1$ & 10/10 & 586 & [518, 646] \\
-      & E   & 0/10 & 0 & [0, 0] \\
-A3    & D$_1$ & 9/10 & 522 & [400, 637] \\
-      & E   & 1/10 & 15 & [0, 45] \\
+Clean & D     & 90/90 & 1052 & [1025, 1077] & 1005 [964, 1044] \\
+      & D$_w$ & 90/90 & 1018 & [994, 1039]  & 971 [933, 1006] \\
+      & D$_1$ & 88/90 & 897  & [843, 950]   & 851 [785, 911] \\
+      & E     & 9/90  & 47   & [18, 79]     & --- \\
+A1    & D$_1$ & 59/60 & 611  & [573, 648]   & 565 [519, 609] \\
+      & E     & 8/60  & 47   & [18, 79]     & --- \\
+A2    & D$_1$ & 58/60 & 587  & [532, 638]   & 557 [499, 612] \\
+      & E     & 7/60  & 30   & [10, 54]     & --- \\
+A3    & D$_1$ & 59/60 & 586  & [526, 639]   & 571 [514, 625] \\
+      & E     & 6/60  & 15   & [2, 31]      & --- \\
 \hline
 \end{tabular}
 \end{table}
@@ -433,9 +452,9 @@ For the two attack classes evaluated, single-evidence detection is blind to
 attacks outside its evidence class, completely rather than partially, and
 collecting both behavioural and localisation evidence removes the observed
 blind spots. Confirmation-gated isolation with release reduced cumulative
-false isolation of honest beacons to 4.1\% of available service against
-73.5\% for the strongest immediate-isolation policy, at a cost of
-15--24\,s of attacker activity after onset. Weighted Stouffer fusion has a
+false isolation of honest beacons to 3.9\% of available service against
+74.8\% for the strongest immediate-isolation policy over 30 seeds, at a
+cost of a mean 20--42\,s of attacker activity after onset. Weighted Stouffer fusion has a
 fusion-only region only when the branches' detection thresholds lie within
 a factor of $1+\sqrt{2}$, and across two sweeps that condition predicted
 whether fusion diluted ($r = 3.63$) or matched and marginally exceeded
