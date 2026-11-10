@@ -15,8 +15,9 @@ S_i(t) \in \{\textsc{Normal}, \textsc{Suspicious}, \textsc{Confirmed}\}.
 The intermediate state exists so that a single anomalous observation does
 not directly authorise removal.
 
-We assume an upstream detector supplies candidate malicious beacons; this
-work concerns what happens to a candidate thereafter. Attackers are insiders
+The pipeline both raises suspicion and decides what follows it; the
+contribution concerns the second step, the verification and response that
+follow a first suspicion. Attackers are insiders
 holding valid credentials, so cryptographic authentication does not resolve
 the problem: an authenticated node can still lie.
 

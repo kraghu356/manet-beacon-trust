@@ -121,7 +121,9 @@ def test_schedules() -> None:
             v = SUSPICIOUS
         else:
             v = CONFIRMED
-        rows.append({"time_s": float(t), "target": 2, "verdict": v, "is_attacker": 1})
+        rows.append({"time_s": float(t), "target": 2, "verdict": v, "is_attacker": 1,
+                     "trust_median": 0.5, "n_observers": 3, "bad_streak": int(v != NORMAL),
+                     "beh_available": True})
     v = pd.DataFrame(rows)
     s = build_schedules(v)
 
@@ -132,6 +134,22 @@ def test_schedules() -> None:
           f"arm E should isolate at first confirmation (60 s), got {s['E']}")
     check(s["D"][0][0] < s["E"][0][0],
           "D must react sooner than E, otherwise the prior-work arm is strawmanned")
+
+
+def test_evidence_aware_release() -> None:
+    # Confirmed on behaviour at 40 s; verdict clears at 60 s while behavioural
+    # evidence is absent (as when the beacon is isolated), then returns at 80 s.
+    rows = []
+    for t in range(30, 100, 5):
+        verdict = CONFIRMED if 40 <= t < 60 else NORMAL
+        rows.append({"time_s": float(t), "target": 1, "verdict": verdict, "is_attacker": 0,
+                     "trust_median": 0.5, "n_observers": 3, "bad_streak": 0,
+                     "beh_available": not (60 <= t < 80)})
+    s = build_schedules(pd.DataFrame(rows))
+    check([r[3] for r in s["E"]] == ["isolate", "release"] and s["E"][1][0] == 60.0,
+          f"E should release at the first normal window (60 s), got {s['E']}")
+    check(s["Ea"][1][0] == 80.0,
+          f"Ea should wait for behavioural evidence (80 s), got {s['Ea']}")
 
 
 def test_aggregate() -> None:

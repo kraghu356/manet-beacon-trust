@@ -41,10 +41,10 @@ in Table~\ref{tab:notation}.
 \draw[arr] (dec.south) -- ++(0,-4mm) -| (con.north);
 \draw[arr, orange!60!black] (con) -- (iset);
 \draw[arr, orange!60!black] (iset) -- (rec);
-\draw[arr, dashed, orange!60!black] (rec.west) -| node[pos=0.3, above, font=\scriptsize]{release if revised (E)} (nor.south);
+\draw[arr, dashed, orange!60!black] (rec.west) -| node[pos=0.3, above, font=\scriptsize]{release if revised (E, E$'$)} (nor.south);
 \node[note, right=3mm of s1] {Unit variance under the null for any weights, so one threshold serves all configurations (Sec.~\ref{sec:calib}).};
 \node[note, right=3mm of s2] {$T^I$: trimmed peer mean, one recommender capped at $\kappa=0.3$. $T^H$: asymmetric EWMA, $\lambda_\downarrow=0.5$, $\lambda_\uparrow=0.9$.};
-\node[note, right=3mm of iset] {Policies D, D$_w$, D$_1$ isolate before confirmation and never release; E isolates only from Confirmed and can release.};
+\node[note, right=3mm of iset] {Policies D, D$_w$, D$_1$ isolate before confirmation and never release; E and E$'$ isolate only from Confirmed and can release.};
 \end{tikzpicture}
 \caption{Verification pipeline. Behavioural and localisation evidence are
 standardised, oriented and fused in Stage~1 to give a per-observer direct
@@ -349,14 +349,27 @@ consecutive clean windows against the $K = 3$ required to enter it, a four-fold
 asymmetry in the same direction as the trust decay constants. This rule gives
 policy E its release behaviour.
 
+\textbf{Evidence-aware release.} Isolation removes a beacon from forwarding, so
+while it is isolated its behavioural branch receives too few transit packets
+to contribute, and its trust rests on localisation alone. Under policy E a
+beacon confirmed on behavioural evidence can therefore be cleared by the
+absence of that evidence rather than by its return. Policy E$'$ closes this
+path: a beacon confirmed in a window in which behavioural evidence was
+available is released only on a clean window in which behavioural evidence is
+again available. A beacon confirmed on localisation evidence alone is released
+as under E. Section~\ref{sec:release} measures what the rule costs.
+
 \subsection{Isolation}
 
-On confirmation the beacon enters the isolation set,
+On confirmation the beacon enters the isolation set, and under a releasing
+policy it leaves when released,
 \begin{equation}
 \label{eq:iso}
-\mathcal{B}_{iso}(t) = \mathcal{B}_{iso}(t-1) \cup \{\, i : S_i(t) = \textsc{Confirmed} \,\},
+\mathcal{B}_{iso}(t) = \bigl(\mathcal{B}_{iso}(t-1) \cup \{\, i : S_i(t) = \textsc{Confirmed} \,\}\bigr)
+\setminus \mathcal{R}(t),
 \end{equation}
-and the admissible node set becomes $V'(t) = V \setminus \mathcal{B}_{iso}(t)$.
+where $\mathcal{R}(t)$ is the set released at $t$ (empty for the policies
+that never release). The admissible node set becomes $V'(t) = V \setminus \mathcal{B}_{iso}(t)$.
 Every subsequent route must satisfy $P \cap \mathcal{B}_{iso}(t) = \emptyset$.
 Enforcement is by a blacklist queueing discipline; route repair is performed by
 AODV.

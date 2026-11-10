@@ -295,6 +295,9 @@ def fig_shadow(R, out):
         mu, lo, hi = [], [], []
         for _, cov, _ in rows:
             x = cov.loc[cov.attack == a, "latency_s"].dropna().to_numpy(float)
+            # A negative latency means the beacon was already (falsely) confirmed
+            # before onset; latency is undefined there (Table 13 note).
+            x = x[x >= 0]
             # Latency is right-skewed: plot median with interquartile range.
             m = np.median(x)
             l, h = np.percentile(x, [25, 75])

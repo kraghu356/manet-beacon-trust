@@ -153,7 +153,7 @@ replayed D$_1$ and E schedules were enforced in the simulator, the enforced
 traces were re-verified with the same calibration, and each policy's schedule
 was rebuilt from the verdicts produced under isolation (20 further runs).
 This is one step of a fixed-point check rather than a fully online detector,
-and Section~\ref{sec:phi} reports the result. We compare five isolation
+and Section~\ref{sec:phi} reports the result. We compare six isolation
 policies:
 
 \begin{itemize}
@@ -169,6 +169,14 @@ policies:
       release. This is the strongest honest immediate policy.
 \item \textbf{E, confirmation-gated isolation.} Isolate only on confirmation;
       release when the verdict is subsequently revised.
+\item \textbf{E$'$, confirmation-gated isolation with evidence-aware
+      release.} As E, but a beacon confirmed while behavioural evidence was
+      available is released only when that evidence returns
+      (Section~\ref{sec:framework}). E$'$ was introduced after the enforced
+      runs showed that E re-admits forwarding attackers
+      (Section~\ref{sec:release}); because a beacon confirmed on behaviour
+      stays isolated under E$'$, its closed-loop schedule follows exactly
+      from the verdicts issued before isolation.
 \end{itemize}
 
 Policies D, D$_w$ and D$_1$ are constructions for comparison and are not models
@@ -182,7 +190,9 @@ as well.
 \subsection{Reproducibility}
 
 The simulator is ns-3.48 built with GCC on Ubuntu under WSL2, with the analysis
-pipeline in Python~3. Every run uses an explicit integer seed, so any run is
+pipeline in Python~3. Simulator sources, the analysis pipeline and the scripts
+for every campaign are public at
+\url{https://github.com/kraghu356/manet-beacon-trust}. Every run uses an explicit integer seed, so any run is
 reproducible from its scenario, policy and seed. Detection thresholds were
 fixed on the trust scale before any attack scenario was run, and the null
 distributions of $A_B$ and $A_L$ were calibrated on clean-network runs that

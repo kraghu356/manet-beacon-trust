@@ -6,3 +6,4 @@ results/*
 __pycache__/
 build/
 .venv/
+!results/tables/

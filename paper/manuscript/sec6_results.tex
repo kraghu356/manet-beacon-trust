@@ -505,7 +505,7 @@ A3    & D$_1$ & 59/60 & 586  & [526, 639]   & 571 [514, 625] \\
 \includegraphics[width=0.8\textwidth]{fig8_phi}
 \caption{Fraction of honest-beacon service withdrawn, $\bar\Phi$, by policy and
 network, 30 seeds, with bootstrap 95\% intervals. Every immediate policy
-withdraws 73--90\% of honest service; confirmation-gated isolation with release
+withdraws 73--90\% of honest service; confirmation-gated isolation (E)
 withdraws 2--6\%.}
 \label{fig:phi}
 \end{figure}
@@ -534,7 +534,8 @@ from 910.5 to 829.5 node-seconds (paired difference $-81$, 95\% CI
 $[-201.5, 45.5]$) and E from 32.5 to 24.5 (difference $-8$, CI $[-22, 0]$).
 Neither interval excludes zero, and per seed the D$_1$ difference ranged from
 $-370$ to $+295$, so the replay is unbiased within this resolution but noisy
-for the immediate policy. The comparison the paper rests on survived: under
+for the immediate policy, and per-seed values of $\Phi$ for D$_1$ should not
+be read individually. The comparison the paper rests on survived: under
 isolation D$_1$ withdrew 69.1\% of honest-beacon service and E 2.0\%, D$_1$
 exceeded E in all ten seeds, and the paired difference was 805 node-seconds
 (CI $[693.5, 917]$) against 878 in the replay. For E the replay, if anything,
@@ -542,11 +543,86 @@ overstates $\Phi$.
 
 The mechanism is that the policies inherit different bounds. Policy E isolates
 only on confirmation, so its false-isolation rate is bounded by the detector's
-false-confirmation rate of about 10\% (Section~\ref{sec:fp}), and its release
-rule bounds how long each error lasts. The immediate policies isolate on weaker
-evidence, which on an uncontested network fires on nearly every monitored
-beacon, and never release. The three-state verdict's contribution is the
+false-confirmation rate of about 10\% (Section~\ref{sec:fp}). The immediate
+policies isolate on weaker evidence, which on an uncontested network fires on
+nearly every monitored beacon. The three-state verdict's contribution is the
 tighter bound; it does not change what the detector can see.
+Section~\ref{sec:release} shows that release contributes little to the gap.
+
+\subsection{Release under isolation}
+\label{sec:release}
+
+The schedules above were built from verdicts issued while no beacon was
+isolated. Re-verifying the enforced runs of the original campaign exposed a
+behaviour that this construction hides. While a beacon is isolated it
+forwards no transit traffic, so its behavioural branch falls below the
+minimum sample: across the enforced runs behavioural evidence was usable in
+1.6\% of the windows in which a beacon was isolated, against 54\% for the same
+beacons and windows without isolation, while localisation evidence remained
+usable in every window. For the A2 attacker, whose only signature is
+behavioural, the fused trust therefore recovers once it is isolated. When the
+E schedule was rebuilt from the verdicts issued under isolation, the A2
+attacker was isolated at 45--65\,s and released at 115--160\,s in all five
+seeds, after the twelve clean windows that clearing requires. A1 and A3
+remained isolated, because their position lie keeps the localisation branch
+in its tail. In a closed loop E would therefore cycle a forwarding attacker
+between isolation and re-admission. The replayed schedules contain milder
+cases of the same effect: even without isolation, E released the attacker in
+7 of the 90 attacked runs of the 30-seed campaign and in 3 of 60 at 4\,dB.
+
+Policy E$'$ (Section~\ref{sec:framework}) releases a beacon confirmed on
+behavioural evidence only when that evidence returns, which an isolated
+beacon cannot supply. Its closed-loop schedule is therefore exact for those
+beacons, which stay isolated, and follows the replay for beacons confirmed on
+localisation alone. Table~\ref{tab:release} gives its cost.
+
+\begin{table}[!t]
+\caption{False isolation under evidence-aware release. $\bar\Phi$ is the
+fraction of honest-beacon service withdrawn; E$'$ is evaluated as the closed
+loop would run it. The last column is the paired difference D$_1 -$ E$'$ in
+node-seconds with its bootstrap 95\% interval. 30 seeds at 0\,dB, 20 under
+shadowing.}
+\label{tab:release}
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llcccc@{}}
+\toprule
+$\sigma_{sh}$ & Network & $\bar\Phi$ E & $\bar\Phi$ E$'$ & $\bar\Phi$ D$_1$ & D$_1 -$ E$'$ [95\% CI] \\
+\midrule
+0\,dB & Clean & 0.039 & 0.050 & 0.748 & 837 [773, 901] \\
+      & A1    & 0.058 & 0.075 & 0.764 & 551 [500, 601] \\
+      & A2    & 0.037 & 0.047 & 0.734 & 550 [486, 607] \\
+      & A3    & 0.018 & 0.035 & 0.732 & 558 [497, 617] \\
+4\,dB & Clean & 0.024 & 0.045 & 0.688 & 771 [677, 858] \\
+      & A1    & 0.016 & 0.029 & 0.694 & 532 [475, 586] \\
+      & A2    & 0.011 & 0.014 & 0.686 & 538 [482, 589] \\
+      & A3    & 0.008 & 0.008 & 0.658 & 520 [445, 584] \\
+8\,dB & Clean & 0.000 & 0.000 & 0.602 & 723 [656, 786] \\
+      & A1    & 0.000 & 0.000 & 0.622 & 498 [452, 541] \\
+      & A2    & 0.036 & 0.036 & 0.514 & 382 [321, 449] \\
+      & A3    & 0.026 & 0.026 & 0.491 & 372 [298, 438] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Evidence-aware release removed re-admission entirely: no attacker isolated
+under E$'$ was released, in any of the 209 runs in which one was isolated. The
+cost in false isolation was small. On the clean network $\bar\Phi$ rose from
+3.9\% to 5.0\% (paired increase 13 node-seconds, 95\% CI [2, 28]), and E$'$
+withdrew at most 7.5\% of honest-beacon service in any condition. The gap to
+D$_1$ remained between 372 and 837 node-seconds, with every interval
+excluding zero. The small cost has a revealing cause: 46 of the 50 honest
+beacons that E$'$ isolated across the three channels were never released, so
+E$'$ amounts to near-permanent isolation on confirmation. Its advantage over
+the immediate policies therefore comes from confirmation gating, not from
+release. Release under E affected few honest beacons, and on the evidence
+here a releasing policy is worth having only if it can distinguish recovered
+evidence from absent evidence.
+
+The A2 throughput and recovery rows of Table~\ref{tab:policy} were produced
+by a schedule that never released the attacker. They are the rows E$'$ would
+produce, not those of E in a closed loop.
 
 \subsection{Aggregation ablation}
 \label{sec:ablation}
@@ -601,10 +677,11 @@ pipeline's attacker detections; latency is the median [interquartile range]
 time from attack onset to confirmation, since the distributions are strongly
 right-skewed; $\bar\Phi$ is the fraction of honest-beacon service withdrawn.
 The $\sigma_{sh} = 0$ rows are the 30-seed campaign. In one 4\,dB seed the
-node that later attacks was confirmed 5\,s before onset in all three
-scenarios, a false confirmation counted here as a detection with latency
-$-5$\,s; it is also the single localisation confirmation of A2 at 4\,dB.
-Excluding that seed changes the A2 median to 125\,s and no other median.}
+beacon that later attacks was already falsely confirmed 5\,s before onset; in
+the clean run of that seed the false confirmation cleared at 115\,s, but in
+all three attack runs it persisted to the end, so the detection is counted.
+Its latency is undefined and that seed is excluded from the latency columns.
+It is also the single localisation confirmation of A2 at 4\,dB.}
 \label{tab:shadow}
 \centering
 \small
@@ -618,8 +695,8 @@ $\sigma_{sh}$ & Attack & Beh. & Loc. & Confirmed & Latency (s) & $\bar\Phi$ E / 
       & A3 & 30/30 & 30/30 & 30/30 & 15.0 [15.0--15.0] & 0.018 / 0.732 \\
       & Clean & --- & --- & --- & --- & 0.039 / 0.748 \\
 4\,dB & A1 & 5/20 & 20/20 & 20/20 & 15.0 [15.0--15.0] & 0.016 / 0.694 \\
-      & A2 & 20/20 & 1/20 & 20/20 & 122.5 [30.0--206.2] & 0.011 / 0.686 \\
-      & A3 & 20/20 & 20/20 & 20/20 & 20.0 [15.0--31.2] & 0.008 / 0.658 \\
+      & A2 & 20/20 & 1/20 & 20/20 & 125.0 [57.5--212.5] & 0.011 / 0.686 \\
+      & A3 & 20/20 & 20/20 & 20/20 & 20.0 [15.0--32.5] & 0.008 / 0.658 \\
       & Clean & --- & --- & --- & --- & 0.024 / 0.688 \\
 8\,dB & A1 & 0/20 & 20/20 & 20/20 & 22.5 [20.0--40.0] & 0.000 / 0.622 \\
       & A2 & 20/20 & 3/20 & 20/20 & 150.0 [101.2--215.0] & 0.036 / 0.514 \\
@@ -655,7 +732,7 @@ the behavioural score is measured against.
 
 The cost appeared as latency. Median time to confirmation for A2, the attack
 visible only through forwarding, rose from 27.5\,s without shadowing to
-122.5\,s at 4\,dB and 150\,s at 8\,dB; A3 rose to 155\,s at 8\,dB, once its
+125\,s at 4\,dB and 150\,s at 8\,dB; A3 rose to 155\,s at 8\,dB, once its
 behavioural branch had degraded. A1, with its strong localisation signature,
 was confirmed at a median of 15\,s at 4\,dB and 22.5\,s at 8\,dB.
 

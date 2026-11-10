@@ -44,8 +44,9 @@ eager degrades exactly the service it exists to protect.
 
 This paper reports an experimental study of both questions, conducted in
 ns-3 across 525 distinct simulations: a 30-seed detection campaign over three
-attack scenarios and a clean network, isolation runs under five policies,
-two attack-intensity sweeps, and a repetition under log-normal shadowing.
+attack scenarios and a clean network, six isolation policies replayed over
+that campaign and checked by enforcing them in the simulator, two
+attack-intensity sweeps, and a repetition under log-normal shadowing.
 
 \begin{enumerate}
 \item We frame malicious beacon verification as a question of evidence
@@ -77,11 +78,20 @@ two attack-intensity sweeps, and a repetition under log-normal shadowing.
       its normalised form~$\bar\Phi$, as complements to the false-positive
       rate. Against three immediate-isolation policies, including one that
       waits for a single window of malicious evidence and one with a
-      warm-up guard, confirmation-gated isolation with release reduced
-      $\Phi$ on a clean network from 897--1052 to 47 node-seconds (paired
-      difference from the strongest immediate policy 851 node-seconds,
-      bootstrap 95\% CI [785, 911]), and on attacked networks from 586--716
-      to 15--47 node-seconds.
+      warm-up guard, confirmation-gated isolation reduced $\Phi$ on a clean
+      network from 897--1052 to 47 node-seconds (paired difference from the
+      strongest immediate policy 851 node-seconds, bootstrap 95\% CI
+      [785, 911]), and on attacked networks from 586--716 to 15--47
+      node-seconds. Enforcing the schedules in the simulator preserved the
+      gap in every seed.
+
+\item We show that releasing an isolated beacon when its verdict clears
+      re-admits forwarding attackers in a closed loop, because isolation
+      removes the very traffic their behavioural evidence comes from. An
+      evidence-aware release rule prevented every re-admission at a cost of
+      13 node-seconds of false isolation on the clean network, and showed
+      that the advantage of confirmation-gated isolation comes from the
+      gating, not from release.
 
 \item We show that every weighted Stouffer detector has a fusion-only
       region, containing attackers whose two anomalies are each
@@ -104,7 +114,7 @@ two attack-intensity sweeps, and a repetition under log-normal shadowing.
 \item We test robustness to log-normal shadowing at 4 and 8\,dB. Detection
       and the false-isolation result survive; the cost moves to latency,
       which for forwarding attacks rises from a median of 27.5\,s to
-      123--155\,s.
+      125--155\,s.
 
 \item We report negative results in the body of the paper: the trust
       aggregation stage changed no verdict, neither isolation policy

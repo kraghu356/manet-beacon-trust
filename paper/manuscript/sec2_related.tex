@@ -49,11 +49,11 @@ false positives under changing topology, which motivates dynamic or adaptive
 trust state. Chatzidakis and Hadjiefthymiades~\cite{chatzidakis2022trust}
 make this explicit, proposing a mechanism that identifies malicious nodes,
 alerts the network, and subsequently restores trust when a node resumes
-healthy behaviour or when an earlier classification proves incorrect. The
-possibility of restoration is important and we adopt it: a verification
-scheme that can only ever remove nodes accumulates errors monotonically, a
-point our clean-network experiment makes quantitatively in
-Section~\ref{sec:phi}.
+healthy behaviour or when an earlier classification proves incorrect. We
+adopt the possibility of restoration, and Section~\ref{sec:release} shows
+that it is harder to use safely than it appears: an isolated node cannot
+display the healthy behaviour that restoration waits for, so a rule that
+restores trust when bad evidence stops can re-admit an attacker.
 
 \subsection{Learned trust models}
 

@@ -1,0 +1,4 @@
+time_s,observer,target,action
+85.0,all,2,isolate
+190.0,all,2,release
+275.0,all,2,isolate

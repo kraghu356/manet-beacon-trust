@@ -59,10 +59,15 @@ def build_schedules(
         trust < theta_low with enough observers and agreement), never release. This is
         'confirmation without persistence', the strongest honest immediate policy.
     E   isolate on CONFIRMED, release when the verdict returns to normal.
+    Ea  E with evidence-aware release: a beacon confirmed while behavioural evidence
+        was available is released only on a normal window that again has behavioural
+        evidence. Isolation removes a beacon's transit traffic, so in a closed loop a
+        beacon confirmed on behaviour stays isolated; without this rule E re-admits
+        forwarding attackers once their behavioural evidence vanishes.
     """
     v = verdicts.sort_values("time_s")
 
-    d_rows, dw_rows, d1_rows, e_rows = [], [], [], []
+    d_rows, dw_rows, d1_rows, e_rows, ea_rows = [], [], [], [], []
 
     for target, g in v.groupby("target", sort=True):
         g = g.sort_values("time_s")
@@ -95,12 +100,24 @@ def build_schedules(
                 e_rows.append((float(row["time_s"]), "all", int(target), "release"))
                 state = "out"
 
+        # Ea: as E, but release needs the evidence that supported confirmation.
+        state, need_beh = "out", False
+        for _, row in g.iterrows():
+            if state == "out" and row["verdict"] == CONFIRMED:
+                ea_rows.append((float(row["time_s"]), "all", int(target), "isolate"))
+                state, need_beh = "in", bool(row.get("beh_available", False))
+            elif (state == "in" and row["verdict"] == "normal"
+                  and (not need_beh or bool(row.get("beh_available", False)))):
+                ea_rows.append((float(row["time_s"]), "all", int(target), "release"))
+                state = "out"
+
     return {
         "C": [],
         "D": sorted(d_rows),
         "Dw": sorted(dw_rows),
         "D1": sorted(d1_rows),
         "E": sorted(e_rows),
+        "Ea": sorted(ea_rows),
     }
 
 
