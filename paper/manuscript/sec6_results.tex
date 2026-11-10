@@ -525,7 +525,20 @@ ordering holds, and every paired interval excludes zero. Replaying the
 original campaign's five clean seeds under that campaign's own calibration
 gives D 1054 and E 49 node-seconds, inside the corresponding 30-seed
 intervals. This is a check on calibration, not on the replay itself: both
-figures are computed offline (Section~\ref{sec:method}).
+figures are computed offline.
+
+The replay itself was tested on clean seeds 1--10 by enforcing the replayed
+schedules and rebuilding them from the verdicts issued under isolation
+(Section~\ref{sec:method}). Isolation lowered $\Phi$ for both policies: D$_1$
+from 910.5 to 829.5 node-seconds (paired difference $-81$, 95\% CI
+$[-201.5, 45.5]$) and E from 32.5 to 24.5 (difference $-8$, CI $[-22, 0]$).
+Neither interval excludes zero, and per seed the D$_1$ difference ranged from
+$-370$ to $+295$, so the replay is unbiased within this resolution but noisy
+for the immediate policy. The comparison the paper rests on survived: under
+isolation D$_1$ withdrew 69.1\% of honest-beacon service and E 2.0\%, D$_1$
+exceeded E in all ten seeds, and the paired difference was 805 node-seconds
+(CI $[693.5, 917]$) against 878 in the replay. For E the replay, if anything,
+overstates $\Phi$.
 
 The mechanism is that the policies inherit different bounds. Policy E isolates
 only on confirmation, so its false-isolation rate is bounded by the detector's

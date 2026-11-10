@@ -39,7 +39,7 @@ Per-axis position offset (A1) & $\delta$ & 300\,m \\
 Measured mean displacement (A1) & --- & 267\,m \\
 Drop probability (A2) & $p$ & 0.6 \\
 Hybrid scaling (A3) & --- & $\delta/2$, $p/2$ \\
-Runs executed / distinct & --- & 550 / 505 (Table~\ref{tab:campaign}) \\
+Runs executed / distinct & --- & 570 / 525 (Table~\ref{tab:campaign}) \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -99,8 +99,8 @@ Section~\ref{sec:sweep} sweeps the hybrid attack down to a displacement of
 
 \begin{table}[!t]
 \caption{Simulation campaign. Calibration seeds are clean runs held out from
-testing. Of the 550 runs, 45 repeat a configuration and seed run elsewhere in
-the campaign and reproduced it byte for byte; 505 are distinct.}
+testing. Of the 570 runs, 45 repeat a configuration and seed run elsewhere in
+the campaign and reproduced it byte for byte; 525 are distinct.}
 \label{tab:campaign}
 \centering
 \small
@@ -116,8 +116,10 @@ Intensity sweep, primary & A3, 11 levels $\times$ 10 seeds, drop $= 0.3f$ & 110 
 Intensity sweep, second pairing & A3, 8 levels $\times$ 10 seeds, drop $= 0.15f$ & 80 \\
 Shadowing & $\sigma_{sh} \in \{4, 8\}$\,dB, 4 scenarios $\times$ 20 seeds, plus
 5 calibration seeds each & 170 \\
+Clean enforced replay & policies D$_1$, E on clean seeds 1--10, schedules
+from the replay enforced in the simulator & 20 \\
 \midrule
-Total & & 550 \\
+Total & & 570 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -144,10 +146,15 @@ occurred; feedback can shift only the isolation times of beacons removed
 later in the same run. Policy E releases on a revised verdict, so its release
 times, and hence its $\Phi$, depend on verdicts issued while another beacon may
 be isolated. Removing a beacon from forwarding shifts load onto its neighbours
-and can move their peer-relative scores in either direction, so we do not
-assume a direction for this bias. The enforced runs of the original campaign
-are all attacked runs and do not test the clean-network replay. We compare
-five isolation policies:
+and can move their peer-relative scores in either direction. The enforced
+runs of the original campaign are all attacked runs and do not test the
+clean-network replay, so we tested it separately: for clean seeds 1--10 the
+replayed D$_1$ and E schedules were enforced in the simulator, the enforced
+traces were re-verified with the same calibration, and each policy's schedule
+was rebuilt from the verdicts produced under isolation (20 further runs).
+This is one step of a fixed-point check rather than a fully online detector,
+and Section~\ref{sec:phi} reports the result. We compare five isolation
+policies:
 
 \begin{itemize}
 \item \textbf{C, no isolation.} No node removed. Control.

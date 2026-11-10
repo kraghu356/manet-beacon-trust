@@ -76,8 +76,11 @@ campaign is computed by applying each policy offline to the same verdict
 stream, which assumes that an isolation does not change later verdicts. For
 the never-releasing policies the first isolation time is exact and only later
 isolations in the same run can be affected; for E the release times can be.
-The direction of the resulting bias is not known, and no closed-loop run on a
-clean network has yet measured it.
+Enforcing the replayed schedules on ten clean seeds and rebuilding them from
+the verdicts issued under isolation moved neither policy's $\Phi$ by an amount
+distinguishable from zero and preserved the D$_1$--E gap in every seed
+(Section~\ref{sec:phi}). That is a one-step check, not a fully online
+detector, and it covers D$_1$ and E only.
 
 \textbf{Internal validity.} The recovery baseline window is short relative to
 throughput variance, which is why we exclude throughput debt. Detection
@@ -116,7 +119,7 @@ with the condition, not as a measured benefit.
 \label{sec:conclusion}
 
 We evaluated multi-evidence verification and confirmation-gated isolation of
-malicious beacon nodes in a mobile ad hoc network across 505 distinct ns-3
+malicious beacon nodes in a mobile ad hoc network across 525 distinct ns-3
 simulations.
 
 For the two attack classes evaluated, single-evidence detection is blind to
