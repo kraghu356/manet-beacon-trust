@@ -187,22 +187,19 @@ question is taken up in Section~6.5.
 %% Sec 6.1, REPLACE the five-seed latency sentence ("15.0 s ... with zero
 %% variance across seeds") with:
 Over 30 seeds, the fused pipeline confirmed the attacker in every seed of
-every attack, with mean latency 20.0\,s (SD 17.1) for A1, 41.7\,s (SD 39.2)
-for A2 and 20.7\,s (SD 16.3) for A3. With a 5\,s window step and a
-persistence requirement of $K=3$ windows, 15\,s is the shortest latency the
-design permits; the five-seed campaign reached it in every seed, and the
-larger campaign shows a tail of slower confirmations, longest for the
-behavioural-only attack A2.
+every attack. Median latency from attack onset was 15.0\,s for A1 and A3
+and 27.5\,s for A2 (means 20.0, 20.7 and 41.7\,s), with a tail of slower
+confirmations reaching 80, 75 and 160\,s respectively. The five-seed
+campaign had reported a constant 15\,s; the larger campaign shows that
+figure was the typical case rather than a fixed property of the design.
 
 %% Sec 6.1, coverage sentence: REPLACE "0/5" for behaviour on A1 with:
 Behavioural evidence alone confirmed the A1 attacker in 3 of 30 seeds. The
 attacker forwards honestly, so these confirmations carry no attack signal:
-the fused pipeline confirms honest beacons at a similar rate on a clean
-network (9 of 90 node-seeds). Localisation evidence alone confirmed the A2
-attacker in 0 of 30.
-%% CHECK: report the behaviour-only false-positive rate on clean runs
-%% (column behaviour_fp in results/tables/seeds30/coverage_per_run.csv)
-%% if you prefer it to the fused rate.
+on a clean network the behavioural branch alone confirms honest beacons in
+15 of 90 node-seeds (17\%), a higher rate than its 10\% on the A1
+attacker. Localisation evidence alone confirmed the A2 attacker in 0 of 30,
+and confirmed no honest beacon in any campaign run.
 
 
 %% ---------------------------------------------------------------------

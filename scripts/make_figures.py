@@ -119,8 +119,9 @@ def fig_throughput(R, out):
                     color="k", capsize=3, ms=4)
         ax.scatter(np.full(x.size, i) + np.random.default_rng(i).uniform(-.12, .12, x.size), x,
                    s=6, color="#999", zorder=0)
-        ax.text(i, hi, f"  n={x.size}", fontsize=7, va="bottom", ha="center")
-    ax.set_xticks(range(len(ATTACKS)), [LABEL[a].split()[0] for a in ATTACKS])
+    ns = {a: int((df.attack == a).sum()) for a in ATTACKS}
+    ax.set_xticks(range(len(ATTACKS)),
+                  [f"{LABEL[a].split()[0]}\n(n={ns[a]})" for a in ATTACKS])
     ax.set_ylabel("Delivered throughput (kbit/s)")
     return save(fig, out, "fig3_throughput")
 
@@ -138,7 +139,7 @@ def fig_sweep(R, out):
     from matplotlib.ticker import FixedLocator, NullLocator
     fig, axes = plt.subplots(1, len(panels), figsize=(3.4 * len(panels), 2.6), sharey=True,
                              sharex=True, squeeze=False)
-    ticks = [5, 10, 20, 50, 100, 150]
+    ticks = [5, 10, 20, 50, 100]
     for ax, (d, drop, title) in zip(axes[0], panels):
         d = d.assign(f=d["level"].str.lstrip("f").astype(float)).sort_values("f")
         x = 150 * d["f"]
@@ -156,8 +157,9 @@ def fig_sweep(R, out):
         ax.set_xticklabels([str(t) for t in ticks])
         ax.set_xlim(3, 170)
         ax.set_xlabel("Attacker displacement (m, log scale)")
-        ax.set_title(f"{title}: drop probability {drop / 150 * 100:.1f}% per metre")
+        ax.set_title(f"{title}\n(drop probability {drop / 150 * 100:.1f}% per metre)")
     axes[0][0].set_ylabel("Attacker confirmed (fraction of 10 seeds)")
+    fig.subplots_adjust(wspace=0.12)
     h, l = axes[0][0].get_legend_handles_labels()
     fig.legend(h, l, frameon=False, ncol=4, loc="lower center", bbox_to_anchor=(0.5, -0.16))
     return save(fig, out, "fig4_sweep")
@@ -195,10 +197,12 @@ def fig_first_isolation(R, out):
             ax.errorbar(j + (i - 1.5) * w, mu, yerr=[[mu - lo], [hi - mu]], color="k",
                         capsize=2, lw=0.8)
     ax.axhline(30, color="k", lw=0.8, ls="--")
-    ax.text(len(atk) - 0.5, 31, "attack onset (30 s)", ha="right", va="bottom", fontsize=7)
+    ax.annotate("attack\nonset", xy=(1.0, 30), xycoords=("axes fraction", "data"),
+                xytext=(3, 0), textcoords="offset points", va="center", fontsize=7)
     ax.set_xticks(range(len(atk)), [LABEL[a] for a in atk])
-    ax.set_ylabel("First isolation (s)")
-    ax.legend(frameon=False, fontsize=7, ncol=2, loc="upper left")
+    ax.set_ylabel("First isolation of any beacon (s)")
+    ax.legend(frameon=False, fontsize=7, ncol=2, loc="upper center",
+              bbox_to_anchor=(0.5, 1.22))
     return save(fig, out, "fig5_first_isolation")
 
 
@@ -258,6 +262,7 @@ def fig_ablation(R, out):
     d = pd.read_csv(os.path.join(R, "tables/agg_ablation_raw.csv"))
     d["confirmed"] = d["confirmed"].astype(str).str.lower().eq("true")
     piv = d.groupby(["attack", "cfg"])["confirmed"].sum().unstack("cfg")
+    piv = piv.reindex([a for a in ATTACKS if a in piv.index])
     cfgs = list(piv.columns)
     fig, ax = plt.subplots(figsize=(4.2, 2.4))
     w = 0.8 / len(cfgs)
@@ -267,7 +272,8 @@ def fig_ablation(R, out):
                color=pal[i % 4], label=c.split("_", 1)[-1].replace("_", " + "))
     ax.set_xticks(range(len(piv)), [LABEL.get(a, a).split()[0] for a in piv.index])
     ax.set_ylabel("Confirmations (targets x seeds)")
-    ax.legend(frameon=False, fontsize=7)
+    ax.legend(frameon=False, fontsize=7, ncol=len(cfgs), loc="upper center",
+              bbox_to_anchor=(0.5, 1.16))
     return save(fig, out, "fig9_ablation")
 
 
@@ -282,7 +288,8 @@ def fig_shadow(R, out):
         rows.append((sigma, pd.read_csv(cp), pd.read_csv(pp)))
     if len(rows) < 2:
         raise FileNotFoundError("tables/shadow4 or shadow8")
-    fig, (a1, a2) = plt.subplots(1, 2, figsize=(6.6, 2.5))
+    fig, (a1, a2) = plt.subplots(1, 2, figsize=(6.8, 2.5))
+    fig.subplots_adjust(wspace=0.35)
     sig = [r[0] for r in rows]
     for a, mk in zip(["A1", "A2", "A3"], "o^s"):
         mu, lo, hi = [], [], []
@@ -291,7 +298,8 @@ def fig_shadow(R, out):
             m = np.nanmean(x)
             l, h = boot_ci(x)
             mu.append(m), lo.append(m - l), hi.append(h - m)
-        a1.errorbar(sig, mu, yerr=[lo, hi], marker=mk, capsize=3, ms=4, label=LABEL[a])
+        a1.errorbar(sig, mu, yerr=[lo, hi], marker=mk, capsize=3, ms=4, label=LABEL[a],
+                    color={"A1": "#d08a2e", "A2": "#3b6fb6", "A3": "#555555"}[a])
     a1.set_xticks(sig)
     a1.set_xlabel(r"Shadowing $\sigma_{sh}$ (dB)")
     a1.set_ylabel("Detection latency (s)")
