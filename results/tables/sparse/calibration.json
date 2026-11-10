@@ -1,0 +1,10 @@
+{
+  "residual_center": 23.037043333333337,
+  "residual_scale": 12.179412593249998,
+  "fwd_center": 1.0,
+  "fwd_scale": 1e-09,
+  "delay_center": 0.0,
+  "delay_scale": 1e-09,
+  "n_residual_samples": 2266,
+  "n_behaviour_samples": 797
+}

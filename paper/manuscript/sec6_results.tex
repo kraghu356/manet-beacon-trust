@@ -692,6 +692,17 @@ release. Release under E affected few honest beacons, and on the evidence
 here a releasing policy is worth having only if it can distinguish recovered
 evidence from absent evidence.
 
+Iterating the loop confirmed both findings. Over three rounds on ten seeds,
+E released the A2 attacker in every seed once its own enforced verdicts were
+used: the fraction of post-onset time the attacker spent isolated fell from
+0.88 in the first round to 0.23 in the second, and recovered only to 0.78 in
+the third as the re-admitted attacker was confirmed again, the oscillation the
+mechanism predicts. Under E$'$ the attacker was never released in any round
+and spent 0.88 of the post-onset time isolated throughout. On the clean
+network E$'$ was a fixed point from the first round in all ten seeds, with
+$\Phi$ unchanged at 37 node-seconds, whereas E's $\Phi$ moved between rounds
+(32.5, 24.5, 33.5) in two of the ten.
+
 The A2 throughput and recovery rows of Table~\ref{tab:policy} were produced
 by a schedule that never released the attacker. They are the rows E$'$ would
 produce, not those of E in a closed loop.
@@ -816,3 +827,62 @@ the channel worsened, because the same widening raised their effective
 threshold, but D$_1$ still withdrew 60--69\% of honest-beacon service on clean
 networks, and the bootstrap intervals of D$_1$ and E did not overlap in any
 condition.
+
+\subsection{Sparse topology}
+\label{sec:sparse}
+
+Spreading the same 25 nodes over a $1000 \times 1000$\,m field changed the
+balance of evidence. Behavioural evidence was usable in 18\% of windows,
+against 52\% in the dense topology, while localisation evidence remained
+usable in every window. Table~\ref{tab:sparse} gives the result.
+
+\begin{table}[!t]
+\caption{Sparse topology (25 nodes, $1000 \times 1000$\,m, 10 seeds).
+Detection counts attackers isolated after onset (for the pipeline, confirmed);
+latency is the median in seconds; FI and $\bar\Phi$ are for the clean network
+(E$'$ for the pipeline).}
+\label{tab:sparse}
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+Method & A1 & A2 & A3 & FI & $\bar\Phi$ \\
+\midrule
+Pipeline & 10/10 & 4/10 & 10/10 & 0/30 & 0.000 \\
+\quad latency & 62.5 & 132.5 & 62.5 & & \\
+LND & 10/10 & 0/10 & 10/10 & 0/30 & 0.000 \\
+WD & 8/10 & 9/10 & 9/10 & 16/30 & 0.239 \\
+LND+WD & 10/10 & 9/10 & 10/10 & 16/30 & 0.239 \\
+Policy D$_1$ & & & & 8/30 & 0.100 \\
+Policy D & & & & 30/30 & 0.849 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The pipeline isolated no honest beacon in any sparse run, but it confirmed
+the forwarding-only attacker in only 4 of 10 seeds and took a median of
+62.5\,s to confirm the attacks with a localisation signature, four times the
+dense figure. The cause is evidence scarcity: with few transit packets per
+window the behavioural branch rarely reaches its minimum sample and its
+confidence weight stays low. The behaviour-only reputation baseline, which
+has no confidence weighting, isolated the A2 attacker in 9 of 10 seeds, but
+on the clean network it also isolated 16 of 30 honest node-seeds and withdrew
+23.9\% of honest-beacon service, because broken routes in a sparse network
+look like dropped packets. The disjunction inherited both properties. The
+paired difference in clean-network $\Phi$ between the pipeline and LND+WD
+was $-287$ node-seconds (95\% CI $[-446, -149]$), and the pipeline's $\Phi$
+was lower under every attack as well (CIs excluding zero).
+
+The comparison of Section~\ref{sec:baselines} therefore depends on the
+topology. In the dense network the disjunction matched the pipeline's false
+isolation and was faster; in the sparse one it detected the forwarding
+attacker more often but at roughly a quarter of honest-beacon service, which
+is the trade $\Phi$ was introduced to expose. One caveat applies to the
+sparse calibration: every usable honest behavioural window in the calibration
+runs forwarded all its transit packets, so the robust scale of the
+behavioural statistic collapsed to its floor. That made the branch maximally
+sensitive whenever it had evidence, which reinforces rather than explains
+its low detection rate, but a calibration with more behavioural samples is
+needed before the sparse behavioural figures are relied on.
+

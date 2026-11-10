@@ -39,7 +39,7 @@ Per-axis position offset (A1) & $\delta$ & 300\,m \\
 Measured mean displacement (A1) & --- & 267\,m \\
 Drop probability (A2) & $p$ & 0.6 \\
 Hybrid scaling (A3) & --- & $\delta/2$, $p/2$ \\
-Runs executed / distinct & --- & 570 / 525 (Table~\ref{tab:campaign}) \\
+Runs executed & --- & 735 (Table~\ref{tab:campaign}) \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -99,8 +99,9 @@ Section~\ref{sec:sweep} sweeps the hybrid attack down to a displacement of
 
 \begin{table}[!t]
 \caption{Simulation campaign. Calibration seeds are clean runs held out from
-testing. Of the 570 runs, 45 repeat a configuration and seed run elsewhere in
-the campaign and reproduced it byte for byte; 525 are distinct.}
+testing. Of the first 570 runs, 45 repeat a configuration and seed run
+elsewhere in the campaign and reproduced it byte for byte; closed-loop rounds
+that re-enforce an unchanged schedule likewise repeat their predecessor.}
 \label{tab:campaign}
 \centering
 \small
@@ -118,18 +119,29 @@ Shadowing & $\sigma_{sh} \in \{4, 8\}$\,dB, 4 scenarios $\times$ 20 seeds, plus
 5 calibration seeds each & 170 \\
 Clean enforced replay & policies D$_1$, E on clean seeds 1--10, schedules
 from the replay enforced in the simulator & 20 \\
+Iterated closed loop & policies E, E$'$ $\times$ \{A2, clean\} $\times$ seeds
+1--10 $\times$ 3 rounds & 120 \\
+Sparse topology & 25 nodes in $1000 \times 1000$\,m, 4 scenarios $\times$ 10
+seeds, plus 5 calibration seeds & 45 \\
 \midrule
-Total & & 570 \\
+Total & & 735 \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+The sparse campaign keeps every parameter of Table~\ref{tab:sim} but
+quadruples the field area, so that nodes have about a quarter as many
+neighbours and routes are longer and break more often; detector thresholds
+are recalibrated on its own clean seeds.
 
 Table~\ref{tab:campaign} lists the campaign. Three groups of runs repeat
 another part of it: the control arm of the enforced runs (15 runs) repeats the
 original detection runs, those detection runs (20) are seeds 1--5 of the
 30-seed campaign, and the primary sweep's full-intensity level (10) is seeds
 1--10 of the 30-seed A3 scenario. Every repeated run reproduced its
-counterpart's output files exactly, which we report as a determinism check;
+counterpart's output files exactly, which we report as a determinism check,
+and a run repeated on a second machine with a separately built simulator
+reproduced the original output byte for byte;
 no analysis uses the same simulation twice. Throughput recovery, mechanism
 accounting, localisation error and the aggregation ablation come from the
 original campaign, in which isolation is enforced by the simulator. Coverage,
@@ -153,7 +165,10 @@ replayed D$_1$ and E schedules were enforced in the simulator, the enforced
 traces were re-verified with the same calibration, and each policy's schedule
 was rebuilt from the verdicts produced under isolation (20 further runs).
 This is one step of a fixed-point check rather than a fully online detector,
-and Section~\ref{sec:phi} reports the result. We compare six isolation
+and Section~\ref{sec:phi} reports the result. For E and E$'$ we then iterated
+the loop: each round enforces the schedule rebuilt from the previous round's
+enforced verdicts, for three rounds on the A2 and clean scenarios
+(Section~\ref{sec:release}). We compare six isolation
 policies:
 
 \begin{itemize}

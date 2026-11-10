@@ -43,11 +43,12 @@ eager degrades exactly the service it exists to protect.
 \subsection{Contributions}
 
 This paper reports an experimental study of both questions, conducted in
-ns-3 across 525 distinct simulations: a 30-seed detection campaign over three
+ns-3 across 735 simulation runs: a 30-seed detection campaign over three
 attack scenarios and a clean network, six isolation policies replayed over
 that campaign and checked by enforcing them in the simulator, two
-attack-intensity sweeps, a repetition under log-normal shadowing, and two
-re-implemented literature baselines evaluated on the same traces.
+attack-intensity sweeps, a repetition under log-normal shadowing, a sparse
+topology, an iterated closed loop, and two re-implemented literature
+baselines evaluated on the same traces.
 
 \begin{enumerate}
 \item We frame malicious beacon verification as a question of evidence
@@ -116,7 +117,10 @@ re-implemented literature baselines evaluated on the same traces.
       reputation detector matched its coverage and false isolation and
       isolated attackers as fast or faster, by up to 77\,s under shadowing.
       The fusion condition predicts this, since every attack evaluated lies
-      outside the fusion-only region.
+      outside the fusion-only region. In a sparse topology the result
+      reversed: the disjunction confirmed the forwarding attacker more often
+      but withdrew 24\% of honest-beacon service, against none for the
+      pipeline, which confirmed that attacker in only 4 of 10 seeds.
 
 \item We report localisation error as the outcome metric for the
       false-location attack, showing that the two attack classes are

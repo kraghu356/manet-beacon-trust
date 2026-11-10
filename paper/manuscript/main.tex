@@ -33,10 +33,10 @@ Malicious Beacon Nodes in Mobile Ad Hoc Networks}}
 
 \begin{abstract}
 \noindent Malicious beacon nodes corrupt the position estimates of nodes that
-never exchange traffic with them. Prior defences detect them from
-localisation evidence and remove them permanently; we study the decision
-that precedes removal and what an error costs, over 525 distinct ns-3
-simulations. First, coverage: every detector restricted to one evidence
+never exchange traffic with them. Prior defences remove them
+permanently; we study the decision
+that precedes removal and what an error costs, over 735 ns-3 simulation
+runs. First, coverage: every detector restricted to one evidence
 class, including re-implemented localisation-only and behaviour-only
 baselines from the literature, confirmed the attack outside that class in at
 most 3 of 30 seeds, while collecting both classes confirmed every attacker.
@@ -46,14 +46,16 @@ against 74.8\% for the strongest immediate-isolation policy, and the gap held
 when the schedules were enforced. Enforcement also showed that releasing a
 beacon when its verdict clears re-admits forwarding attackers, whose
 behavioural evidence vanishes while isolated; releasing only when that
-evidence returns prevented every re-admission. Third, every weighted
-Stouffer detector can confirm attackers that neither branch confirms alone,
-but an attack scaled in intensity reaches that region only if the branches'
-detection thresholds lie within a factor of $1+\sqrt{2}$. The condition
-explains a negative result: for these attacks, a calibrated disjunction of
+evidence returns prevented every re-admission, including in an iterated
+closed loop. Third, an attack scaled
+in intensity reaches the region where weighted Stouffer fusion beats either
+branch only if the branches' detection thresholds lie within a factor of
+$1+\sqrt{2}$. This explains a negative result: a calibrated disjunction of
 the two baselines matched our fused pipeline's coverage and false isolation
-and confirmed attackers as fast or faster, most clearly under 4--8\,dB
-shadowing. Results cover one dense 25-node topology.
+and confirmed attackers as fast or faster, especially under shadowing. In a sparse topology the comparison reversed: the pipeline
+isolated no honest beacon but confirmed the forwarding attacker in 4 of 10
+seeds, while the disjunction confirmed it in 9 at a cost of 24\% of
+honest-beacon service. Results cover dense and sparse 25-node topologies.
 
 \medskip
 \noindent\textbf{Keywords} Mobile ad hoc networks $\cdot$ Beacon nodes
