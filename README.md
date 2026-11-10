@@ -92,3 +92,12 @@ its own right — see `docs/04-platform-and-setup.md`.
 - [x] Step 13 — Metric suite
 - [x] Step 14 — Dataset strategy
 - [ ] Step 15 — Manuscript (plan written; blocked on real runs)
+
+### Figures
+
+`python3 scripts/make_figures.py --results results --out figures` regenerates
+every data figure of the paper (coverage, throughput, intensity sweeps, first
+isolation, recovery ratio, cumulative false isolation, aggregation ablation,
+shadowing) from the result tables. Each figure is skipped, with a message, if
+its inputs are absent. Raw traces for all 485 runs are archived on Zenodo
+(see the paper's data availability statement).
