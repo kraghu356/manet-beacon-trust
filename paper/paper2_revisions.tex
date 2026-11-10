@@ -24,33 +24,30 @@ Malicious Beacon Nodes in Mobile Ad Hoc Networks}
 
 
 %% ---------------------------------------------------------------------
-%% ABSTRACT  (replace whole abstract; 240 words)
+%% ABSTRACT  (replace whole abstract; under 250 words)
 %% ---------------------------------------------------------------------
 \begin{abstract}
 Malicious beacon nodes corrupt the position estimates of nodes that never
 exchange traffic with them. Prior defences detect them from localisation
-evidence and remove them permanently. We study the decision that precedes
-removal and what an error costs. A two-stage pipeline fuses behavioural and
-localisation evidence into per-observer trust and resolves it into a
-three-state verdict; isolation policies are compared across 315 ns-3 runs,
-including a 30-seed campaign. First, evidence coverage: against the attack
-that leaves no signature in its evidence class, the localisation branch
-confirmed the attacker in 0 of 30 seeds and the behavioural branch in 3 of
-30, near its chance rate, while using both confirmed it in all 30. Second, we introduce cumulative false isolation~$\Phi$, in
-node-seconds, which measures how long a mechanism's errors persist. On an
-uncontested network, confirmation-gated isolation with release withdrew
-3.9\% of honest-beacon service against 74.8\% for the strongest
-immediate-isolation policy, at a cost of a mean 20--42\,s of attacker
-activity after onset. Third, we derive when weighted Stouffer fusion can
+evidence and remove them permanently; we study the decision that precedes
+removal and what an error costs. A pipeline fuses behavioural and
+localisation evidence into per-observer trust and a three-state verdict,
+evaluated over 485 ns-3 runs. First, coverage: against the attack invisible
+to its evidence class, the localisation branch confirmed the attacker in 0
+of 30 seeds and the behavioural branch in 3 of 30, near its chance rate;
+using both confirmed it in all 30. Second, we introduce cumulative false
+isolation~$\Phi$, in node-seconds. Confirmation-gated isolation with
+release withdrew 3.9\% of honest-beacon service against 74.8\% for the
+strongest immediate-isolation policy, at a cost of 20--42\,s mean
+detection latency. Third, we derive when weighted Stouffer fusion can
 detect what neither branch detects alone: the branches' detection
-thresholds must lie within a factor of $1+\sqrt{2}$ for equal weights. The
-condition predicted the outcome of two intensity sweeps (190 runs): where
-the ratio was 3.63, fusion lost detections to a disjunctive rule; where it
-was 1.87, fusion matched it and gained one detection. The
-aggregation stage changed no verdict and neither isolation policy produced
-a throughput difference exceeding its confidence interval. The campaign is
-a proof of concept on one dense topology; Section~8.1 lists the
-experiments required before the findings generalise.
+thresholds must lie within a factor of $1+\sqrt{2}$. The condition
+predicted two intensity sweeps: at a threshold ratio of 3.63 fusion lost
+detections to a disjunctive rule, and at 1.87 it matched it. Under 4 and
+8\,dB shadowing the pipeline confirmed 119 of 120 attackers and false
+isolation stayed below 4\%, but forwarding attacks took 127--151\,s to
+confirm. Results cover one dense topology; Section~8.1 lists what is
+needed before they generalise.
 \end{abstract}
 
 
@@ -418,6 +415,75 @@ A3    & D$_1$ & 59/60 & 586  & [526, 639]   & 571 [514, 625] \\
 
 
 %% ---------------------------------------------------------------------
+%% NEW Sec 6.11 "Robustness to Shadowing"  (insert after Sec 6.10)
+%% Also: delete shadowing from Sec 8.1 limitations / Sec 9.1 further work,
+%% and add "Shadowing sigma_sh: 0, 4, 8 dB" to the simulation table.
+%% ---------------------------------------------------------------------
+\subsection{Robustness to Shadowing}
+\label{sec:shadow}
+
+Every result above uses a channel without shadowing, which flatters RSSI
+ranging. We repeated the campaign under log-normal shadowing with
+$\sigma_{sh} = 4$ and 8\,dB, 20 seeds per attack and channel (170 runs
+including calibration). The pipeline was recalibrated on clean runs of each
+channel, as a deployment would be; no threshold was changed.
+Table~\ref{tab:shadow} gives the result.
+
+Detection survived. The fused pipeline confirmed the attacker in every seed
+at 4\,dB and in 59 of 60 at 8\,dB, the miss being one A3 seed. The coverage
+pattern held: localisation alone confirmed the A2 attacker in at most 3 of
+20 seeds, and behaviour alone confirmed the A1 attacker in 5 of 20 at
+4\,dB and none at 8\,dB. Behavioural evidence degraded first: at 8\,dB it
+confirmed the A3 attacker in 14 of 20 seeds, against 20 of 20 at 4\,dB.
+Shadowing adds link loss that honest forwarders cannot control, which
+widens the peer distribution the behavioural score is measured against.
+
+The cost appeared as latency. Mean time to confirmation for A2, the attack
+visible only through forwarding, rose from 41.7\,s without shadowing to
+127.0\,s at 4\,dB and 148.3\,s at 8\,dB; A3 rose to 150.8\,s at 8\,dB.
+Attacks with a strong localisation signature were barely affected: A1 was
+confirmed in 17.5\,s at 4\,dB and 40.0\,s at 8\,dB.
+
+False isolation did not grow. Policy~E isolated at most 5 of 40 honest
+node-seeds under attack and withdrew at most 3.6\% of honest-beacon
+service. Recalibration widened the clean-network null enough that E
+isolated no honest beacon in any clean 8\,dB seed. The immediate policies
+also isolated less as the channel worsened, because the same widening
+raised their effective threshold, but D$_1$ still withdrew 60--69\% of
+honest-beacon service on clean networks and the bootstrap intervals of
+D$_1$ and E did not overlap in any condition.
+
+\begin{table}[!t]
+\caption{Shadowing robustness, 20 seeds per cell. ``Confirmed'' is the
+fused pipeline's attacker detections; latency is mean (SD) time from attack
+onset to confirmation; $\bar\Phi$ is the fraction of honest-beacon service
+withdrawn. The $\sigma_{sh} = 0$ rows are the 30-seed campaign.}
+\label{tab:shadow}
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llccccc@{}}
+\hline
+$\sigma_{sh}$ & Attack & Beh. & Loc. & Confirmed & Latency (s) & $\bar\Phi$ E / D$_1$ \\
+\hline
+0\,dB & A1 & 3/30 & 30/30 & 30/30 & 20.0 (17.1) & 0.058 / 0.764 \\
+      & A2 & 30/30 & 0/30 & 30/30 & 41.7 (39.2) & 0.037 / 0.734 \\
+      & A3 & 30/30 & 30/30 & 30/30 & 20.7 (16.3) & 0.018 / 0.732 \\
+      & none & --- & --- & --- & --- & 0.039 / 0.748 \\
+4\,dB & A1 & 5/20 & 20/20 & 20/20 & 17.5 (14.4) & 0.016 / 0.694 \\
+      & A2 & 20/20 & 1/20 & 20/20 & 127.0 (97.0) & 0.011 / 0.686 \\
+      & A3 & 20/20 & 20/20 & 20/20 & 24.8 (17.1) & 0.008 / 0.658 \\
+      & none & --- & --- & --- & --- & 0.024 / 0.688 \\
+8\,dB & A1 & 0/20 & 20/20 & 20/20 & 40.0 (39.0) & 0.000 / 0.622 \\
+      & A2 & 20/20 & 3/20 & 20/20 & 148.3 (72.6) & 0.036 / 0.514 \\
+      & A3 & 14/20 & 18/20 & 19/20 & 150.8 (95.6) & 0.026 / 0.491 \\
+      & none & --- & --- & --- & --- & 0.000 / 0.602 \\
+\hline
+\end{tabular}
+\end{table}
+
+
+%% ---------------------------------------------------------------------
 %% Sec 6.10, para 3  (replace the two sentences on indirect-only)
 %% ---------------------------------------------------------------------
 The components are not inert in the underlying computation. On A2 seed~1,
@@ -454,7 +520,9 @@ collecting both behavioural and localisation evidence removes the observed
 blind spots. Confirmation-gated isolation with release reduced cumulative
 false isolation of honest beacons to 3.9\% of available service against
 74.8\% for the strongest immediate-isolation policy over 30 seeds, at a
-cost of a mean 20--42\,s of attacker activity after onset. Weighted Stouffer fusion has a
+cost of a mean 20--42\,s of attacker activity after onset. Both results
+held under 4 and 8\,dB shadowing, where the price moved to latency:
+forwarding attacks took 127--151\,s to confirm. Weighted Stouffer fusion has a
 fusion-only region only when the branches' detection thresholds lie within
 a factor of $1+\sqrt{2}$, and across two sweeps that condition predicted
 whether fusion diluted ($r = 3.63$) or matched and marginally exceeded
