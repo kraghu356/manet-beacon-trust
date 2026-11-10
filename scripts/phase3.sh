@@ -4,7 +4,7 @@
 #
 #   STAGE=sparse     ./scripts/phase3.sh  # 25 nodes, 1000x1000 m: 4 scen x 10 seeds + 5 calib = 45 runs
 #   STAGE=scale50    ./scripts/phase3.sh  # 50 nodes, 707 m, 6 beacons, 2 attackers: 45 runs
-#   STAGE=scale100   ./scripts/phase3.sh  # 100 nodes, 1000 m, 12 beacons, 4 attackers: 4x5 + 3 = 23 runs
+#   STAGE=scale100   ./scripts/phase3.sh  # 100 nodes, 1000 m, 12 beacons, 4 attackers: 4x3 + 3 = 15 runs (OPTIONAL, ~1 day)
 #   STAGE=closedloop ./scripts/phase3.sh  # E and Ea iterated 3 rounds, A2 + clean, seeds 1-10: 120 runs
 #   STAGE=eval       ./scripts/phase3.sh  # no ns-3: score everything above
 #
@@ -52,14 +52,14 @@ case "$STAGE" in
       --nNodes=50 --nBeacons=6 --attacker=4 --nAttackers=2 --areaX=707 --areaY=707 \
       --nFlows=14 --pktRate=12 --simTime=400 ;;
   scale100)
-    campaign "$R/scale100" "$(seq 1 5)" "101 102 103" \
+    campaign "$R/scale100" "${SEEDS100:-1 2 3}" "101 102 103" \
       --nNodes=100 --nBeacons=12 --attacker=8 --nAttackers=4 --areaX=1000 --areaY=1000 \
       --nFlows=20 --pktRate=12 --simTime=400 ;;
   closedloop)
     CAL="$R/tables/seeds30/calibration.json"
-    for atk in A2 none; do
-      for arm in E Ea; do
-        for s in $(seq 1 10); do
+    for atk in ${CL_ATTACKS:-A2 none}; do
+      for arm in ${CL_ARMS:-E Ea}; do
+        for s in ${CL_SEEDS:-$(seq 1 10)}; do
           prev="$R/tables/seeds30/sched/sched-$atk-seed$s/$arm.csv"
           if [ ! -f "$prev" ]; then
             python3 -m analysis.make_schedules --verdicts "$R/tables/seeds30/verdicts/$atk-seed$s-verdicts.csv" \
