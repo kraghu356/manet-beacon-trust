@@ -35,7 +35,6 @@ from .phi import bootstrap_ci, isolated_seconds, paired_diff_ci
 from .trust import TrustParams, compute_trust
 
 SPEC = WindowSpec(10.0, 5.0)
-BEACONS = [0, 1, 2]
 
 
 def _phi(schedule: pd.DataFrame, honest: list[int], sim_time: float) -> float:
@@ -61,7 +60,9 @@ def main(argv=None) -> int:
             continue
         arm, seed = m["arm"], int(m["seed"])
         beh = brx[0].replace("-beacon_rx.csv", "-behaviour.csv")
-        ev = build_evidence(load_beacon_rx(brx[0]), load_behaviour(beh), SPEC, beacon_ids=BEACONS)
+        rx = load_beacon_rx(brx[0])
+        ev = build_evidence(rx, load_behaviour(beh), SPEC,
+                            beacon_ids=sorted(int(b) for b in rx["beacon_id"].unique()))
         v = decide(compute_trust(ev, cal, TrustParams(mode="fused")), DecisionParams(), mode="fused")
         s = confirmation_summary(v, 30.0)
         honest = s.loc[s["is_attacker"] == 0, "target"].astype(int).tolist()

@@ -35,26 +35,25 @@ Malicious Beacon Nodes in Mobile Ad Hoc Networks}}
 \noindent Malicious beacon nodes corrupt the position estimates of nodes that
 never exchange traffic with them. Prior defences detect them from
 localisation evidence and remove them permanently; we study the decision
-that precedes removal and what an error costs. A pipeline fuses behavioural
-and localisation evidence into per-observer trust and a three-state verdict,
-evaluated over 525 distinct ns-3 simulations. First, coverage: against the
-attack invisible to its evidence class, the localisation branch confirmed the
-attacker in 0 of 30 seeds and the behavioural branch in 3 of 30, below its
-rate on honest beacons; using both confirmed it in all 30. Second, we
-introduce cumulative false isolation~$\Phi$, in node-seconds. Isolating only
-on confirmation withdrew 3.9--5.0\% of honest-beacon service against 74.8\%
-for the strongest immediate-isolation policy, at a median detection latency
-of 15--27.5\,s, and the gap held when the schedules were enforced. Enforcement
-also showed that releasing a beacon when its verdict clears re-admits
-forwarding attackers, whose behavioural evidence vanishes while isolated;
-releasing only when that evidence returns prevented every re-admission.
-Third, every weighted Stouffer detector can confirm attackers that neither
-branch confirms alone, but an attack scaled in intensity reaches that region
-only if the branches' detection thresholds lie within a factor of
-$1+\sqrt{2}$, a condition that predicted the outcome of two intensity sweeps.
-Under 4 and 8\,dB shadowing the pipeline confirmed 119 of 120 attackers with
-false isolation below 5\%, but forwarding attacks took a median of
-125--155\,s to confirm. Results cover one dense 25-node topology.
+that precedes removal and what an error costs, over 525 distinct ns-3
+simulations. First, coverage: every detector restricted to one evidence
+class, including re-implemented localisation-only and behaviour-only
+baselines from the literature, confirmed the attack outside that class in at
+most 3 of 30 seeds, while collecting both classes confirmed every attacker.
+Second, we introduce cumulative false isolation~$\Phi$, in node-seconds.
+Isolating only on confirmation withdrew 3.9--5.0\% of honest-beacon service
+against 74.8\% for the strongest immediate-isolation policy, and the gap held
+when the schedules were enforced. Enforcement also showed that releasing a
+beacon when its verdict clears re-admits forwarding attackers, whose
+behavioural evidence vanishes while isolated; releasing only when that
+evidence returns prevented every re-admission. Third, every weighted
+Stouffer detector can confirm attackers that neither branch confirms alone,
+but an attack scaled in intensity reaches that region only if the branches'
+detection thresholds lie within a factor of $1+\sqrt{2}$. The condition
+explains a negative result: for these attacks, a calibrated disjunction of
+the two baselines matched our fused pipeline's coverage and false isolation
+and confirmed attackers as fast or faster, most clearly under 4--8\,dB
+shadowing. Results cover one dense 25-node topology.
 
 \medskip
 \noindent\textbf{Keywords} Mobile ad hoc networks $\cdot$ Beacon nodes

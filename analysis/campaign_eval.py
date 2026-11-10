@@ -31,12 +31,15 @@ from .phi import bootstrap_ci, paired_diff_ci, phi_for_run
 from .trust import TrustParams, compute_trust
 
 SPEC = WindowSpec(10.0, 5.0)
-BEACONS = [0, 1, 2]
 
 
 def _evidence(brx: str) -> pd.DataFrame:
+    """Evidence for every beacon present in the trace (3 in the base topology,
+    more in the scaled ones)."""
     beh = brx.replace("-beacon_rx.csv", "-behaviour.csv")
-    return build_evidence(load_beacon_rx(brx), load_behaviour(beh), SPEC, beacon_ids=BEACONS)
+    rx = load_beacon_rx(brx)
+    beacons = sorted(int(b) for b in rx["beacon_id"].unique())
+    return build_evidence(rx, load_behaviour(beh), SPEC, beacon_ids=beacons)
 
 
 def calibrate_many(paths: list[str]):
@@ -76,10 +79,14 @@ def main(argv=None) -> int:
             v = decide(trust, DecisionParams(), mode=mode)
             s = confirmation_summary(v, args.attack_start)
             a, h = s[s["is_attacker"] == 1], s[s["is_attacker"] == 0]
-            row[f"{mode}_tp"] = int(a["ever_confirmed"].max()) if len(a) else np.nan
+            # With several attackers, *_tp is 1 only if every attacker was confirmed;
+            # *_tp_frac records the fraction confirmed.
+            row[f"{mode}_tp"] = int(a["ever_confirmed"].min()) if len(a) else np.nan
+            row[f"{mode}_tp_frac"] = float(a["ever_confirmed"].mean()) if len(a) else np.nan
             row[f"{mode}_fp"] = int(h["ever_confirmed"].sum())
             if mode == "fused":
-                row["latency_s"] = float(a["detection_latency_s"].min()) if len(a) else np.nan
+                # Single attacker: its latency. Several: the mean over attackers detected.
+                row["latency_s"] = float(a["detection_latency_s"].mean()) if len(a) else np.nan
                 vdir = os.path.join(args.out, "verdicts")
                 os.makedirs(vdir, exist_ok=True)
                 v.to_csv(os.path.join(vdir, f"{atk}-seed{seed}-verdicts.csv"), index=False)

@@ -187,6 +187,41 @@ node, including in control runs. With an empty blacklist the discipline
 behaves as a plain FIFO, so its queueing behaviour is present in the baseline
 as well.
 
+\subsection{Literature baselines}
+\label{sec:baselinedef}
+
+Two baselines re-implement the evidence class and decision rule of a
+well-known design and run on the same traces as our pipeline. They are not
+reimplementations of complete published systems.
+
+\textbf{LND, localisation-only alert counting.} After Liu, Ning and
+Du~\cite{liu2005detecting}, the evidence class EMBN-MANET also uses. In each
+window an observer with at least three receptions raises an alert against a
+beacon whose mean range residual exceeds $\rho$, and the beacon is revoked
+permanently once more than $\tau'$ alerts have accumulated.
+
+\textbf{WD, behaviour-only reputation.} After the watchdog of Marti
+et al.~\cite{marti2000mitigating} and the Beta reputation of
+CONFIDANT~\cite{buchegger2002confidant}. A beacon's reputation is the mean of
+a Beta distribution whose parameters are the counts of forwarded and
+unforwarded transit packets, faded by 0.9 per 10\,s window; once at least 20
+packets of evidence have accumulated, the beacon is isolated permanently when
+its reputation falls below $\tau_W$.
+
+\textbf{LND+WD.} Both detectors run side by side and a beacon is isolated
+when either fires. This is the disjunctive rule of Section~\ref{sec:sweep}
+applied to two independently designed detectors.
+
+All three thresholds come from the held-out clean calibration seeds of each
+channel and from nothing else: $\rho$ is the 99th percentile of clean
+residuals, $\tau_W$ the 1st percentile of clean reputations, and $\tau'$ the
+smallest alert count at which no calibration run revokes any beacon. At
+0, 4 and 8\,dB this gives $\rho = 63$, 87 and 170\,m, $\tau_W = 0.81$, 0.57
+and 0.38, and $\tau' = 10$, 11 and 15. A sweep of $\tau'$ on the test runs,
+reported for transparency, shows the trade-off the calibration resolves: at
+$\tau' = 5$ LND revoked 31 of 90 honest node-seeds on the clean network, at
+10 three, and at 20 none, while still revoking the A1 attacker in every seed.
+
 \subsection{Reproducibility}
 
 The simulator is ns-3.48 built with GCC on Ubuntu under WSL2, with the analysis

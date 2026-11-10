@@ -7,6 +7,11 @@ Trust management in MANETs has developed along two largely separate lines.
 The first evaluates node reliability from forwarding behaviour, reputation
 and recommendation, and uses the resulting score to steer route
 selection~\cite{cai2019evolutionary,xia2013trust,sirajuddin2021tbsmr,singh2020self}.
+Its foundations are the watchdog and pathrater of Marti
+et al.~\cite{marti2000mitigating}, which overhear whether a neighbour forwards
+what it receives, and CONFIDANT~\cite{buchegger2002confidant}, which turns
+such observations into a Bayesian reputation and isolates nodes whose
+reputation falls below a threshold.
 Approaches in this line combine direct observation with neighbour
 recommendation~\cite{singh2020self,sanchez2015model} and, more recently,
 with learned models~\cite{dhand2025secure,mahamune2024trust}. The recurring
@@ -32,7 +37,9 @@ recommender may itself be
 adversarial~\cite{singh2020self,rajeswari2021efficient,pari2023hybrid}.
 
 Our work sits in the second and third of these but differs in what it
-optimises. Almost all of the above evaluate the trust mechanism by its
+optimises. A recent systematic review of malicious-node handling in wireless
+multi-hop networks found that more than 90\% of the surveyed studies address
+detection and very few address removal~\cite{pourdehghan2025review}. Almost all of the above evaluate the trust mechanism by its
 effect on delivery ratio, throughput and delay, which measures the benefit
 of excluding attackers. Far fewer measure the cost of excluding honest nodes
 by mistake, and fewer still measure how long such an exclusion persists.
@@ -84,7 +91,25 @@ consistency to determine whether an advertised position is
 plausible~\cite{kuriakose2023embn,liu2008attack}. Robustness here usually
 means tolerating a bounded number of lying beacons rather than identifying
 them individually, and the classical results bound achievable localisation
-error as a function of the fraction of compromised anchors.
+error as a function of the fraction of compromised anchors. Recent work
+continues this line for static sensor networks: BO-MAP combines clustering
+with probabilistic analysis to predict and isolate malicious
+anchors~\cite{sreeja2024bomap}, and Tomic et al.\ detect spoofing anchors by
+voting over anchor-pair intersections, deliberately excluding no anchor
+because a wrongly removed honest anchor degrades
+accuracy~\cite{tomic2026voting}. Both assume static anchors and a single
+snapshot of ranging evidence, and neither uses forwarding behaviour or models
+a reversible decision.
+
+Position falsification is also studied in vehicular networks, where
+misbehaviour detection checks the plausibility of the positions vehicles
+broadcast. The VeReMi dataset made such detectors comparable on a common set
+of falsification attacks~\cite{vanderheijden2018veremi}, and recent detectors
+learn from message sequences, for example with federated
+Transformers~\cite{khan2026mofed}. The evidence class is the same as our
+localisation branch, but these systems detect misbehaving senders and leave
+revocation to a credential authority. They neither combine positional with
+forwarding evidence nor measure what a wrongful revocation costs.
 
 Secure localisation has a longer history in sensor networks. SeRLoc bounds a
 node's position using directional beacons without range
@@ -161,8 +186,8 @@ a false-isolation cost measure.
 
 \subsection{Structured comparison and basis for comparison}
 
-Because we decline a numerical accuracy comparison, we give a structured
-qualitative one instead. Table~\ref{tab:families} states, for each family of
+Alongside the measured baselines of Section~\ref{sec:baselines}, we give a
+structured qualitative comparison. Table~\ref{tab:families} states, for each family of
 approach, which evidence classes it observes and which attack classes
 therefore fall inside its scope. Localisation-centred beacon security
 observes the evidence class that the false-location attack disturbs and not
@@ -184,5 +209,6 @@ produced it. Our own results show why. Every configuration tested, including
 both single-evidence ones, achieves perfect recall against the attack its
 evidence can observe and near zero against the attack it cannot. An accuracy
 figure drawn from the first case alone would be correct and uninformative.
-The informative axis is coverage, and we compare against EMBN-MANET on it,
-where the comparison is both fair and decidable.
+The informative axis is coverage. We compare against EMBN-MANET on it
+analytically, and Section~\ref{sec:baselines} measures it for re-implemented
+decision rules of both families on identical traces.

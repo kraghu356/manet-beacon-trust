@@ -46,7 +46,8 @@ This paper reports an experimental study of both questions, conducted in
 ns-3 across 525 distinct simulations: a 30-seed detection campaign over three
 attack scenarios and a clean network, six isolation policies replayed over
 that campaign and checked by enforcing them in the simulator, two
-attack-intensity sweeps, and a repetition under log-normal shadowing.
+attack-intensity sweeps, a repetition under log-normal shadowing, and two
+re-implemented literature baselines evaluated on the same traces.
 
 \begin{enumerate}
 \item We frame malicious beacon verification as a question of evidence
@@ -54,7 +55,9 @@ attack-intensity sweeps, and a repetition under log-normal shadowing.
       in which behavioural and localisation evidence are fused into a
       per-observer direct trust value before a three-state verdict is
       issued. The individual components are established; the contribution
-      is the coverage framing and the evaluation that follows from it.
+      is the coverage framing and the evaluation that follows from it. The
+      pipeline is the vehicle for the study, not a claimed improvement in
+      detection, as the baseline comparison below shows.
 
 \item We make explicit, for trust fusion, a calibration requirement that
       is standard in meta-analysis~\cite{stouffer1949,whitlock2005weighted}:
@@ -70,9 +73,11 @@ attack-intensity sweeps, and a repetition under log-normal shadowing.
       signature in its class: over 30 seeds, localisation evidence alone
       confirmed a selective-forwarding attacker in none, and behavioural
       evidence alone confirmed a false-location attacker in 3, below its
-      rate of 17\% on honest beacons. Collecting both classes confirmed
-      every attacker. A disjunctive rule achieves the same coverage, so the
-      result concerns evidence collection, not the combination rule.
+      rate of 17\% on honest beacons. Re-implemented localisation-only and
+      behaviour-only baselines from the literature showed the same blindness.
+      Collecting both classes confirmed every attacker. A disjunctive rule
+      achieves the same coverage, so the result concerns evidence
+      collection, not the combination rule.
 
 \item We introduce cumulative false isolation~$\Phi$, in node-seconds, and
       its normalised form~$\bar\Phi$, as complements to the false-positive
@@ -104,6 +109,14 @@ attack-intensity sweeps, and a repetition under log-normal shadowing.
       2.67--5.47) fusion confirmed fewer attackers than a disjunctive rule
       near the behavioural threshold, and at 1.87 (95\% CI 1.41--2.21) it
       never confirmed fewer and confirmed one more.
+
+\item We report that the fused pipeline is not a better detector than
+      classical ones for these attacks. A calibrated disjunction of a
+      localisation-only alert-counting detector and a behaviour-only
+      reputation detector matched its coverage and false isolation and
+      isolated attackers as fast or faster, by up to 77\,s under shadowing.
+      The fusion condition predicts this, since every attack evaluated lies
+      outside the fusion-only region.
 
 \item We report localisation error as the outcome metric for the
       false-location attack, showing that the two attack classes are

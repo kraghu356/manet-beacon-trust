@@ -57,22 +57,22 @@ def main(argv=None) -> int:
         honest = sorted(set(v["target"].unique()) - set(att))
         sch = build_schedules(v)
         ea_cl, _ = closed_loop_ea(v, a.sim_time)
-        r = {"attack": m["atk"], "seed": int(m["seed"])}
+        r = {"attack": m["atk"], "seed": int(m["seed"]), "n_honest_runs": len(honest)}
         for arm, s in (("D1", pd.DataFrame(sch["D1"], columns=["time_s", "observer", "target", "action"])),
                        ("E", pd.DataFrame(sch["E"], columns=["time_s", "observer", "target", "action"])),
                        ("Ea_closed", ea_cl)):
             r[f"phi_{arm}"] = float(sum(isolated_seconds(s, h, a.sim_time) for h in honest))
         if len(att):
-            # attacker exposure after onset (30 s) under closed-loop Ea: time not isolated
-            iso = isolated_seconds(ea_cl[ea_cl.time_s >= 0], int(att[0]), a.sim_time)
-            r["attacker_exposed_s"] = (a.sim_time - 30.0) - iso
+            # attacker exposure after onset (30 s) under closed-loop Ea: time not
+            # isolated, averaged over attackers
+            r["attacker_exposed_s"] = float(np.mean(
+                [(a.sim_time - 30.0) - isolated_seconds(ea_cl, int(x), a.sim_time) for x in att]))
         rows.append(r)
     df = pd.DataFrame(rows)
     os.makedirs(a.out, exist_ok=True)
     df.to_csv(os.path.join(a.out, "release_per_run.csv"), index=False)
-    n_h = 3 * a.sim_time
     for atk, g in df.groupby("attack"):
-        nh = n_h if atk == "none" else 2 * a.sim_time
+        nh = a.sim_time * g["n_honest_runs"].mean() if "n_honest_runs" in g else a.sim_time
         line = [f"{atk:5s} n={len(g):2d}"]
         for arm in ("D1", "E", "Ea_closed"):
             x = g[f"phi_{arm}"].to_numpy(float)

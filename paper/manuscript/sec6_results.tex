@@ -322,6 +322,78 @@ collection determines coverage, and whether the combination rule adds anything
 against a given attack family is decided by the branches' relative
 sensitivity to that family.
 
+\subsection{Comparison with literature baselines}
+\label{sec:baselines}
+
+Table~\ref{tab:baselines} compares the pipeline with the baselines of
+Section~\ref{sec:baselinedef} on identical traces. The pipeline's false
+isolation is that of policy E$'$, since the baselines also isolate on their
+own detection and, like E$'$ in practice, do not release.
+
+\begin{table}[!t]
+\caption{Pipeline against literature baselines on identical traces. Detection
+counts the attacker isolated after onset; FI is honest beacons isolated on the
+clean network; $\bar\Phi$ is clean-network false isolation (E$'$ for the
+pipeline); latency is the median time from onset to isolation, in seconds,
+for A1 / A2 / A3, given only where the attacker was detected in at least half
+the seeds. 30 seeds at 0\,dB and 20 under shadowing.}
+\label{tab:baselines}
+\centering
+\small
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{@{}llcccccc@{}}
+\toprule
+$\sigma_{sh}$ & Method & A1 & A2 & A3 & FI & $\bar\Phi$ & Latency A1 / A2 / A3 \\
+\midrule
+0\,dB & LND & 30/30 & 2/30 & 30/30 & 3/90 & 0.003 & 10 / --- / 15 \\
+      & WD & 1/30 & 30/30 & 30/30 & 4/90 & 0.031 & --- / 20 / 40 \\
+      & LND+WD & 30/30 & 30/30 & 30/30 & 7/90 & 0.034 & 10 / 20 / 15 \\
+      & Pipeline & 30/30 & 30/30 & 30/30 & 9/90 & 0.050 & 15 / 27.5 / 15 \\
+4\,dB & LND & 20/20 & 1/20 & 20/20 & 2/60 & 0.005 & 15 / --- / 22.5 \\
+      & WD & 4/20 & 20/20 & 13/20 & 7/60 & 0.050 & --- / 60 / 270 \\
+      & LND+WD & 20/20 & 20/20 & 20/20 & 8/60 & 0.054 & 15 / 60 / 22.5 \\
+      & Pipeline & 20/20 & 20/20 & 20/20 & 6/60 & 0.045 & 15 / 125 / 20 \\
+8\,dB & LND & 20/20 & 0/20 & 20/20 & 1/60 & 0.000 & 20 / --- / 65 \\
+      & WD & 0/20 & 20/20 & 3/20 & 0/60 & 0.000 & --- / 120 / --- \\
+      & LND+WD & 20/20 & 20/20 & 20/20 & 1/60 & 0.000 & 20 / 120 / 65 \\
+      & Pipeline & 20/20 & 20/20 & 19/20 & 0/60 & 0.000 & 22.5 / 150 / 155 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The single-evidence baselines reproduce the coverage result with detectors
+we did not design. The localisation-only detector revoked the A1 and A3
+attackers in every seed of every channel and the A2 attacker in at most 2 of
+30, and those few revocations came at least 225\,s after onset, at about the
+rate at which it revoked honest beacons. The behaviour-only detector isolated
+the A2 attacker in every seed and the A1 attacker in at most 4 of 20. Each
+literature family is blind to the attack outside its evidence class, as
+Table~\ref{tab:families} predicts from published descriptions.
+
+The disjunction of the two baselines is the more instructive comparison, and
+on it the pipeline does not win. LND+WD covered every attack in every channel
+with false isolation statistically indistinguishable from the pipeline's: the
+paired difference in clean-network $\Phi$ (pipeline minus LND+WD) was 19
+node-seconds at 0\,dB (95\% CI $[-22, 61]$) and $-10$ at 4\,dB ($[-62, 43]$),
+and both were zero at 8\,dB. It isolated attackers as fast or faster. The
+pipeline was slower by a mean of 3.7\,s on A1 at 0\,dB (CI $[2.0, 5.2]$), by
+60\,s on A2 at 4\,dB ($[18, 104]$) and by 77\,s on A3 at 8\,dB ($[33, 122]$),
+and no paired interval showed it faster.
+
+This is what Section~\ref{sec:region} predicts. A1 and A2 each disturb one
+branch only, and A3 at its evaluated intensity lies above both branches'
+individual thresholds rather than in the fusion-only region, so for every
+attack evaluated here a disjunction loses nothing to fusion and
+avoids the attenuation of a live branch by a silent one. The latency gap is
+largest under shadowing, plausibly because the pipeline's behavioural branch
+also waits for its confidence weight to saturate, which a reputation
+threshold does not. The comparison
+therefore narrows what the pipeline contributes: its detection is matched by
+two calibrated classical detectors run in parallel, and what the paper adds
+lies in the coverage analysis, the false-isolation measure, the release
+result of Section~\ref{sec:release} and the fusion condition, not in a better
+detector.
+
 \subsection{Localisation error}
 \label{sec:locerr}
 

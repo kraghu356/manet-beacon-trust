@@ -46,7 +46,10 @@ inside the bound, and fusion then never confirmed fewer and confirmed one more.
 The detector was the same in both sweeps; only the mix of displacement and
 drop rate changed. Fusion contributes against attackers whose two
 misbehaviours are comparably visible to the two branches, and against
-lopsided ones a disjunctive rule does as well or better. Branch sensitivity to
+lopsided ones a disjunctive rule does as well or better. The baseline
+comparison is the same result at the level of whole detectors: two calibrated
+single-evidence detectors run in parallel matched the fused pipeline on every
+attack evaluated and were faster under shadowing. Branch sensitivity to
 a given attack family can be measured before fusion is applied, and no system
 we surveyed reports checking it. An adaptive adversary could exploit this by
 concentrating its misbehaviour on one axis, which is a further reason to
@@ -110,13 +113,16 @@ nulls. Three monitored beacons per run makes rate-based metrics coarse. And
 only the hybrid attack's intensity is swept. We do not claim the results
 generalise beyond this configuration.
 
-\textbf{Comparative validity.} No baseline from the literature is implemented.
-Policies D, D$_w$ and D$_1$ are our own constructions; they are reasonable
-stand-ins for isolate-on-suspicion behaviour but not reimplementations of any
-published method. The comparison against EMBN-MANET is analytical, resting on
-a reading of its evidence class and threat model. Every cross-method statement
-in this paper is a hypothesis about evidence coverage, not a measured
-comparison.
+\textbf{Comparative validity.} The two literature baselines re-implement
+the evidence class and decision rule of Liu--Ning--Du alert counting and of
+watchdog/CONFIDANT reputation; they are not complete reimplementations of
+those systems, and they use our simulator's node-global behavioural counters
+and our residual. Their thresholds were set on calibration seeds by rules we
+chose, and a different but equally defensible rule would move their operating
+points. Policies D, D$_w$ and D$_1$ are our own constructions, reasonable
+stand-ins for isolate-on-suspicion behaviour. The comparison against
+EMBN-MANET itself remains analytical, resting on a reading of its evidence
+class and threat model.
 
 \textbf{Statistical conclusion validity.} Coverage, latency, false positives
 and $\Phi$ rest on 30 seeds with held-out calibration and paired bootstrap
@@ -149,7 +155,10 @@ Stouffer detector has a fusion-only region, but an attack family scaled in
 intensity reaches it only when the branches' detection thresholds for that
 family lie within a factor of $1+\sqrt2$, and across two sweeps that condition
 predicted whether fusion diluted ($r = 3.63$) or matched and marginally
-exceeded ($r = 1.87$) a disjunctive rule. The trust aggregation layer changed
+exceeded ($r = 1.87$) a disjunctive rule. Consistent with that condition, a
+calibrated disjunction of localisation-only and behaviour-only literature
+baselines matched the fused pipeline's coverage and false isolation and
+isolated attackers as fast or faster. The trust aggregation layer changed
 no verdict, and neither isolation policy produced a throughput difference
 exceeding its confidence interval.
 
@@ -161,9 +170,9 @@ mistakes last.
 \subsection{Future work}
 \label{sec:future}
 
-\textbf{Baselines.} EMBN-MANET and at least one behavioural trust-routing scheme
-should be implemented on the same topology and evidence streams, so that the
-coverage argument becomes a measurement rather than an analysis.
+\textbf{Complete baselines.} Full implementations of EMBN-MANET and of a
+behavioural trust-routing scheme, including their response mechanisms, on the
+same topology and traces.
 
 \textbf{Scale and topology.} 50- and 100-node networks, sparse topologies in
 which isolation can affect delivery, varied mobility speeds, and multiple and
