@@ -1,0 +1,120 @@
+\section{Introduction}
+
+Mobile ad hoc networks (MANETs) operate without fixed infrastructure. Nodes
+organise themselves, forward one another's traffic, and reconfigure as the
+topology changes. The properties that make this attractive for disaster
+response, defence communication and location-aware services are the same
+ones that make the network hard to secure. There is no central authority to
+consult, no stable membership, and no reliable way to tell a node that is
+failing from a node that is lying.
+
+Beacon nodes deserve separate treatment within this problem. A beacon
+advertises position information that neighbouring nodes consume in order to
+localise themselves. A compromised beacon therefore corrupts the position
+estimates of nodes it never exchanged data traffic with, and the corruption
+propagates through the localisation computation rather than through the
+routing fabric. The consequences differ in kind from ordinary
+packet-dropping attacks, not merely in degree. A node that drops packets
+degrades a service the network can measure; a beacon that lies about its
+position degrades a service the network has no independent way to check.
+
+Elimination of malicious beacons from localisation evidence is well studied
+for static beacons. Liu, Ning and Du detect a beacon whose RSSI-implied
+distance disagrees with the distance implied by its declared position, and
+revoke it once enough alerts accumulate~\cite{liu2005detecting}. Kuriakose
+et al.~\cite{kuriakose2023embn} address the same problem in EMBN-MANET, a
+UWB-based mobile ad hoc network, using RSSI and trilateration residuals, and
+report complete identification when fewer than four malicious beacons share
+a neighbourhood. Both establish that detection from localisation evidence is
+tractable. What neither settles is the decision that precedes removal, and
+what happens to the network when that decision is wrong: revocation in both
+is permanent.
+
+Both questions matter for a practical reason. In a mobile wireless
+environment, congestion, transient link failure, interference and mobility
+all produce observations that resemble attack. A verification stage
+separating detection from confirmation therefore has a plausible role, a
+need also identified in work on trust change and revision~\cite{chatzidakis2022trust}
+and on verification supported by observable evidence~\cite{li2019dapv,ryu2023reputation}.
+And because a removed beacon is a beacon whose localisation service is lost
+to its neighbours, removal is not free: a verification mechanism that is too
+eager degrades exactly the service it exists to protect.
+
+\subsection{Contributions}
+
+This paper reports an experimental study of both questions, conducted in
+ns-3 across 550 simulation runs: a 30-seed detection campaign over three
+attack scenarios and a clean network, isolation runs under five policies,
+two attack-intensity sweeps, and a repetition under log-normal shadowing.
+
+\begin{enumerate}
+\item We frame malicious beacon verification as a question of evidence
+      coverage rather than detection accuracy, and give a two-stage pipeline
+      in which behavioural and localisation evidence are fused into a
+      per-observer direct trust value before a three-state verdict is
+      issued. The individual components are established; the contribution
+      is the coverage framing and the evaluation that follows from it.
+
+\item We show that a fused statistic must be calibrated against its own
+      null distribution before a fusion claim can be tested. A combined
+      score thresholded at the single-branch threshold can never detect an
+      attacker that both branches miss, and tables built this way report a
+      fusion advantage that is a property of the comparison. Weighted
+      Stouffer combination~\cite{stouffer1949,whitlock2005weighted} is unit
+      variance under the null, so one threshold serves every configuration.
+
+\item We report a coverage result and keep it separate from a fusion claim.
+      Each single-evidence detector is blind to the attack that leaves no
+      signature in its class: over 30 seeds, localisation evidence alone
+      confirmed a selective-forwarding attacker in none, and behavioural
+      evidence alone confirmed a false-location attacker in 3, below its
+      rate of 17\% on honest beacons. Collecting both classes confirmed
+      every attacker. A disjunctive rule achieves the same coverage, so the
+      result concerns evidence collection, not the combination rule.
+
+\item We introduce cumulative false isolation~$\Phi$, in node-seconds, and
+      its normalised form~$\bar\Phi$, as complements to the false-positive
+      rate. Against three immediate-isolation policies, including one that
+      waits for a single window of malicious evidence and one with a
+      warm-up guard, confirmation-gated isolation with release reduced
+      $\Phi$ on a clean network from 897--1052 to 47 node-seconds (paired
+      difference from the strongest immediate policy 851 node-seconds,
+      bootstrap 95\% CI [785, 911]), and on attacked networks from 586--716
+      to 15--47 node-seconds.
+
+\item We derive the condition under which weighted Stouffer fusion has a
+      fusion-only detection region: with equal effective weights, the two
+      branches' detection thresholds must lie within a factor of
+      $1+\sqrt{2}\approx 2.414$. The condition is checkable from
+      single-branch detection curves before any fusion experiment, and it
+      predicted the outcome of two sweeps: at a ratio of 3.63 (95\% CI
+      2.67--5.47) fusion confirmed fewer attackers than a disjunctive rule
+      near the behavioural threshold, and at 1.87 (95\% CI 1.41--2.21) it
+      never confirmed fewer and confirmed one more.
+
+\item We report localisation error as the outcome metric for the
+      false-location attack, showing that the two attack classes are
+      disjoint in both evidence directions: selective forwarding leaves no
+      positional signature (0.04\,m, indistinguishable from a clean
+      network) just as false location leaves no packet-level signature.
+
+\item We test robustness to log-normal shadowing at 4 and 8\,dB. Detection
+      and the false-isolation result survive; the cost moves to latency,
+      which for forwarding attacks rises from a mean of 42\,s to 127--151\,s.
+
+\item We report negative results in the body of the paper: the trust
+      aggregation stage changed no verdict, neither isolation policy
+      produced a throughput advantage surviving its confidence interval,
+      and the false-location attack has no packet-level footprint at all,
+      so throughput-based evaluation of that attack class measures nothing.
+\end{enumerate}
+
+\subsection{Organisation}
+
+Section~\ref{sec:related} positions the work against the closest prior art.
+Section~\ref{sec:model} defines the network and threat models.
+Section~\ref{sec:framework} develops the model in full.
+Section~\ref{sec:method} describes the simulation campaign.
+Section~\ref{sec:results} reports results, Section~\ref{sec:discussion}
+interprets them, Section~\ref{sec:threats} states threats to validity, and
+Section~\ref{sec:conclusion} concludes.

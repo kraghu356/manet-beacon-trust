@@ -1,0 +1,72 @@
+%% Springer Nature submission, single-column. For the official class, open
+%% the Springer Nature template on Overleaf and replace the preamble with
+%% \documentclass[pdflatex,sn-mathphys-num]{sn-jnl}; the section files and
+%% refs.bib need no changes.
+\documentclass[12pt]{article}
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb,graphicx,booktabs,url,setspace}
+\usepackage[table]{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,fit,calc}
+\usepackage[hidelinks]{hyperref}
+\usepackage[numbers,sort&compress]{natbib}
+\onehalfspacing
+\bibliographystyle{unsrtnat}
+\graphicspath{{figures/}}
+
+\title{\textbf{Evidence Coverage and the Cost of False Isolation: Verifying
+Malicious Beacon Nodes in Mobile Ad Hoc Networks}}
+\author{%
+  \normalsize Amruth V\,$^{1,\ast}$ \quad Devaraj Verma C\,$^{1}$ \\[8pt]
+  \small $^{1}$Department of Computer Science and Engineering, \\
+  \small JAIN (Deemed-to-be University), Bengaluru 562112, Karnataka, India \\[6pt]
+  \small $^{\ast}$Corresponding author: Amruth V, Research Scholar \\
+  \small \texttt{amruthv020@gmail.com}%
+}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent Malicious beacon nodes corrupt the position estimates of nodes that
+never exchange traffic with them. Prior defences detect them from
+localisation evidence and remove them permanently; we study the decision
+that precedes removal and what an error costs. A pipeline fuses behavioural
+and localisation evidence into per-observer trust and a three-state verdict,
+evaluated over 550 ns-3 runs. First, coverage: against the attack invisible
+to its evidence class, the localisation branch confirmed the attacker in 0
+of 30 seeds and the behavioural branch in 3 of 30, below its rate on honest
+beacons; using both confirmed it in all 30. Second, we introduce cumulative
+false isolation~$\Phi$, in node-seconds. Confirmation-gated isolation with
+release withdrew 3.9\% of honest-beacon service against 74.8\% for the
+strongest immediate-isolation policy, at a median detection latency of
+15--27.5\,s. Third, we derive when weighted Stouffer fusion can detect what
+neither branch detects alone: the branches' detection thresholds must lie
+within a factor of $1+\sqrt{2}$. The condition predicted two intensity
+sweeps: at a threshold ratio of 3.63 fusion lost detections to a
+disjunctive rule, and at 1.87 it matched it. Under 4 and 8\,dB shadowing
+the pipeline confirmed 119 of 120 attackers and false isolation stayed
+below 4\%, but forwarding attacks took 127--151\,s to confirm. Results cover
+one dense topology; Section~\ref{sec:threats} states what is needed before
+they generalise.
+
+\medskip
+\noindent\textbf{Keywords} Mobile ad hoc networks $\cdot$ Beacon nodes
+$\cdot$ Trust management $\cdot$ Evidence fusion $\cdot$ Node isolation
+$\cdot$ Localisation security
+\end{abstract}
+
+\input{sec1_intro}
+\input{sec2_related}
+\input{sec3_model}
+\input{sec4_framework}
+\input{sec5_method}
+\input{sec6_results}
+\input{sec7_discussion}
+
+\bibliography{refs}
+\end{document}

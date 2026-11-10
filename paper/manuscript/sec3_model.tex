@@ -1,0 +1,85 @@
+\section{Network and Threat Model}
+\label{sec:model}
+
+\subsection{Network model}
+
+The network is a dynamic graph $G(t) = (V, E(t))$ over $N$ mobile nodes with
+time-varying wireless links. A subset $\mathcal{B} \subseteq V$ are beacon
+nodes advertising position information usable by neighbours for
+localisation. A subset $\mathcal{B}_m \subseteq \mathcal{B}$ are compromised.
+Each monitored beacon $i$ carries a state
+\begin{equation}
+\label{eq:state}
+S_i(t) \in \{\textsc{Normal}, \textsc{Suspicious}, \textsc{Confirmed}\}.
+\end{equation}
+The intermediate state exists so that a single anomalous observation does
+not directly authorise removal.
+
+We assume an upstream detector supplies candidate malicious beacons; this
+work concerns what happens to a candidate thereafter. Attackers are insiders
+holding valid credentials, so cryptographic authentication does not resolve
+the problem: an authenticated node can still lie.
+
+\subsection{Attack model}
+
+We evaluate three attacker behaviours, chosen so the first two are disjoint
+in the evidence they disturb and the third combines them.
+
+\textbf{A1, false location.} The compromised beacon advertises a position
+displaced from its true position, while forwarding all transit traffic
+honestly. This corrupts localisation and, by construction, produces no
+forwarding anomaly. The offset $\delta$ is applied to both coordinates and
+the result is clamped to the field,
+\begin{equation}
+\label{eq:clamp}
+x^{c} = \min\bigl(X, \max(0, x + \delta)\bigr), \qquad
+y^{c} = \min\bigl(Y, \max(0, y + \delta)\bigr).
+\end{equation}
+An unclamped beacon is therefore displaced by $\delta\sqrt{2} = 424$\,m for
+$\delta = 300$\,m, while one near the far corner is displaced much less.
+Over the campaign the realised displacement averaged 267\,m, with median
+271\,m and 95th percentile 299\,m (Section~\ref{sec:locerr}). We report the
+measured displacement alongside the nominal parameter, since the effective
+attack strength depends on where in the field the attacker happens to be.
+
+\textbf{A2, selective forwarding.} The compromised beacon advertises its true
+position and drops transit packets with probability $p$. This degrades
+delivery and produces no localisation anomaly.
+
+\textbf{A3, hybrid at half intensity.} The compromised beacon applies both
+behaviours with each halved: offset $\delta/2$ and drop probability $p/2$.
+
+The choice to halve rather than compound is deliberate. Compounding both
+behaviours at full strength produces an attacker that is more conspicuous on
+every axis at once, which tests nothing A1 and A2 do not already test.
+Halving produces an attacker that is less conspicuous on each axis while
+remaining malicious on both. That is the configuration under which a fusion
+advantage, if the mechanism confers one, should appear, because each
+single-evidence branch operates closer to its detection threshold. A3 is
+therefore a test of the fusion hypothesis rather than a demonstration of it,
+and Section~\ref{sec:sweep} sweeps its intensity.
+
+\begin{table}[!t]
+\caption{Principal notation.}
+\label{tab:notation}
+\centering
+\small
+\begin{tabular}{@{}ll@{}}
+\toprule
+Symbol & Meaning \\
+\midrule
+$FR_i(t)$ & forwarding ratio of beacon $i$ \\
+$z_B, z_L$ & standardised behavioural / localisation evidence \\
+$A_B, A_L$ & oriented anomaly scores \\
+$Z_{ij}(w)$ & fused evidence statistic \\
+$T^D, T^I, T^H$ & direct, indirect, historical trust \\
+$\hat C_i(t)$ & collapsed confidence \\
+$\tau_N, \tau_M$ & normal and malicious thresholds \\
+$W, K$ & persistence window and confirmation count \\
+$\mathcal{B}_{iso}(t)$ & isolation set \\
+$\theta_B, \theta_L$ & branch detection thresholds in attack intensity \\
+$R_{PDR}, R_{TH}$ & delivery and throughput recovery ratios \\
+$\Phi, \bar\Phi$ & cumulative false isolation (node-seconds) and its normalised form \\
+\bottomrule
+\end{tabular}
+\end{table}

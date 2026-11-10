@@ -1,0 +1,418 @@
+\section{Proposed Framework}
+\label{sec:framework}
+
+This section develops the verification and recovery model in full.
+Fig.~\ref{fig:pipeline} shows how the pieces connect; notation is summarised
+in Table~\ref{tab:notation}.
+
+\begin{figure}[!t]
+\centering
+\begin{tikzpicture}[
+  font=\footnotesize,
+  box/.style={draw=black!70, rounded corners=2pt, align=center, fill=gray!8,
+              minimum width=4.6cm, inner sep=4pt},
+  ev/.style={box, fill=white, minimum width=3.6cm},
+  st/.style={draw=black!70, rounded corners=2pt, minimum width=2.4cm,
+             inner sep=4pt, fill=white},
+  iso/.style={box, fill=orange!8, draw=orange!60!black, minimum width=3.9cm},
+  note/.style={align=left, font=\scriptsize, text width=3.6cm},
+  arr/.style={-{Stealth[length=2mm]}, black!70},
+  node distance=6mm]
+\node[ev] (beh) {\textbf{Behavioural evidence}\\forwarding ratio, peer-relative $z_B$};
+\node[ev, right=8mm of beh] (loc) {\textbf{Localisation evidence}\\range residual, calibrated $z_L$};
+\node[box, below=12mm of $(beh)!0.5!(loc)$] (s1) {\textbf{Stage 1: weighted Stouffer fusion}\\
+  $Z_{ij}=(\tilde\omega_B A_B+\tilde\omega_L A_L)/\sqrt{\tilde\omega_B^2+\tilde\omega_L^2}$};
+\node[box, below=of s1] (td) {Direct trust $T^D_{ij}=\exp(-Z_{ij}^2/2)$, per observer};
+\node[box, below=of td] (s2) {\textbf{Stage 2: aggregation}\\
+  $T_{ij}=(w_D T^D+w_I T^I+w_H T^H)/\sum w$};
+\node[box, below=of s2] (dec) {Median over observers, agreement, persistence $M_i \ge K$};
+\node[st, below=9mm of dec] (sus) {Suspicious};
+\node[st, left=8mm of sus] (nor) {Normal};
+\node[st, right=8mm of sus] (con) {Confirmed};
+\node[iso, below=8mm of con] (iset) {Isolation set $\mathcal{B}_{iso}(t)$\\blacklist queueing discipline};
+\node[iso, below=5mm of iset] (rec) {Route repair (AODV)\\$P \cap \mathcal{B}_{iso} = \emptyset$};
+\draw[arr] (beh.south) |- ([yshift=5mm]s1.north) -- (s1.north);
+\draw[black!70] (loc.south) |- ([yshift=5mm]s1.north);
+\draw[arr] (s1) -- (td);
+\draw[arr] (td) -- (s2);
+\draw[arr] (s2) -- (dec);
+\draw[arr] (dec.south) -- ++(0,-4mm) -| (nor.north);
+\draw[arr] (dec.south) -- (sus.north);
+\draw[arr] (dec.south) -- ++(0,-4mm) -| (con.north);
+\draw[arr, orange!60!black] (con) -- (iset);
+\draw[arr, orange!60!black] (iset) -- (rec);
+\draw[arr, dashed, orange!60!black] (rec.west) -| node[pos=0.3, above, font=\scriptsize]{release if revised (E)} (nor.south);
+\node[note, right=3mm of s1] {Unit variance under the null for any weights, so one threshold serves all configurations (Sec.~\ref{sec:calib}).};
+\node[note, right=3mm of s2] {$T^I$: trimmed peer mean, one recommender capped at $\kappa=0.3$. $T^H$: asymmetric EWMA, $\lambda_\downarrow=0.5$, $\lambda_\uparrow=0.9$.};
+\node[note, right=3mm of iset] {Policies D, D$_w$, D$_1$ isolate before confirmation and never release; E isolates only from Confirmed and can release.};
+\end{tikzpicture}
+\caption{Verification pipeline. Behavioural and localisation evidence are
+standardised, oriented and fused in Stage~1 to give a per-observer direct
+trust value; Stage~2 aggregates that value across observers and over time.
+The three-state verdict separates suspicion from confirmation, and the
+isolation policies differ only in which evidence authorises removal and
+whether removal can be reversed.}
+\label{fig:pipeline}
+\end{figure}
+
+\subsection{Behavioural evidence}
+
+For beacon $i$ in window $w$, let $P_i^{fwd}$ and $P_i^{recv}$ denote packets
+forwarded and received for forwarding. The behavioural observable is the
+forwarding ratio
+\begin{equation}
+\label{eq:fr}
+FR_i(t) = \frac{P_i^{fwd}(t)}{P_i^{recv}(t) + \epsilon},
+\end{equation}
+with $\epsilon$ guarding against division by zero.
+
+We use a single behavioural observable rather than a composite score, because
+composites in this literature are often degenerate. A weighted sum of the
+form $w_1 FR_i + w_2(1-DR_i) + \dots$, where $DR_i = 1 - FR_i$ is the drop
+ratio, collapses to $(w_1 + w_2) FR_i$: what reads as two independent pieces
+of evidence is one observable counted twice, with an inflated effective
+weight. Observables genuinely independent of $FR_i$, such as routing-response
+consistency or response delay, would each require their own null calibration
+and are outside the scope of this study.
+
+The observable is standardised against contemporaneous peers rather than a
+static calibrated baseline. Benign congestion depresses forwarding across all
+nodes in a neighbourhood simultaneously; measured against a fixed baseline
+this registers as individual misbehaviour, whereas measured against peers
+observed in the same window a network-wide depression cancels. If
+$\mathcal{P}_i$ is the peer set of $i$ with at least $n_{min}$ members,
+\begin{equation}
+\label{eq:zb}
+z_B(w) = \frac{FR_i(w) - \mu(\mathcal{P}_i, w)}{\sigma(\mathcal{P}_i, w) + \epsilon},
+\end{equation}
+falling back to the static calibrated null where the peer set is too small to
+estimate. Equation~\eqref{eq:zb} is the quantity that enters fusion.
+
+\subsection{Localisation evidence}
+
+\subsubsection{Range residual}
+
+The detector is not given the beacon's true position: a node in a MANET has no
+such oracle, and a model that consumes one is not implementable. We therefore
+score the internal inconsistency of what the beacon broadcasts, which requires
+only quantities an observer can measure.
+
+For observer $j$ receiving a beacon from $i$, let $\hat d_{ij}$ be the distance
+implied by measured RSSI under the calibrated path-loss model, and
+$\tilde d_{ij}$ the distance implied by the coordinates the beacon advertises
+together with $j$'s own position estimate. The range residual is
+\begin{equation}
+\label{eq:resid}
+r_{ij}(w) = \bigl| \hat d_{ij}(w) - \tilde d_{ij}(w) \bigr|,
+\end{equation}
+and the standardised localisation evidence is $r_{ij}$ scored against the
+residual null distribution calibrated on clean-network runs,
+\begin{equation}
+\label{eq:zl}
+z_L(w) = \frac{r_{ij}(w) - \mu_r}{\sigma_r + \epsilon}.
+\end{equation}
+A beacon displaced by $\delta$ inflates $\tilde d_{ij}$ without changing
+$\hat d_{ij}$, so $r_{ij}$ grows with $\delta$; an honest beacon leaves $r_{ij}$
+at the measurement noise floor. True positions appear in our logs only for
+labelling detections as correct or incorrect after the fact.
+
+Two consequences follow. First, the residual is bounded below by RSSI ranging
+error, so the attack is undetectable for offsets comparable to that error; the
+detection floor is a property of the ranging channel and not of the fusion
+rule. Second, an attacker who could also manipulate the RSSI observed by its
+neighbours could suppress the residual. Our threat model does not include
+physical-layer power manipulation, and we flag it as a gap rather than a
+solved case.
+
+\subsubsection{RSSI consistency}
+
+Let $\mathrm{RSSI}_{ij}^{obs}$ be the RSSI measured by neighbour $j$ for beacon
+$i$ and $\mathrm{RSSI}_{ij}^{exp}$ the value expected from the estimated distance
+under the path-loss model:
+\begin{equation}
+\label{eq:ersi}
+E_i^{RSSI}(t) = \frac{1}{|N_i|} \sum_{j \in N_i}
+  \frac{|\mathrm{RSSI}_{ij}^{obs} - \mathrm{RSSI}_{ij}^{exp}|}
+       {\mathrm{RSSI}_{max} - \mathrm{RSSI}_{min} + \epsilon},
+\qquad
+L_i^{RSSI}(t) = 1 - \min\bigl(1, E_i^{RSSI}(t)\bigr).
+\end{equation}
+
+\subsection{Stage one: evidence fusion}
+
+\subsubsection{Orienting the two evidence streams}
+
+The two standardised statistics point in opposite directions with respect to
+misbehaviour. A malicious beacon depresses its forwarding ratio, so $z_B$
+becomes large and negative; it inflates its range residual, so $z_L$ becomes
+large and positive. Summing the two as they stand would allow a node
+misbehaving on both axes to cancel its own evidence. We therefore define a
+common one-sided anomaly scale on which larger means more suspicious,
+\begin{equation}
+\label{eq:orient}
+A_B(w) = -z_B(w), \qquad A_L(w) = +z_L(w),
+\end{equation}
+and all subsequent fusion operates on $A_B$ and $A_L$. The sign convention is
+trivial once stated, but Section~\ref{sec:orientation} shows that getting it
+wrong produces a detector that fails specifically on hybrid attacks while
+continuing to work on single-axis ones.
+
+\subsubsection{Confidence-weighted fusion}
+
+Each branch is weighted by a fixed branch weight and by a confidence factor
+saturating in sample count,
+\begin{equation}
+\label{eq:conf}
+c(n) = \frac{n}{n + n_{1/2}},
+\end{equation}
+with $n_{1/2} = 5$ for localisation and $n_{1/2} = 45$ for behaviour. A single
+beacon reception carries positional information directly, whereas forwarding
+behaviour is observable only through an accumulation of transit packets. This
+asymmetry reappears in the measured confirmation latencies of
+Section~\ref{sec:results}. Writing the effective weights as
+\begin{equation}
+\label{eq:effw}
+\tilde\omega_B(w) = \omega_B\, c(n_B(w)), \qquad
+\tilde\omega_L(w) = \omega_L\, c(n_L(w)),
+\end{equation}
+where $n_B$ and $n_L$ are the observation counts available to each branch in
+window $w$, the fused statistic is
+\begin{equation}
+\label{eq:stouffer}
+Z_{ij}(w) = \frac{\tilde\omega_B A_B(w) + \tilde\omega_L A_L(w)}
+                 {\sqrt{\tilde\omega_B^2 + \tilde\omega_L^2}}.
+\end{equation}
+A branch with no observations in a window has $c = 0$ and drops out, leaving
+the remaining branch unchanged; this is why the confidence factor appears
+inside the normalisation rather than outside it.
+
+Direct trust is the fused statistic mapped through the Gaussian kernel
+\begin{equation}
+\label{eq:phi}
+T^D_{ij}(w) = \phi\bigl(Z_{ij}(w)\bigr) = \exp\bigl(-\tfrac12 Z_{ij}(w)^2\bigr),
+\end{equation}
+so that $T^D = 1$ for a beacon indistinguishable from the calibrated null and
+$T^D \to 0$ as the fused statistic moves into either tail. Thresholds on $T^D$
+therefore correspond to thresholds on $|Z|$: the values used here,
+$\tau_M = 0.40$ and $\tau_N = 0.70$, correspond to $|Z| = 1.354$ and
+$|Z| = 0.845$, two-sided null tail probabilities of 0.176 and 0.398.
+
+Two properties of~\eqref{eq:phi} matter. It is even in $Z$, so a deviation in
+either direction reduces trust equally; this is deliberate, since a beacon
+forwarding implausibly more traffic than its peers is as anomalous as one
+forwarding less. And because $\phi$ is applied after fusion rather than before
+it, the two-sidedness does not rescue a sign error: it is the fused $Z$ that is
+folded, not the individual branches.
+
+\subsubsection{Calibrating the fused statistic}
+\label{sec:calib}
+
+The combination rule matters less than how its output is thresholded. Let
+$s_B, s_L \in [0,1]$ be evidence scores and $C = \omega_B s_B + \omega_L s_L$
+with $\omega_B + \omega_L = 1$. Then
+\begin{equation}
+\label{eq:convex}
+\min(s_B, s_L) \le C \le \max(s_B, s_L),
+\end{equation}
+so if both scores lie on the benign side of a threshold~$\tau$, so does $C$. A
+detector that applies the single-branch threshold to a convex combination
+therefore cannot confirm an attacker that both branches miss. Tables built
+this way will still show the fused row ahead of the weaker branch, because a
+mean of a strong score and a weak one exceeds the weak one; the apparent
+advantage is a property of the comparison, not of the mechanism.
+
+The bound is a consequence of reusing $\tau$, not of averaging as such. For two
+independent standardised branches the arithmetic mean
+$\bar z = (z_B + z_L)/2$ has standard deviation $1/\sqrt2$ under the null, so a
+threshold recalibrated to the same false-positive rate is $\tau/\sqrt2$, and
+the rule $\bar z > \tau/\sqrt2$ is identical to the equal-weight Stouffer rule
+$(z_B + z_L)/\sqrt2 > \tau$. What the fusion hypothesis requires is a combined
+statistic calibrated against its own null distribution. Weighted Stouffer
+combination~\eqref{eq:stouffer} is unit variance under the null whatever the
+weights, so a single threshold serves every configuration and the hypothesis
+becomes falsifiable: two branches each at $z = 1.5$ combine, with equal
+weights, to $Z = 2.12$.
+
+This argument disqualifies uncalibrated combination; it does not make
+Stouffer's method the best calibrated rule, and we do not claim that it is.
+Fisher's method, likelihood-ratio and Bayesian fusion, Dempster--Shafer
+combination~\cite{singh2020self}, and learned rules can all be calibrated in
+the same sense. We chose Stouffer's method because it accepts continuous
+evidence without a likelihood model for either branch, admits per-branch
+weights directly~\cite{whitlock2005weighted}, and degrades gracefully when one
+branch has no observations in a window, which is frequent under mobility.
+Section~\ref{sec:sweep} compares it against a disjunctive rule; the remaining
+rules are listed in Section~\ref{sec:future}.
+
+Equation~\eqref{eq:stouffer} assumes $z_B$ and $z_L$ are independent under the
+null. In our attack scenarios they are close to independent by construction,
+because A1 and A2 disturb disjoint observables. Under a correlated failure,
+such as congestion coinciding with a mobility-induced ranging error, the fused
+statistic would be optimistic; correcting for it requires an estimated
+correlation term.
+
+\subsection{Stage two: trust aggregation}
+
+\subsubsection{Direct trust}
+
+Direct trust is the Stage~1 output, evaluated per observer per window:
+\begin{equation}
+\label{eq:td}
+T^D_{ij}(w) = \phi\bigl(Z_{ij}(w)\bigr).
+\end{equation}
+It is not separately smoothed; temporal weighting enters the model once, in
+$T^H$ below.
+
+\subsubsection{Indirect trust}
+
+Let $R_{ij}(t) \in [0,1]$ be neighbour $j$'s recommendation regarding beacon
+$i$ and $T_j(t)$ the reliability of that recommender:
+\begin{equation}
+\label{eq:ti}
+T^I_i(t) = \frac{\sum_{j \in N_i} T_j(t) R_{ij}(t)}{\sum_{j \in N_i} T_j(t) + \epsilon}.
+\end{equation}
+Equation~\eqref{eq:ti} is the general reliability-weighted form. The evaluated
+implementation uses a specialisation in which $R_{ij}$ is the direct trust
+observer $j$ holds in target $i$, and the reliability weights are replaced by a
+robust aggregation rule: a trimmed mean over the direct trust of observers
+other than $j$, with $j$'s own assessment excluded to avoid self-reinforcement,
+trim fraction 0.2, and any single recommender's influence capped at
+$\kappa = 0.3$. The cap bounds the effect of a colluding recommender, following
+the robustness principle of attack-resistant location
+estimation~\cite{liu2008attack}: no minority of recommenders can move the
+aggregate arbitrarily.
+
+\subsubsection{Historical trust}
+
+$T^H$ is an exponentially weighted average of prior combined trust for the
+$(j,i)$ pair with asymmetric decay. The update is applied after the
+combination of~\eqref{eq:combined} for window $t$ has been formed, and the
+value it contributes to that combination is the one carried forward from the
+previous window:
+\begin{equation}
+\label{eq:th}
+T^H_{ij}(t) = \lambda\, T^H_{ij}(t-1) + (1-\lambda)\, T_{ij}(t),
+\qquad
+\lambda =
+\begin{cases}
+\lambda_\downarrow = 0.5, & T_{ij}(t) < T^H_{ij}(t-1),\\
+\lambda_\uparrow = 0.9, & \text{otherwise,}
+\end{cases}
+\end{equation}
+so trust degrades faster than it recovers: wrongly trusting an attacker costs
+more than briefly distrusting an honest node. On the first window for a pair,
+$T^H$ is undefined, drops out of the renormalisation, and is seeded from the
+resulting combination.
+
+\subsubsection{Combined trust}
+
+\begin{equation}
+\label{eq:combined}
+T_{ij}(t) = \frac{w_D T^D_{ij}(t) + w_I T^I_{ij}(t) + w_H T^H_{ij}(t-1)}{w_D + w_I + w_H},
+\end{equation}
+renormalised over whichever terms are defined in the window. Because $T^H$
+seeds from the combined value, it cannot be evaluated in isolation: a
+configuration weighting history alone yields no defined trust at any window.
+This constrains the ablation design of Section~\ref{sec:ablation}.
+
+\subsection{Confidence, state and confirmation}
+
+Per-observer trust is collapsed to a single per-target confidence by the median
+over observers holding a defined opinion in that window,
+\begin{equation}
+\label{eq:median}
+C_i(t) = \operatorname{median}\{\, T_{ij}(t) : j \in O_i(t) \,\},
+\end{equation}
+where $O_i(t)$ is that observer set and $|O_i(t)| \ge 3$ is required for any
+verdict. The median prevents a single observer with an extreme value from
+moving the collapsed confidence. The confidence may optionally be smoothed,
+$\hat C_i(t) = \gamma C_i(t) + (1-\gamma)\hat C_i(t-1)$, though the evaluated
+configuration uses $\gamma = 1$, so temporal memory enters the decision through
+the persistence requirement rather than through smoothing. The verdict map is
+\begin{equation}
+\label{eq:verdict}
+S_i(t) =
+\begin{cases}
+\textsc{Normal}, & \hat C_i(t) \ge \tau_N,\\
+\textsc{Suspicious}, & \tau_M < \hat C_i(t) < \tau_N,\\
+\textsc{Confirmed}, & \hat C_i(t) \le \tau_M,
+\end{cases}
+\end{equation}
+with $0 \le \tau_M < \tau_N \le 1$. Confirmation additionally requires
+persistence,
+\begin{equation}
+\label{eq:persist}
+M_i(t) = \sum_{k=0}^{W-1} \mathbb{I}\bigl[\hat C_i(t-k) \le \tau_M\bigr],
+\end{equation}
+with $W = K = 3$, so beacon $i$ is confirmed only if the three most recent
+windows all satisfy the condition. A verdict also requires agreement: at
+least a fraction $a_{min} = 0.5$ of observers holding a defined opinion, and no
+fewer than three observers, must place the target below $\tau_M$ in the same
+window.
+
+Two further rules complete the decision logic.
+
+\textbf{Single-branch override.} An observer whose direct trust falls below
+$\tau_X = 0.10$, corresponding to $|Z| \ge 2.146$, can confirm a target without
+satisfying the agreement fraction. An attack visible to only one evidence class
+produces one branch far into its tail while the other stays at the null, and
+requiring majority agreement there would suppress the detection the
+architecture is meant to enable. The override is load-bearing for the coverage
+result: under A1 the behavioural branch contributes nothing, and confirmation
+proceeds on localisation evidence alone. The A1 and A2 results should be
+attributed to fusion together with this override, not to fusion by itself.
+
+\textbf{Asymmetric clearing.} Leaving the confirmed state requires $K_c = 12$
+consecutive clean windows against the $K = 3$ required to enter it, a four-fold
+asymmetry in the same direction as the trust decay constants. This rule gives
+policy E its release behaviour.
+
+\subsection{Isolation}
+
+On confirmation the beacon enters the isolation set,
+\begin{equation}
+\label{eq:iso}
+\mathcal{B}_{iso}(t) = \mathcal{B}_{iso}(t-1) \cup \{\, i : S_i(t) = \textsc{Confirmed} \,\},
+\end{equation}
+and the admissible node set becomes $V'(t) = V \setminus \mathcal{B}_{iso}(t)$.
+Every subsequent route must satisfy $P \cap \mathcal{B}_{iso}(t) = \emptyset$.
+Enforcement is by a blacklist queueing discipline; route repair is performed by
+AODV.
+
+\subsection{Evaluation quantities}
+
+Recovery time is $T_{rec} = T_{new\text{-}route} - T_{isolation}$. Standard
+network measures are
+\begin{equation}
+\label{eq:netm}
+PDR = \frac{P_{received}}{P_{sent}}, \qquad
+TH = \frac{8 D_{received}}{T_{sim}}, \qquad
+RO = \frac{N_{control}}{N_{data}},
+\end{equation}
+and we report recovery ratios
+\begin{equation}
+\label{eq:recov}
+R_{PDR} = \frac{PDR_{after}}{PDR_{normal}}, \qquad
+R_{TH} = \frac{TH_{after}}{TH_{normal}},
+\end{equation}
+for which a well-behaved mechanism gives $R \to 1$.
+
+Finally we define a false-isolation cost that we believe is under-reported in
+this literature. Let $H$ be the set of honest beacons and $\iota_i(t)$ the
+indicator that $i$ is isolated at time $t$. Cumulative false isolation over a
+run of duration $T$ is
+\begin{equation}
+\label{eq:Phi}
+\Phi = \int_0^T \sum_{i \in H} \iota_i(t)\, dt,
+\end{equation}
+in node-seconds. $\Phi$ measures service withdrawn from the network by the
+security mechanism itself. A mechanism with a low false-positive rate may
+still have large $\Phi$ if it never releases. Because $\Phi$ grows with the
+number of honest beacons and with run duration, we also report the
+dimensionless form
+\begin{equation}
+\label{eq:Phibar}
+\bar\Phi = \frac{\Phi}{|H| \cdot T},
+\end{equation}
+the mean fraction of honest-beacon service time withdrawn by the mechanism,
+which is comparable across topologies.

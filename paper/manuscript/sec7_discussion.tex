@@ -1,0 +1,182 @@
+\section{Discussion}
+\label{sec:discussion}
+
+\subsection{Interpretation}
+
+The coverage result is structural, following from what each evidence class can
+physically observe rather than from a threshold setting, and it was obtained
+with calibration held fixed across all scenarios. The implication for the
+literature is narrow but practical. An accuracy reported against
+localisation-visible attacks is an accuracy over that subset of the attack
+space. EMBN-MANET's threat model is confined to false-location behaviour by
+design, so its figure is correct within its scope and we do not dispute it.
+What we would ask of any such report is one additional line: which attack
+classes the evidence can observe at all.
+
+The isolation result is the paper's strongest. Over 30 seeds,
+confirmation-gated isolation with release withdrew 3.9\% of honest-beacon
+service on an uncontested network against 74.8\% for the strongest immediate
+policy, with every paired interval excluding zero, and the ordering held under
+attack and under shadowing. Its cost is the time an attacker remains active
+before confirmation: a median of 15\,s for attacks with a localisation
+signature and 27.5\,s for selective forwarding, rising to 127--151\,s for
+forwarding attacks under shadowing. Whether that trade is favourable depends on
+the prior probability of attack and on what a wrongly removed beacon costs the
+network. Where attack is rare and beacon coverage sparse, gating is preferable,
+since $\Phi$ accumulates continuously while attacker exposure is bounded by the
+confirmation delay. Where attack is frequent and beacon redundancy high,
+immediate isolation may be preferable. We present the trade rather than a
+winner, and suggest that $\Phi$ or a comparable measure be reported routinely:
+a mechanism's false-positive rate says nothing about how long its errors
+persist.
+
+\subsection{Limits of the evidence}
+
+Whether fusion helps was decided by the configuration, not by the combination
+rule. In the primary sweep the branches' sensitivity ratio was 3.63, beyond the
+bound of 2.414, and Stouffer combination confirmed fewer attackers than a
+disjunctive rule at the two intensities nearest the behavioural threshold.
+Halving the drop rate relative to displacement brought the ratio to 1.87,
+inside the bound, and fusion then never confirmed fewer and confirmed one more.
+Comparable branch sensitivity is a prerequisite for fusion to contribute, it
+can be measured before fusion is applied, and no system we surveyed reports
+checking it.
+
+The aggregation stage changed no verdict anywhere. It belongs in the framework
+as an unevaluated robustness extension, not as a validated component: a system
+using only direct per-observer trust would reproduce every reported finding.
+It remains because our campaign barely samples the conditions it exists to
+handle, namely observers who disagree, direct trust that is noisy, and
+recommenders who lie.
+
+Neither isolation policy produced a defensible throughput benefit. This may be
+a property of a dense 25-node topology in which AODV finds alternative routes
+readily, and a sparse-topology evaluation is the obvious next experiment.
+Multipath recovery schemes~\cite{sirajuddin2021tbsmr} and isolation studies in
+related ad hoc settings~\cite{kavitha2019india,buksh2024trust} suggest the
+effect may be topology-dependent. On the evidence we have, the claim that
+isolation restores network performance is unsupported. Finally,
+throughput-based evaluation of A1 measures nothing, since A1 has no
+packet-level footprint; the appropriate metric for that attack class is
+localisation error.
+
+\section{Threats to Validity}
+\label{sec:threats}
+
+\textbf{Construct validity.} Behavioural monitoring is node-global rather than
+per-observer, so indirect trust operates on a coarser behavioural signal than
+the model specifies. This weakens the aggregation ablation: the null may
+reflect the implementation rather than the design. $\Phi$ for the 30-seed
+campaign is computed by applying each policy offline to the same verdict
+stream, which ignores the feedback of an isolation on later traffic; the
+enforced five-seed runs agree with it.
+
+\textbf{Internal validity.} The recovery baseline window is short relative to
+throughput variance, which is why we exclude throughput debt. Detection
+thresholds were calibrated on held-out clean runs and fixed, which avoids
+tuning to the test scenarios but means no scenario received its optimal
+operating point.
+
+\textbf{External validity.} The primary channel has no shadowing, multipath or
+obstruction model; the shadowing campaign shows that detection and the
+false-isolation result survive 4--8\,dB, at a substantial cost in latency for
+forwarding attacks. The campaign is otherwise narrow in five ways. Attackers
+are non-colluding and non-adaptive. Mobility follows a synthetic model rather
+than a trace. The topology is a single dense 25-node configuration, with the
+field small relative to radio range, which plausibly explains the throughput
+nulls. Three monitored beacons per run makes rate-based metrics coarse. And
+only the hybrid attack's intensity is swept. We do not claim the results
+generalise beyond this configuration.
+
+\textbf{Comparative validity.} No baseline from the literature is implemented.
+Policies D, D$_w$ and D$_1$ are our own constructions; they are reasonable
+stand-ins for isolate-on-suspicion behaviour but not reimplementations of any
+published method. The comparison against EMBN-MANET is analytical, resting on
+a reading of its evidence class and threat model. Every cross-method statement
+in this paper is a hypothesis about evidence coverage, not a measured
+comparison.
+
+\textbf{Statistical conclusion validity.} Coverage, latency, false positives
+and $\Phi$ rest on 30 seeds with held-out calibration and paired bootstrap
+intervals. The throughput, recovery, localisation-error and ablation results
+rest on the five seeds of the original campaign; no difference among the
+continuous throughput measures is claimed. The sweeps use ten seeds per level,
+so the one-seed fusion gain in the second pairing is reported as consistent
+with the condition, not as a measured benefit.
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+We evaluated multi-evidence verification and confirmation-gated isolation of
+malicious beacon nodes in a mobile ad hoc network across 550 ns-3 simulation
+runs.
+
+For the two attack classes evaluated, single-evidence detection is blind to
+attacks outside its evidence class, and collecting both behavioural and
+localisation evidence removes the observed blind spots. Confirmation-gated
+isolation with release reduced cumulative false isolation of honest beacons to
+3.9\% of available service against 74.8\% for the strongest immediate-isolation
+policy over 30 seeds, at a median cost of 15--27.5\,s of attacker activity after
+onset. Both results held under 4 and 8\,dB shadowing, where the price moved to
+latency: forwarding attacks took 127--151\,s to confirm. Weighted Stouffer
+fusion has a fusion-only region only when the branches' detection thresholds
+lie within a factor of $1+\sqrt2$, and across two sweeps that condition
+predicted whether fusion diluted ($r = 3.63$) or matched and marginally
+exceeded ($r = 1.87$) a disjunctive rule. The trust aggregation layer changed
+no verdict, and neither isolation policy produced a throughput difference
+exceeding its confidence interval.
+
+We report these outcomes together because the negative ones bound the positive
+ones. In a literature where reported accuracies cluster above 95\%, the more
+informative questions are which attacks a detector can see and how long its
+mistakes last.
+
+\subsection{Future work}
+\label{sec:future}
+
+\textbf{Baselines.} EMBN-MANET and at least one behavioural trust-routing scheme
+should be implemented on the same topology and evidence streams, so that the
+coverage argument becomes a measurement rather than an analysis.
+
+\textbf{Scale and topology.} 50- and 100-node networks, sparse topologies in
+which isolation can affect delivery, varied mobility speeds, and multiple and
+colluding attackers.
+
+\textbf{Fusion-rule comparison.} Bounded rules (arithmetic and geometric mean),
+calibrated statistical rules (Stouffer, Fisher, Dempster--Shafer) and learned
+rules (regularised logistic regression, gradient-boosted trees) compared on
+identical oriented evidence, in configurations chosen on both sides of the
+bound~\eqref{eq:ratio}, with folds partitioned by seed.
+
+\textbf{Aggregation in its intended regime.} Noisy observers, conflicting
+observers and malicious recommenders, which is where indirect and historical
+trust are designed to matter.
+
+\textbf{Post-isolation localisation error.} Splitting localisation error at the
+isolation timestamp would give direct evidence that isolation restores a
+degraded service, which throughput cannot show for A1.
+
+\textbf{Faster behavioural confirmation under shadowing.} The latency cost of
+forwarding attacks under shadowing comes from the behavioural branch's slow
+confidence saturation and widened peer distribution; adaptive half-weights or
+a second behavioural observable could reduce it.
+
+\section*{Declarations}
+
+\textbf{Funding.} No funding was received for this work.
+
+\textbf{Competing interests.} The authors declare no competing interests.
+
+\textbf{Author contributions.} A.V.\ designed and implemented the simulator,
+verification pipeline and experiments, and drafted the manuscript. D.V.C.\
+supervised the work, contributed to the experimental design and revised the
+manuscript. Both authors read and approved the final version.
+
+\textbf{Data and code availability.} Simulation sources, the analysis pipeline,
+the scripts that run every campaign and regenerate every data figure are
+available at \url{https://github.com/kraghu356/manet-beacon-trust}. Raw per-run
+traces, verdicts, isolation schedules and result tables for all runs are
+archived at \url{https://doi.org/10.5281/zenodo.XXXXXXX}.
+
+\textbf{Ethics approval.} Not applicable. This study involves neither human
+participants nor animals.
