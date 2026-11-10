@@ -294,15 +294,16 @@ def fig_shadow(R, out):
     for a, mk in zip(["A1", "A2", "A3"], "o^s"):
         mu, lo, hi = [], [], []
         for _, cov, _ in rows:
-            x = cov.loc[cov.attack == a, "latency_s"].to_numpy(float)
-            m = np.nanmean(x)
-            l, h = boot_ci(x)
+            x = cov.loc[cov.attack == a, "latency_s"].dropna().to_numpy(float)
+            # Latency is right-skewed: plot median with interquartile range.
+            m = np.median(x)
+            l, h = np.percentile(x, [25, 75])
             mu.append(m), lo.append(m - l), hi.append(h - m)
         a1.errorbar(sig, mu, yerr=[lo, hi], marker=mk, capsize=3, ms=4, label=LABEL[a],
                     color={"A1": "#d08a2e", "A2": "#3b6fb6", "A3": "#555555"}[a])
     a1.set_xticks(sig)
     a1.set_xlabel(r"Shadowing $\sigma_{sh}$ (dB)")
-    a1.set_ylabel("Detection latency (s)")
+    a1.set_ylabel("Detection latency, median (s)")
     a1.set_ylim(bottom=0)
     a1.legend(frameon=False, fontsize=7)
     for arm in ("D1", "E"):

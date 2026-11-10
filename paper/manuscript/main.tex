@@ -37,20 +37,21 @@ never exchange traffic with them. Prior defences detect them from
 localisation evidence and remove them permanently; we study the decision
 that precedes removal and what an error costs. A pipeline fuses behavioural
 and localisation evidence into per-observer trust and a three-state verdict,
-evaluated over 550 ns-3 runs. First, coverage: against the attack invisible
+evaluated over 505 distinct ns-3 simulations. First, coverage: against the attack invisible
 to its evidence class, the localisation branch confirmed the attacker in 0
 of 30 seeds and the behavioural branch in 3 of 30, below its rate on honest
 beacons; using both confirmed it in all 30. Second, we introduce cumulative
 false isolation~$\Phi$, in node-seconds. Confirmation-gated isolation with
 release withdrew 3.9\% of honest-beacon service against 74.8\% for the
 strongest immediate-isolation policy, at a median detection latency of
-15--27.5\,s. Third, we derive when weighted Stouffer fusion can detect what
-neither branch detects alone: the branches' detection thresholds must lie
-within a factor of $1+\sqrt{2}$. The condition predicted two intensity
-sweeps: at a threshold ratio of 3.63 fusion lost detections to a
-disjunctive rule, and at 1.87 it matched it. Under 4 and 8\,dB shadowing
+15--27.5\,s. Third, we show that every weighted Stouffer detector can
+confirm some attackers that neither branch confirms alone, but an attack
+family scaled in intensity reaches that region only if the branches'
+detection thresholds for it lie within a factor of $1+\sqrt{2}$. The
+condition predicted two intensity sweeps: at a threshold ratio of 3.63 fusion
+lost detections to a disjunctive rule, and at 1.87 it matched it. Under 4 and 8\,dB shadowing
 the pipeline confirmed 119 of 120 attackers and false isolation stayed
-below 4\%, but forwarding attacks took 127--151\,s to confirm. Results cover
+below 4\%, but forwarding attacks took a median of 123--155\,s to confirm. Results cover
 one dense topology; Section~\ref{sec:threats} states what is needed before
 they generalise.
 

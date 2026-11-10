@@ -134,8 +134,8 @@ crosses the threshold at
 f_F = \frac{\sqrt{\tilde\omega_B^{2} + \tilde\omega_L^{2}}}
            {\tilde\omega_B/\theta_B + \tilde\omega_L/\theta_L},
 \end{equation}
-and a fusion-only region --- an intensity at which fusion confirms and neither
-branch does --- exists precisely when
+and the family passes through a fusion-only region --- an intensity at which
+fusion confirms and neither branch does --- precisely when
 \begin{equation}
 \label{eq:region}
 f_F < \min(\theta_B, \theta_L).
@@ -155,10 +155,32 @@ With unequal weights, let $\tilde\omega_s$ weight the more sensitive branch and
 $\tilde\omega_w$ the less sensitive one; the region exists if and only if
 $r < \tilde\omega_w / \bigl(\sqrt{\tilde\omega_s^2 + \tilde\omega_w^2} -
 \tilde\omega_s\bigr)$, which falls below $1+\sqrt{2}$ when the less sensitive
-branch carries more weight (1.618 at twice the weight). Equation~\eqref{eq:ratio}
-is a condition on a configuration that can be checked from single-branch
-detection curves before any fusion experiment is run. Section~\ref{sec:sweep}
-checks it.
+branch carries more weight (1.618 at twice the weight).
+
+The condition concerns the attack family, not the detector, and the
+distinction matters for how it is used. Write each branch's anomaly in units
+of the decision threshold, $u = A_L/\theta$ and $v = A_B/\theta$, so that a
+branch confirms alone when its coordinate reaches 1. With equal effective
+weights the fused statistic confirms when $u + v \ge \sqrt2$, so the
+fusion-only region is the triangle
+\begin{equation}
+\label{eq:wedge}
+u < 1, \qquad v < 1, \qquad u + v > \sqrt2,
+\end{equation}
+which is non-empty for every equal-weight Stouffer detector, and with unequal
+positive weights the corresponding region is non-empty as well. Every such
+detector can therefore confirm attackers that neither branch confirms alone:
+those whose two anomalies are each sub-threshold and of comparable normalised
+size. Scaling an attack by intensity $f$ moves it along the ray
+$(u, v) = f\,(1/\theta_L, 1/\theta_B)$ from the origin, and~\eqref{eq:ratio} is
+the condition for that ray to pass through the triangle. A lopsided attack,
+one that is much more visible to one branch than to the other, crosses the
+more sensitive branch's threshold while the other branch's anomaly is still
+too small to lift the fused statistic, and its ray misses the region. The ratio $r$ is therefore a property of how the
+attack mixes the two misbehaviours, and it can be read from single-branch
+detection curves for a given attack family before any fusion experiment is
+run. Section~\ref{sec:sweep} tests it on two families that differ only in
+that mix.
 
 \subsection{False positives}
 \label{sec:fp}
@@ -199,7 +221,9 @@ exceeds disjunction.}
 
 \begin{table}[!t]
 \caption{Primary sweep: attacker confirmed (of 10 seeds). Displacement is the
-measured mean; drop probability is $0.3f$. OR is the disjunctive rule over the
+measured mean over the attacker's beacons after onset; below 45\,m it equals
+the nominal $f\delta/2$ because the field boundary never clamps the offset.
+Drop probability is $0.3f$. OR is the disjunctive rule over the
 two single-evidence branches. FP counts honest beacons confirmed, of 20
 node-seeds.}
 \label{tab:sweep}
@@ -242,13 +266,13 @@ $f$ & Displ.\ (m) & Drop & Beh. & Loc. & OR & Fused & FP (OR / fused) \\
 0.30 & 45.0 & 0.045 & 10 & 10 & 10 & 10 & 5 / 5 \\
 0.40 & 60.0 & 0.06 & 10 & 10 & 10 & 10 & 4 / 1 \\
 0.50 & 74.9 & 0.075 & 10 & 10 & 10 & 10 & 2 / 2 \\
-0.70 & 104.5 & 0.105 & 10 & 10 & 10 & 10 & 3 / 2 \\
+0.70 & 104.4 & 0.105 & 10 & 10 & 10 & 10 & 3 / 2 \\
 1.00 & 147.1 & 0.15 & 10 & 10 & 10 & 10 & 3 / 2 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\subsubsection{Primary sweep: no fusion-only region}
+\subsubsection{Primary sweep: the attack path misses the fusion-only region}
 
 Behavioural detection falls from 8 of 10 at 15\,m to 6, 3 and 0 of 10 at 11.25,
 7.5 and 3.75\,m; it reaches half detection at $\theta_B = 9.8$\,m, interpolated
@@ -257,8 +281,8 @@ $\theta_L = 35.7$\,m. The measured ratio is $r = 3.63$. Resampling each level's
 ten seeds as independent Bernoulli trials gives a bootstrap 95\% interval of
 [2.67, 5.47], and fewer than 0.5\% of resamples fall below $1+\sqrt2$. Since
 the less sensitive branch, localisation, carries the larger effective weight
-through~\eqref{eq:conf}, the applicable bound is tighter still. No fusion-only
-region exists in this configuration.
+through~\eqref{eq:conf}, the applicable bound is tighter still. This attack
+family's path does not enter the fusion-only region.
 
 The sweep shows the consequence the bound predicts. Where the behavioural
 branch is near its threshold, adding the weaker localisation branch dilutes
@@ -287,14 +311,16 @@ attackers than the disjunctive rule, and at $f = 0.15$, where the behavioural
 branch alone confirmed 6 of 10, fusion confirmed 7: one seed in which neither
 branch crossed its threshold but their combined evidence did. One seed is weak
 evidence and we do not report it as a fusion benefit. What the two sweeps
-establish is that the same pipeline dilutes or helps depending on a ratio
-measurable before fusion is applied. The effective weights vary by window
+establish is that the same detector dilutes or helps depending on how the
+attack family mixes its two misbehaviours, and that the ratio predicting which
+can be measured before fusion is applied. The effective weights vary by window
 through~\eqref{eq:conf}; if localisation carries twice the weight of behaviour,
 the bound tightens to 1.618, which 17\% of resamples satisfy.
 
 Taken together with Table~\ref{tab:coverage}, the finding is that evidence
 collection determines coverage, and whether the combination rule adds anything
-is decided by the relative sensitivity of the branches.
+against a given attack family is decided by the branches' relative
+sensitivity to that family.
 
 \subsection{Localisation error}
 \label{sec:locerr}
@@ -355,7 +381,7 @@ follows a verdict.
 
 \begin{table}[!t]
 \caption{Isolation policy comparison in the enforced runs, five seeds per cell.
-Times in seconds; the attack begins at $t = 30$\,s. Policy C performs no
+Times in seconds, means over seeds; the attack begins at $t = 30$\,s. Policy C performs no
 isolation.}
 \label{tab:policy}
 \centering
@@ -388,8 +414,12 @@ onset, and E fires at onset plus detection latency.}
 \end{figure}
 
 Policy D first isolates at a median of 15\,s in every scenario, including the
-clean network, before the attack begins at 30\,s; in the enforced runs it
-isolated at 20.0\,s in every seed. What D removes at that point cannot be the
+clean network, before the attack begins at 30\,s. The 20.0\,s in
+Table~\ref{tab:policy} is a five-seed mean (individual seeds 10--35\,s, median
+20\,s), and is the same in all three attacks because the first isolation
+precedes the attack and so depends only on the seed. The enforced runs used
+the original campaign's calibration rather than the held-out seeds 101--105,
+which moves one of the five seeds from 20 to 35\,s. What D removes at that point cannot be the
 attacker. Its apparently fast recovery time of 4.2--6.2\,s is consequently an
 artefact of having isolated before there was anything to recover from. D$_w$
 and D$_1$ first isolate at medians of 30 and 35\,s. Policy E first isolates at
@@ -491,9 +521,11 @@ policy E, which isolated 9 of 90. The paired difference between D$_1$ and E is
 withdraws 74.8\% of honest-beacon service and E 3.9\%. The advantage therefore
 does not come from the start-up transient: removing the persistence requirement
 alone is enough to isolate nearly every honest beacon. Under attack the same
-ordering holds, and every paired interval excludes zero. The five-seed values
-from the original campaign (D 1054, E 49 node-seconds) fall inside the
-corresponding 30-seed intervals.
+ordering holds, and every paired interval excludes zero. Replaying the
+original campaign's five clean seeds under that campaign's own calibration
+gives D 1054 and E 49 node-seconds, inside the corresponding 30-seed
+intervals. This is a check on calibration, not on the replay itself: both
+figures are computed offline (Section~\ref{sec:method}).
 
 The mechanism is that the policies inherit different bounds. Policy E isolates
 only on confirmation, so its false-isolation rate is bounded by the detector's
@@ -552,9 +584,14 @@ does not produce often enough to matter.
 
 \begin{table}[!t]
 \caption{Shadowing robustness, 20 seeds per cell. ``Confirmed'' is the fused
-pipeline's attacker detections; latency is mean (SD) time from attack onset to
-confirmation; $\bar\Phi$ is the fraction of honest-beacon service withdrawn.
-The $\sigma_{sh} = 0$ rows are the 30-seed campaign.}
+pipeline's attacker detections; latency is the median [interquartile range]
+time from attack onset to confirmation, since the distributions are strongly
+right-skewed; $\bar\Phi$ is the fraction of honest-beacon service withdrawn.
+The $\sigma_{sh} = 0$ rows are the 30-seed campaign. In one 4\,dB seed the
+node that later attacks was confirmed 5\,s before onset in all three
+scenarios, a false confirmation counted here as a detection with latency
+$-5$\,s; it is also the single localisation confirmation of A2 at 4\,dB.
+Excluding that seed changes the A2 median to 125\,s and no other median.}
 \label{tab:shadow}
 \centering
 \small
@@ -563,17 +600,17 @@ The $\sigma_{sh} = 0$ rows are the 30-seed campaign.}
 \toprule
 $\sigma_{sh}$ & Attack & Beh. & Loc. & Confirmed & Latency (s) & $\bar\Phi$ E / D$_1$ \\
 \midrule
-0\,dB & A1 & 3/30 & 30/30 & 30/30 & 20.0 (17.1) & 0.058 / 0.764 \\
-      & A2 & 30/30 & 0/30 & 30/30 & 41.7 (39.2) & 0.037 / 0.734 \\
-      & A3 & 30/30 & 30/30 & 30/30 & 20.7 (16.3) & 0.018 / 0.732 \\
+0\,dB & A1 & 3/30 & 30/30 & 30/30 & 15.0 [15.0--15.0] & 0.058 / 0.764 \\
+      & A2 & 30/30 & 0/30 & 30/30 & 27.5 [15.0--52.5] & 0.037 / 0.734 \\
+      & A3 & 30/30 & 30/30 & 30/30 & 15.0 [15.0--15.0] & 0.018 / 0.732 \\
       & Clean & --- & --- & --- & --- & 0.039 / 0.748 \\
-4\,dB & A1 & 5/20 & 20/20 & 20/20 & 17.5 (14.4) & 0.016 / 0.694 \\
-      & A2 & 20/20 & 1/20 & 20/20 & 127.0 (97.0) & 0.011 / 0.686 \\
-      & A3 & 20/20 & 20/20 & 20/20 & 24.8 (17.1) & 0.008 / 0.658 \\
+4\,dB & A1 & 5/20 & 20/20 & 20/20 & 15.0 [15.0--15.0] & 0.016 / 0.694 \\
+      & A2 & 20/20 & 1/20 & 20/20 & 122.5 [30.0--206.2] & 0.011 / 0.686 \\
+      & A3 & 20/20 & 20/20 & 20/20 & 20.0 [15.0--31.2] & 0.008 / 0.658 \\
       & Clean & --- & --- & --- & --- & 0.024 / 0.688 \\
-8\,dB & A1 & 0/20 & 20/20 & 20/20 & 40.0 (39.0) & 0.000 / 0.622 \\
-      & A2 & 20/20 & 3/20 & 20/20 & 148.3 (72.6) & 0.036 / 0.514 \\
-      & A3 & 14/20 & 18/20 & 19/20 & 150.8 (95.6) & 0.026 / 0.491 \\
+8\,dB & A1 & 0/20 & 20/20 & 20/20 & 22.5 [20.0--40.0] & 0.000 / 0.622 \\
+      & A2 & 20/20 & 3/20 & 20/20 & 150.0 [101.2--215.0] & 0.036 / 0.514 \\
+      & A3 & 14/20 & 18/20 & 19/20 & 155.0 [70.0--212.5] & 0.026 / 0.491 \\
       & Clean & --- & --- & --- & --- & 0.000 / 0.602 \\
 \bottomrule
 \end{tabular}
@@ -582,7 +619,7 @@ $\sigma_{sh}$ & Attack & Beh. & Loc. & Confirmed & Latency (s) & $\bar\Phi$ E / 
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\textwidth]{fig10_shadowing}
-\caption{Effect of log-normal shadowing. Left: detection latency rises sharply
+\caption{Effect of log-normal shadowing. Left: median detection latency, with interquartile range, rises sharply
 for attacks seen through forwarding behaviour. Right: false isolation on the
 clean network stays low for policy E and high for D$_1$.}
 \label{fig:shadow}
@@ -603,11 +640,11 @@ A3 attacker in 14 of 20 seeds, against 20 of 20 at 4\,dB. Shadowing adds link
 loss that honest forwarders cannot control, which widens the peer distribution
 the behavioural score is measured against.
 
-The cost appeared as latency. Mean time to confirmation for A2, the attack
-visible only through forwarding, rose from 41.7\,s without shadowing to
-127.0\,s at 4\,dB and 148.3\,s at 8\,dB; A3 rose to 150.8\,s at 8\,dB. A1, with
-its strong localisation signature, was confirmed in 17.5\,s at 4\,dB and
-40.0\,s at 8\,dB.
+The cost appeared as latency. Median time to confirmation for A2, the attack
+visible only through forwarding, rose from 27.5\,s without shadowing to
+122.5\,s at 4\,dB and 150\,s at 8\,dB; A3 rose to 155\,s at 8\,dB, once its
+behavioural branch had degraded. A1, with its strong localisation signature,
+was confirmed at a median of 15\,s at 4\,dB and 22.5\,s at 8\,dB.
 
 False isolation did not grow. Policy E isolated at most 5 of 40 honest
 node-seeds under attack and withdrew at most 3.6\% of honest-beacon service.

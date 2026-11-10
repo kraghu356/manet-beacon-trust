@@ -124,20 +124,6 @@ neighbours could suppress the residual. Our threat model does not include
 physical-layer power manipulation, and we flag it as a gap rather than a
 solved case.
 
-\subsubsection{RSSI consistency}
-
-Let $\mathrm{RSSI}_{ij}^{obs}$ be the RSSI measured by neighbour $j$ for beacon
-$i$ and $\mathrm{RSSI}_{ij}^{exp}$ the value expected from the estimated distance
-under the path-loss model:
-\begin{equation}
-\label{eq:ersi}
-E_i^{RSSI}(t) = \frac{1}{|N_i|} \sum_{j \in N_i}
-  \frac{|\mathrm{RSSI}_{ij}^{obs} - \mathrm{RSSI}_{ij}^{exp}|}
-       {\mathrm{RSSI}_{max} - \mathrm{RSSI}_{min} + \epsilon},
-\qquad
-L_i^{RSSI}(t) = 1 - \min\bigl(1, E_i^{RSSI}(t)\bigr).
-\end{equation}
-
 \subsection{Stage one: evidence fusion}
 
 \subsubsection{Orienting the two evidence streams}
@@ -255,12 +241,8 @@ correlation term.
 
 \subsubsection{Direct trust}
 
-Direct trust is the Stage~1 output, evaluated per observer per window:
-\begin{equation}
-\label{eq:td}
-T^D_{ij}(w) = \phi\bigl(Z_{ij}(w)\bigr).
-\end{equation}
-It is not separately smoothed; temporal weighting enters the model once, in
+Direct trust is the Stage~1 output $T^D_{ij}(w)$ of~\eqref{eq:phi}, evaluated
+per observer per window. It is not separately smoothed; temporal weighting enters the model once, in
 $T^H$ below.
 
 \subsubsection{Indirect trust}
@@ -389,10 +371,9 @@ PDR = \frac{P_{received}}{P_{sent}}, \qquad
 TH = \frac{8 D_{received}}{T_{sim}}, \qquad
 RO = \frac{N_{control}}{N_{data}},
 \end{equation}
-and we report recovery ratios
+and we report the throughput recovery ratio
 \begin{equation}
 \label{eq:recov}
-R_{PDR} = \frac{PDR_{after}}{PDR_{normal}}, \qquad
 R_{TH} = \frac{TH_{after}}{TH_{normal}},
 \end{equation}
 for which a well-behaved mechanism gives $R \to 1$.

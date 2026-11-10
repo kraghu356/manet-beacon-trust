@@ -19,7 +19,7 @@ service on an uncontested network against 74.8\% for the strongest immediate
 policy, with every paired interval excluding zero, and the ordering held under
 attack and under shadowing. Its cost is the time an attacker remains active
 before confirmation: a median of 15\,s for attacks with a localisation
-signature and 27.5\,s for selective forwarding, rising to 127--151\,s for
+signature and 27.5\,s for selective forwarding, rising to medians of 123--155\,s for
 forwarding attacks under shadowing. Whether that trade is favourable depends on
 the prior probability of attack and on what a wrongly removed beacon costs the
 network. Where attack is rare and beacon coverage sparse, gating is preferable,
@@ -32,15 +32,20 @@ persist.
 
 \subsection{Limits of the evidence}
 
-Whether fusion helps was decided by the configuration, not by the combination
-rule. In the primary sweep the branches' sensitivity ratio was 3.63, beyond the
+Whether fusion helped was decided by the attack family, not by the
+combination rule. In the primary sweep the branches' sensitivity ratio was 3.63, beyond the
 bound of 2.414, and Stouffer combination confirmed fewer attackers than a
 disjunctive rule at the two intensities nearest the behavioural threshold.
 Halving the drop rate relative to displacement brought the ratio to 1.87,
 inside the bound, and fusion then never confirmed fewer and confirmed one more.
-Comparable branch sensitivity is a prerequisite for fusion to contribute, it
-can be measured before fusion is applied, and no system we surveyed reports
-checking it.
+The detector was the same in both sweeps; only the mix of displacement and
+drop rate changed. Fusion contributes against attackers whose two
+misbehaviours are comparably visible to the two branches, and against
+lopsided ones a disjunctive rule does as well or better. Branch sensitivity to
+a given attack family can be measured before fusion is applied, and no system
+we surveyed reports checking it. An adaptive adversary could exploit this by
+concentrating its misbehaviour on one axis, which is a further reason to
+keep a single-branch path to confirmation alongside the fused statistic.
 
 The aggregation stage changed no verdict anywhere. It belongs in the framework
 as an unevaluated robustness extension, not as a validated component: a system
@@ -68,8 +73,11 @@ per-observer, so indirect trust operates on a coarser behavioural signal than
 the model specifies. This weakens the aggregation ablation: the null may
 reflect the implementation rather than the design. $\Phi$ for the 30-seed
 campaign is computed by applying each policy offline to the same verdict
-stream, which ignores the feedback of an isolation on later traffic; the
-enforced five-seed runs agree with it.
+stream, which assumes that an isolation does not change later verdicts. For
+the never-releasing policies the first isolation time is exact and only later
+isolations in the same run can be affected; for E the release times can be.
+The direction of the resulting bias is not known, and no closed-loop run on a
+clean network has yet measured it.
 
 \textbf{Internal validity.} The recovery baseline window is short relative to
 throughput variance, which is why we exclude throughput debt. Detection
@@ -108,8 +116,8 @@ with the condition, not as a measured benefit.
 \label{sec:conclusion}
 
 We evaluated multi-evidence verification and confirmation-gated isolation of
-malicious beacon nodes in a mobile ad hoc network across 550 ns-3 simulation
-runs.
+malicious beacon nodes in a mobile ad hoc network across 505 distinct ns-3
+simulations.
 
 For the two attack classes evaluated, single-evidence detection is blind to
 attacks outside its evidence class, and collecting both behavioural and
@@ -118,9 +126,10 @@ isolation with release reduced cumulative false isolation of honest beacons to
 3.9\% of available service against 74.8\% for the strongest immediate-isolation
 policy over 30 seeds, at a median cost of 15--27.5\,s of attacker activity after
 onset. Both results held under 4 and 8\,dB shadowing, where the price moved to
-latency: forwarding attacks took 127--151\,s to confirm. Weighted Stouffer
-fusion has a fusion-only region only when the branches' detection thresholds
-lie within a factor of $1+\sqrt2$, and across two sweeps that condition
+latency: forwarding attacks took a median of 123--155\,s to confirm. Every weighted
+Stouffer detector has a fusion-only region, but an attack family scaled in
+intensity reaches it only when the branches' detection thresholds for that
+family lie within a factor of $1+\sqrt2$, and across two sweeps that condition
 predicted whether fusion diluted ($r = 3.63$) or matched and marginally
 exceeded ($r = 1.87$) a disjunctive rule. The trust aggregation layer changed
 no verdict, and neither isolation policy produced a throughput difference

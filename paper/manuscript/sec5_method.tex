@@ -39,7 +39,7 @@ Per-axis position offset (A1) & $\delta$ & 300\,m \\
 Measured mean displacement (A1) & --- & 267\,m \\
 Drop probability (A2) & $p$ & 0.6 \\
 Hybrid scaling (A3) & --- & $\delta/2$, $p/2$ \\
-Total runs & --- & 550 (Table~\ref{tab:campaign}) \\
+Runs executed / distinct & --- & 550 / 505 (Table~\ref{tab:campaign}) \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -99,7 +99,8 @@ Section~\ref{sec:sweep} sweeps the hybrid attack down to a displacement of
 
 \begin{table}[!t]
 \caption{Simulation campaign. Calibration seeds are clean runs held out from
-testing.}
+testing. Of the 550 runs, 45 repeat a configuration and seed run elsewhere in
+the campaign and reproduced it byte for byte; 505 are distinct.}
 \label{tab:campaign}
 \centering
 \small
@@ -121,17 +122,32 @@ Total & & 550 \\
 \end{tabular}
 \end{table}
 
-Table~\ref{tab:campaign} lists the campaign. Throughput recovery, mechanism
+Table~\ref{tab:campaign} lists the campaign. Three groups of runs repeat
+another part of it: the control arm of the enforced runs (15 runs) repeats the
+original detection runs, those detection runs (20) are seeds 1--5 of the
+30-seed campaign, and the primary sweep's full-intensity level (10) is seeds
+1--10 of the 30-seed A3 scenario. Every repeated run reproduced its
+counterpart's output files exactly, which we report as a determinism check;
+no analysis uses the same simulation twice. Throughput recovery, mechanism
 accounting, localisation error and the aggregation ablation come from the
 original campaign, in which isolation is enforced by the simulator. Coverage,
 detection latency, false positives and cumulative false isolation come from
 the 30-seed campaign. For the latter, each isolation policy is applied to the
 same per-window verdict stream offline: $\Phi$ depends only on when each beacon
 is isolated and released, so one detection run per seed yields every policy's
-$\Phi$ with the seeds paired across policies. This ignores the feedback of an
-isolation on later traffic; the five-seed values from the enforced campaign
-fall inside the 30-seed intervals (Section~\ref{sec:phi}). We compare five
-isolation policies:
+$\Phi$ with the seeds paired across policies. The replay assumes that an
+isolation does not alter the verdicts issued after it. How far that assumption
+reaches differs by policy. D, D$_w$ and D$_1$ never release, so the
+contribution of a beacon to $\Phi$ is fixed by its first isolation time, and
+that time is computed exactly from verdicts issued before any isolation
+occurred; feedback can shift only the isolation times of beacons removed
+later in the same run. Policy E releases on a revised verdict, so its release
+times, and hence its $\Phi$, depend on verdicts issued while another beacon may
+be isolated. Removing a beacon from forwarding shifts load onto its neighbours
+and can move their peer-relative scores in either direction, so we do not
+assume a direction for this bias. The enforced runs of the original campaign
+are all attacked runs and do not test the clean-network replay. We compare
+five isolation policies:
 
 \begin{itemize}
 \item \textbf{C, no isolation.} No node removed. Control.

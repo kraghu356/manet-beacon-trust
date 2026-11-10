@@ -43,7 +43,7 @@ eager degrades exactly the service it exists to protect.
 \subsection{Contributions}
 
 This paper reports an experimental study of both questions, conducted in
-ns-3 across 550 simulation runs: a 30-seed detection campaign over three
+ns-3 across 505 distinct simulations: a 30-seed detection campaign over three
 attack scenarios and a clean network, isolation runs under five policies,
 two attack-intensity sweeps, and a repetition under log-normal shadowing.
 
@@ -55,12 +55,13 @@ two attack-intensity sweeps, and a repetition under log-normal shadowing.
       issued. The individual components are established; the contribution
       is the coverage framing and the evaluation that follows from it.
 
-\item We show that a fused statistic must be calibrated against its own
-      null distribution before a fusion claim can be tested. A combined
-      score thresholded at the single-branch threshold can never detect an
-      attacker that both branches miss, and tables built this way report a
-      fusion advantage that is a property of the comparison. Weighted
-      Stouffer combination~\cite{stouffer1949,whitlock2005weighted} is unit
+\item We make explicit, for trust fusion, a calibration requirement that
+      is standard in meta-analysis~\cite{stouffer1949,whitlock2005weighted}:
+      a combined score thresholded at the single-branch threshold can never
+      detect an attacker that both branches miss, so a fusion advantage
+      reported that way is a property of the comparison. The requirement is
+      not new; we state it because the fusion claim tested here depends on
+      it, and we use weighted Stouffer combination because it is unit
       variance under the null, so one threshold serves every configuration.
 
 \item We report a coverage result and keep it separate from a fusion claim.
@@ -82,10 +83,12 @@ two attack-intensity sweeps, and a repetition under log-normal shadowing.
       bootstrap 95\% CI [785, 911]), and on attacked networks from 586--716
       to 15--47 node-seconds.
 
-\item We derive the condition under which weighted Stouffer fusion has a
-      fusion-only detection region: with equal effective weights, the two
-      branches' detection thresholds must lie within a factor of
-      $1+\sqrt{2}\approx 2.414$. The condition is checkable from
+\item We show that every weighted Stouffer detector has a fusion-only
+      region, containing attackers whose two anomalies are each
+      sub-threshold and of comparable size, and derive when an attack family
+      scaled in intensity passes through it: with equal effective weights, the
+      two branches' detection thresholds for that family must lie within a
+      factor of $1+\sqrt{2}\approx 2.414$. The condition is checkable from
       single-branch detection curves before any fusion experiment, and it
       predicted the outcome of two sweeps: at a ratio of 3.63 (95\% CI
       2.67--5.47) fusion confirmed fewer attackers than a disjunctive rule
@@ -100,7 +103,8 @@ two attack-intensity sweeps, and a repetition under log-normal shadowing.
 
 \item We test robustness to log-normal shadowing at 4 and 8\,dB. Detection
       and the false-isolation result survive; the cost moves to latency,
-      which for forwarding attacks rises from a mean of 42\,s to 127--151\,s.
+      which for forwarding attacks rises from a median of 27.5\,s to
+      123--155\,s.
 
 \item We report negative results in the body of the paper: the trust
       aggregation stage changed no verdict, neither isolation policy
