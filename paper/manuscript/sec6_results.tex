@@ -527,6 +527,20 @@ nearly every monitored beacon. The three-state verdict's contribution is the
 tighter bound; it does not change what the detector can see.
 Section~\ref{sec:release} shows that release contributes little to the gap.
 
+The immediate policies are our own constructions, and the strongest of them,
+D$_1$, isolates on a single window of evidence. Published schemes usually
+wait for evidence to accumulate before they act: the localisation-only
+baseline revokes a beacon only after more than $\tau'$ alerts, and the
+behaviour-only baseline only after 20 packets of evidence. Both had low false
+isolation in the dense network (0.3\% and 3.1\% of honest-beacon service,
+Table~\ref{tab:baselines}). The comparison in Table~\ref{tab:phivariants} should
+therefore be read as a measure of what acting before evidence accumulates
+costs, not as a comparison with published practice. What the policies here
+add is the size of that cost (about 75\% of honest-beacon service on a clean
+network). Confirmation is one accumulation rule among several, and it was not
+the cheapest in every network; Sections~\ref{sec:baselines},
+\ref{sec:sparse} and~\ref{sec:scale} compare it with the two baselines.
+
 \subsection{Release under isolation}
 \label{sec:release}
 
@@ -703,8 +717,9 @@ usable in every window. Table~\ref{tab:sparse} gives the result.
 Detection counts attackers isolated after onset (for the pipeline, confirmed);
 latency is the median in seconds; FI and $\bar\Phi$ are for the clean network
 (E$'$ for the pipeline). The single-branch rows count confirmations by each of
-the pipeline's branches on its own, with FI the honest beacons it falsely
-confirmed.}
+the pipeline's branches on its own. FI counts honest beacons isolated, except
+for values marked $c$, which count honest beacons falsely confirmed by that
+branch.}
 \label{tab:sparse}
 \centering
 \small
@@ -715,8 +730,8 @@ Method & A1 & A2 & A3 & FI & $\bar\Phi$ \\
 \midrule
 Pipeline & 10/10 & 4/10 & 10/10 & 0/30 & 0.000 \\
 \quad latency & 62.5 & 132.5 & 62.5 & & \\
-\quad behaviour branch only & 0/10 & 4/10 & 4/10 & 0/30 & -- \\
-\quad localisation branch only & 10/10 & 0/10 & 10/10 & 0/30 & -- \\
+\quad behaviour branch only & 0/10 & 4/10 & 4/10 & 0/30$^{c}$ & -- \\
+\quad localisation branch only & 10/10 & 0/10 & 10/10 & 0/30$^{c}$ & -- \\
 LND & 10/10 & 0/10 & 10/10 & 0/30 & 0.000 \\
 WD & 8/10 & 9/10 & 9/10 & 16/30 & 0.239 \\
 LND+WD & 10/10 & 9/10 & 10/10 & 16/30 & 0.239 \\
@@ -770,7 +785,9 @@ Detection counts runs in which both attackers were isolated after onset;
 latency is the median over runs of the mean time to confirm the two
 attackers, in seconds; FI and $\bar\Phi$ are for the clean network (E$'$ for
 the pipeline). The single-branch rows count confirmations by each of the
-pipeline's branches on its own.}
+pipeline's branches on its own. FI counts honest beacons isolated, except for
+values marked $c$, which count honest beacons falsely confirmed by that
+branch.}
 \label{tab:scale}
 \centering
 \small
@@ -780,8 +797,8 @@ pipeline's branches on its own.}
 Method & A1 & A2 & A3 & Latency A1 / A2 / A3 & FI & $\bar\Phi$ \\
 \midrule
 Pipeline & 10/10 & 10/10 & 10/10 & 15 / 27.5 / 15 & 5/60 & 0.026 \\
-\quad behaviour branch only & 0/10 & 10/10 & 10/10 & & 16/60 & -- \\
-\quad localisation branch only & 10/10 & 0/10 & 10/10 & & 0/60 & -- \\
+\quad behaviour branch only & 0/10 & 10/10 & 10/10 & & 16/60$^{c}$ & -- \\
+\quad localisation branch only & 10/10 & 0/10 & 10/10 & & 0/60$^{c}$ & -- \\
 LND & 10/10 & 0/10 & 10/10 & 11.3 / -- / 17.5 & 2/60 & 0.005 \\
 WD & 0/10 & 9/10 & 9/10 & -- / 20 / 67.5 & 7/60 & 0.108 \\
 LND+WD & 9/10 & 9/10 & 9/10 & 12.5 / 20 / 15 & 9/60 & 0.113 \\
