@@ -1,0 +1,44 @@
+%% Springer Nature journal version of the manuscript.
+%% Compile on Overleaf: open the official "Springer Nature LaTeX Template"
+%% (Overleaf gallery), upload this file, abstract_text.tex, sec*.tex, refs.bib
+%% and figures/, set this file as the main document, and compile with pdfLaTeX.
+%% The class file sn-jnl.cls and sn-mathphys.bst come with the official template.
+\documentclass[pdflatex,sn-mathphys-num]{sn-jnl}% older templates: sn-mathphys
+
+\usepackage{microtype}
+\usepackage{amsmath,amssymb,graphicx,booktabs}
+\usepackage[table]{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,fit,calc}
+\graphicspath{{figures/}}
+
+\begin{document}
+
+\title[Evidence Coverage and the Cost of False Isolation]{Evidence Coverage and the
+Cost of False Isolation: Verifying Malicious Beacon Nodes in Mobile Ad Hoc Networks}
+
+\author*[1]{\fnm{Amruth} \sur{V}}\email{amruthv020@gmail.com}
+\author[1]{\fnm{Devaraj} \sur{Verma C}}
+
+\affil*[1]{\orgdiv{Department of Computer Science and Engineering},
+\orgname{JAIN (Deemed-to-be University)}, \orgaddress{\city{Bengaluru},
+\postcode{562112}, \state{Karnataka}, \country{India}}}
+
+\abstract{\input{abstract_text}}
+
+\keywords{Mobile ad hoc networks, Beacon nodes, Trust management, Evidence fusion,
+Node isolation, Localisation security}
+
+\maketitle
+
+\input{sec1_intro}
+\input{sec2_related}
+\input{sec3_model}
+\input{sec4_framework}
+\input{sec5_method}
+\input{sec6_results}
+\input{sec7_discussion}
+
+\bibliography{refs}
+
+\end{document}
