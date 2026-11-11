@@ -1,25 +1,25 @@
 %% Abstract text, shared by main.tex and sn_main.tex.
-Malicious beacon nodes corrupt the position estimates of nodes that
-never exchange traffic with them. Prior defences remove them
-permanently; we study the decision
-that precedes removal and what an error costs, over 735 ns-3 simulation
-runs. First, coverage: every detector restricted to one evidence
-class, including re-implemented localisation-only and behaviour-only
-baselines from the literature, confirmed the attack outside that class in at
-most 3 of 30 seeds, while collecting both classes confirmed every attacker.
-Second, we introduce cumulative false isolation~$\Phi$, in node-seconds.
-Isolating only on confirmation withdrew 3.9--5.0\% of honest-beacon service
-against 74.8\% for the strongest immediate-isolation policy, and the gap held
-when the schedules were enforced. Enforcement also showed that releasing a
-beacon when its verdict clears re-admits forwarding attackers, whose
-behavioural evidence vanishes while isolated; releasing only when that
-evidence returns prevented every re-admission, including in an iterated
-closed loop. Third, an attack scaled
-in intensity reaches the region where weighted Stouffer fusion beats either
-branch only if the branches' detection thresholds lie within a factor of
-$1+\sqrt{2}$. This explains a negative result: a calibrated disjunction of
-the two baselines matched our fused pipeline's coverage and false isolation
-and confirmed attackers as fast or faster, especially under shadowing. In a sparse topology the comparison reversed: the pipeline
-isolated no honest beacon but confirmed the forwarding attacker in 4 of 10
-seeds, while the disjunction confirmed it in 9 at a cost of 24\% of
-honest-beacon service. Results cover dense and sparse 25-node topologies.
+Malicious beacon nodes in mobile ad hoc networks corrupt the position
+estimates of nodes that never exchange traffic with them, and existing
+defences remove a suspected beacon permanently. This paper studies the
+decision that precedes removal and what an error costs. A verification
+pipeline fuses behavioural and localisation evidence into per-observer trust
+and a three-state verdict, and is evaluated in ns-3 under six isolation
+policies and against two re-implemented literature baselines, in dense, sparse,
+shadowed and 50-node networks with up to two simultaneous attackers. Four
+findings emerge. First, every detector restricted to one evidence class was
+blind to the attack outside it, while collecting both classes confirmed every
+attacker in the dense networks. Second, we introduce cumulative false
+isolation~$\Phi$, in node-seconds: isolating only on confirmation withdrew
+about 4--5\% of honest-beacon service against about 75\% for immediate
+isolation, and the gap held when the schedules were enforced in the
+simulator. Third, releasing a beacon when its verdict clears re-admitted
+forwarding attackers in a closed loop, because isolation silences their
+behavioural evidence; releasing only when that evidence returns prevented
+every re-admission. Fourth, we derive when weighted Stouffer fusion can
+confirm what neither branch confirms alone. The condition explains why, in a
+small dense network, a disjunction of the two baselines matched the fused
+pipeline, whereas in sparse and larger networks it withdrew several times as
+much honest-beacon service. Evidence coverage and the persistence of errors,
+rather than headline accuracy, should therefore guide the evaluation of
+beacon verification.

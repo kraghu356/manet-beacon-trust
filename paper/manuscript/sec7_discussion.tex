@@ -47,9 +47,14 @@ The detector was the same in both sweeps; only the mix of displacement and
 drop rate changed. Fusion contributes against attackers whose two
 misbehaviours are comparably visible to the two branches, and against
 lopsided ones a disjunctive rule does as well or better. The baseline
-comparison is the same result at the level of whole detectors: two calibrated
-single-evidence detectors run in parallel matched the fused pipeline on every
-attack evaluated and were faster under shadowing. Branch sensitivity to
+comparison is the same result at the level of whole detectors: in the small
+dense network, two calibrated single-evidence detectors run in parallel
+matched the fused pipeline on every attack evaluated and were faster under
+shadowing. In the sparse and 50-node networks the behaviour-only detector's
+false isolation rose to 11--24\% of honest-beacon service while the
+pipeline's stayed at 0--3\%, plausibly because of its confidence weighting
+and peer-relative scoring;
+there the benefit of fusion appears in $\Phi$, not in detection. Branch sensitivity to
 a given attack family can be measured before fusion is applied, and no system
 we surveyed reports checking it. An adaptive adversary could exploit this by
 concentrating its misbehaviour on one axis, which is a further reason to
@@ -110,12 +115,14 @@ obstruction model; the shadowing campaign shows that detection and the
 false-isolation result survive 4--8\,dB, at a substantial cost in latency for
 forwarding attacks. The campaign is otherwise narrow in five ways. Attackers
 are non-colluding and non-adaptive. Mobility follows a synthetic model rather
-than a trace. The topology is a 25-node network in a dense and a sparse
-field; the sparse campaign measured detection and false isolation but not
-the throughput effect of enforced isolation, so the throughput nulls rest on
-the dense field alone. Larger networks were limited by memory: a 50-node run
-needs about 3\,GB, and the 100-node configuration did not fit the hardware
-available. Three monitored beacons per run makes rate-based metrics coarse. And
+than a trace. The topologies are a 25-node network in a dense and a sparse
+field and a 50-node network at the dense field's density; the sparse and
+50-node campaigns measured detection and false isolation but not the
+throughput effect of enforced isolation, so the throughput nulls rest on the
+small dense field alone. Larger networks were limited by memory: a 50-node
+run needs about 3\,GB, and a 100-node configuration did not fit the hardware
+available. Three monitored beacons per run, six at 50 nodes, make rate-based
+metrics coarse. And
 only the hybrid attack's intensity is swept. We do not claim the results
 generalise beyond this configuration.
 
@@ -134,7 +141,9 @@ class and threat model.
 and $\Phi$ rest on 30 seeds with held-out calibration and paired bootstrap
 intervals. The throughput, recovery, localisation-error and ablation results
 rest on the five seeds of the original campaign; no difference among the
-continuous throughput measures is claimed. The sweeps use ten seeds per level,
+continuous throughput measures is claimed. The sparse and 50-node campaigns use ten seeds each, so their paired
+intervals are wide and two of the 50-node comparisons reach zero. The sweeps
+use ten seeds per level,
 so the one-seed fusion gain in the second pairing is reported as consistent
 with the condition, not as a measured benefit.
 
@@ -142,7 +151,7 @@ with the condition, not as a measured benefit.
 \label{sec:conclusion}
 
 We evaluated multi-evidence verification and confirmation-gated isolation of
-malicious beacon nodes in a mobile ad hoc network across 735 ns-3 simulation
+malicious beacon nodes in a mobile ad hoc network across 780 ns-3 simulation
 runs.
 
 For the two attack classes evaluated, single-evidence detection is blind to
@@ -164,9 +173,11 @@ predicted whether fusion diluted ($r = 3.63$) or matched and marginally
 exceeded ($r = 1.87$) a disjunctive rule. Consistent with that condition, a
 calibrated disjunction of localisation-only and behaviour-only literature
 baselines matched the fused pipeline's coverage and false isolation and
-isolated attackers as fast or faster in the dense topology; in the sparse one
-the disjunction detected the forwarding attacker more often but withdrew
-24\% of honest-beacon service, against none for the pipeline. The trust aggregation layer changed
+isolated attackers as fast or faster in the small dense network. In the
+sparse network the disjunction detected the forwarding attacker more often
+but withdrew 24\% of honest-beacon service, against none for the pipeline,
+and in a 50-node network with two attackers it withdrew 11\% against 3\%
+while the pipeline confirmed every attacker. The trust aggregation layer changed
 no verdict, and neither isolation policy produced a throughput difference
 exceeding its confidence interval.
 
@@ -182,9 +193,9 @@ mistakes last.
 behavioural trust-routing scheme, including their response mechanisms, on the
 same topology and traces.
 
-\textbf{Scale and topology.} 50- and 100-node networks, sparse topologies in
-which isolation can affect delivery, varied mobility speeds, and multiple and
-colluding attackers.
+\textbf{Scale and topology.} Networks of 100 nodes and more, enforced
+isolation in sparse topologies where it can affect delivery, varied mobility
+speeds, and colluding or adaptive attackers.
 
 \textbf{Fusion-rule comparison.} Bounded rules (arithmetic and geometric mean),
 calibrated statistical rules (Stouffer, Fisher, Dempster--Shafer) and learned
@@ -201,7 +212,7 @@ isolation timestamp would give direct evidence that isolation restores a
 degraded service, which throughput cannot show for A1.
 
 \textbf{Online closed-loop evaluation.} The policies here were evaluated by
-replay and by one-step enforcement. Running the detector inside the
+replay, one-step enforcement and a three-round iterated loop. Running the detector inside the
 simulator, so that each isolation and release feeds back into later
 verdicts, would test E$'$ and the replay assumption directly, and would allow
 probationary release, in which a released beacon is re-isolated on its first

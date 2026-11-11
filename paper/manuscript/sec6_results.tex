@@ -2,6 +2,7 @@
 \label{sec:results}
 
 \subsection{Evidence coverage}
+\label{sec:coverage}
 
 \begin{table}[!t]
 \caption{Attacker confirmation by evidence configuration, 30 seeds per cell.}
@@ -387,12 +388,11 @@ attack evaluated here a disjunction loses nothing to fusion and
 avoids the attenuation of a live branch by a silent one. The latency gap is
 largest under shadowing, plausibly because the pipeline's behavioural branch
 also waits for its confidence weight to saturate, which a reputation
-threshold does not. The comparison
-therefore narrows what the pipeline contributes: its detection is matched by
-two calibrated classical detectors run in parallel, and what the paper adds
-lies in the coverage analysis, the false-isolation measure, the release
-result of Section~\ref{sec:release} and the fusion condition, not in a better
-detector.
+threshold does not. In this network, therefore, the pipeline's detection is
+matched by two calibrated classical detectors run in parallel.
+Sections~\ref{sec:sparse} and~\ref{sec:scale} show that this does not carry
+over to a sparse or a larger network, where the same disjunction pays several
+times the pipeline's false isolation.
 
 \subsection{Localisation error}
 \label{sec:locerr}
@@ -875,8 +875,8 @@ was $-287$ node-seconds (95\% CI $[-446, -149]$), and the pipeline's $\Phi$
 was lower under every attack as well (CIs excluding zero).
 
 The comparison of Section~\ref{sec:baselines} therefore depends on the
-topology. In the dense network the disjunction matched the pipeline's false
-isolation and was faster; in the sparse one it detected the forwarding
+topology. In the small dense network the disjunction matched the pipeline's
+false isolation and was faster; in the sparse one it detected the forwarding
 attacker more often but at roughly a quarter of honest-beacon service, which
 is the trade $\Phi$ was introduced to expose. One caveat applies to the
 sparse calibration: every usable honest behavioural window in the calibration
@@ -885,4 +885,63 @@ behavioural statistic collapsed to its floor. That made the branch maximally
 sensitive whenever it had evidence, which reinforces rather than explains
 its low detection rate, but a calibration with more behavioural samples is
 needed before the sparse behavioural figures are relied on.
+
+\subsection{A larger network with two attackers}
+\label{sec:scale}
+
+Doubling the network to 50 nodes at the same density, with six monitored
+beacons of which two attack simultaneously, left the main results in place
+and sharpened the baseline comparison. Table~\ref{tab:scale} gives the
+result.
+
+\begin{table}[!t]
+\caption{50-node network, two attackers, six monitored beacons, 10 seeds.
+Detection counts runs in which both attackers were isolated after onset;
+latency is the median over runs of the mean time to confirm the two
+attackers, in seconds; FI and $\bar\Phi$ are for the clean network (E$'$ for
+the pipeline).}
+\label{tab:scale}
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+Method & A1 & A2 & A3 & Latency A1 / A2 / A3 & FI & $\bar\Phi$ \\
+\midrule
+Pipeline & 10/10 & 10/10 & 10/10 & 15 / 27.5 / 15 & 5/60 & 0.026 \\
+LND & 10/10 & 0/10 & 10/10 & 11.3 / --- / 17.5 & 2/60 & 0.005 \\
+WD & 0/10 & 9/10 & 9/10 & --- / 20 / 67.5 & 7/60 & 0.108 \\
+LND+WD & 9/10 & 9/10 & 9/10 & 12.5 / 20 / 15 & 9/60 & 0.113 \\
+Policy D$_1$ & & & & & 60/60 & 0.742 \\
+Policy D & & & & & 60/60 & 0.901 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The pipeline confirmed both attackers in every attacked run, with medians of
+15--27.5\,s, and isolated 5 of 60 honest node-seeds on the clean network.
+Each single-evidence baseline was again blind outside its evidence class:
+the localisation-only detector isolated no A2 attacker pair and the
+behaviour-only detector no A1 pair. The coverage result therefore holds with
+two simultaneous attackers and at twice the scale.
+
+The disjunction of the baselines no longer matched the pipeline. It missed
+one attacker in one run of each attack scenario, and its behavioural half
+made it withdraw about four times as much honest-beacon service: 11.3\% on
+the clean network against the pipeline's 2.6\%. Paired across
+seeds, the pipeline's $\Phi$ was lower by 154 node-seconds under A2 (95\% CI
+$[30, 277]$) and by 155 under A3 ($[42, 276]$); under A1 ($-163$,
+$[-342, 8]$) and on the clean network ($-209$, $[-458, 0]$) the intervals
+reached zero. Detection speed was indistinguishable: no paired latency
+difference excluded zero. Immediate isolation was as costly as in the small
+network, with D$_1$ withdrawing 72--74\% of honest-beacon service, and the
+gap to E$'$ exceeded 1100 node-seconds under every scenario.
+
+Taken with Section~\ref{sec:sparse}, this bounds the baseline comparison of
+Section~\ref{sec:baselines}. Only in the small dense network did two
+classical detectors run side by side match the fused pipeline. In the sparse
+network and in the larger one, the behaviour-only reputation detector, which
+has no confidence weighting or peer-relative scoring, paid for its
+sensitivity in false isolation, and the pipeline's lower $\Phi$ is the
+measured benefit of combining the evidence.
 

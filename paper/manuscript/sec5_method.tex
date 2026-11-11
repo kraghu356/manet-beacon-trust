@@ -11,15 +11,15 @@ tuning was performed.
 \label{tab:sim}
 \centering
 \small
-\begin{tabular}{@{}llr@{}}
+\begin{tabular}{@{}ll>{\raggedright\arraybackslash}p{6.4cm}@{}}
 \toprule
 Parameter & Symbol & Value \\
 \midrule
 Simulator & --- & ns-3.48 \\
 Routing protocol & --- & AODV \\
-Field & --- & $500 \times 500$\,m \\
-Nodes & $N$ & 25 \\
-Monitored beacons & $|\mathcal{B}|$ & 3 (1 attacker) \\
+Field & --- & $500 \times 500$\,m (sparse: $1000 \times 1000$; 50-node: $707 \times 707$) \\
+Nodes & $N$ & 25 (50-node campaign: 50) \\
+Monitored beacons & $|\mathcal{B}|$ & 3, 1 attacker (50-node campaign: 6, 2 attackers) \\
 Transmit power & --- & 30\,dBm \\
 Propagation loss model & --- & log-distance \\
 Path-loss exponent & $\eta$ & 3.0 \\
@@ -29,7 +29,7 @@ RSSI measurement noise & $\sigma_{RSSI}$ & 4\,dB \\
 Mobility model & --- & random waypoint \\
 Node speed & --- & $U(1,5)$\,m/s \\
 Pause time & --- & 2.0\,s \\
-Traffic & --- & 10 CBR flows, 12\,pkt/s \\
+Traffic & --- & 10 CBR flows, 12\,pkt/s (50-node campaign: 14) \\
 Packet size & --- & 512\,B \\
 Beacon interval & --- & 1.0\,s \\
 PHY data rate & --- & DSSS 1\,Mbps \\
@@ -39,7 +39,7 @@ Per-axis position offset (A1) & $\delta$ & 300\,m \\
 Measured mean displacement (A1) & --- & 267\,m \\
 Drop probability (A2) & $p$ & 0.6 \\
 Hybrid scaling (A3) & --- & $\delta/2$, $p/2$ \\
-Runs executed & --- & 735 (Table~\ref{tab:campaign}) \\
+Runs executed & --- & 780 (Table~\ref{tab:campaign}) \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -123,8 +123,10 @@ Iterated closed loop & policies E, E$'$ $\times$ \{A2, clean\} $\times$ seeds
 1--10 $\times$ 3 rounds & 120 \\
 Sparse topology & 25 nodes in $1000 \times 1000$\,m, 4 scenarios $\times$ 10
 seeds, plus 5 calibration seeds & 45 \\
+50-node network & 50 nodes in $707 \times 707$\,m, 6 monitored beacons, 2
+attackers, 4 scenarios $\times$ 10 seeds, plus 5 calibration seeds & 45 \\
 \midrule
-Total & & 735 \\
+Total & & 780 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -132,7 +134,10 @@ Total & & 735 \\
 The sparse campaign keeps every parameter of Table~\ref{tab:sim} but
 quadruples the field area, so that nodes have about a quarter as many
 neighbours and routes are longer and break more often; detector thresholds
-are recalibrated on its own clean seeds.
+are recalibrated on its own clean seeds. The 50-node campaign keeps node
+density constant: twice the nodes in twice the area, six monitored beacons of
+which two attack, and 14 traffic flows. Its thresholds are likewise
+recalibrated on its own clean seeds.
 
 Table~\ref{tab:campaign} lists the campaign. Three groups of runs repeat
 another part of it: the control arm of the enforced runs (15 runs) repeats the
