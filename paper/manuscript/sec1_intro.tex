@@ -12,7 +12,7 @@ Beacon nodes deserve separate treatment within this problem. A beacon
 advertises position information that neighbouring nodes consume in order to
 localise themselves. A compromised beacon therefore corrupts the position
 estimates of nodes it never exchanged data traffic with, and the corruption
-propagates through the localisation computation rather than through the
+propagates through the localisation computation, not through the
 routing fabric. The consequences differ in kind from ordinary
 packet-dropping attacks, not merely in degree. A node that drops packets
 degrades a service the network can measure; a beacon that lies about its
@@ -81,7 +81,7 @@ on the same traces.
       sparse and 50-node networks alike; collecting both classes confirmed
       every attacker in the dense networks. The verification pipeline that
       fuses the two classes into per-observer trust and a three-state verdict
-      is built from established components and serves as the vehicle for
+      is built from established components and is the vehicle for
       the study.
 
 \item \textbf{A measure of what false isolation costs (RQ2).} We introduce
@@ -99,7 +99,7 @@ on the same traces.
       their behavioural evidence comes from. An evidence-aware release rule
       prevented every re-admission at a small cost in false isolation, and
       showed that the advantage of confirmation-gated isolation comes from
-      the gating rather than from release.
+      the gating itself.
 
 \item \textbf{When fusion helps (RQ4).} Every weighted Stouffer detector
       has a fusion-only region, containing attackers whose two anomalies are
@@ -118,7 +118,7 @@ on the same traces.
       predicts. In the sparse and 50-node networks the same disjunction
       withdrew 11--24\% of honest-beacon service on a clean network against
       0--3\% for the pipeline, so the benefit of combining evidence appears
-      in $\Phi$ rather than in detection speed. In the sparse network that
+      in $\Phi$ and not in detection speed. In the sparse network that
       benefit came with a cost: the pipeline confirmed the forwarding
       attacker in only 4 of 10 seeds.
 

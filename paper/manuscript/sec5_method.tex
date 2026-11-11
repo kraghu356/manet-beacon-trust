@@ -15,31 +15,31 @@ tuning was performed.
 \toprule
 Parameter & Symbol & Value \\
 \midrule
-Simulator & --- & ns-3.48 \\
-Routing protocol & --- & AODV \\
-Field & --- & $500 \times 500$\,m (sparse: $1000 \times 1000$; 50-node: $707 \times 707$) \\
+Simulator & -- & ns-3.48 \\
+Routing protocol & -- & AODV \\
+Field & -- & $500 \times 500$\,m (sparse: $1000 \times 1000$; 50-node: $707 \times 707$) \\
 Nodes & $N$ & 25 (50-node campaign: 50) \\
 Monitored beacons & $|\mathcal{B}|$ & 3, 1 attacker (50-node campaign: 6, 2 attackers) \\
-Transmit power & --- & 30\,dBm \\
-Propagation loss model & --- & log-distance \\
+Transmit power & -- & 30\,dBm \\
+Propagation loss model & -- & log-distance \\
 Path-loss exponent & $\eta$ & 3.0 \\
 Reference loss at 1\,m & $P_0$ & 46.68\,dB \\
 Shadowing & $\sigma_{sh}$ & 0\,dB; 4 and 8\,dB in Sec.~\ref{sec:shadow} \\
 RSSI measurement noise & $\sigma_{RSSI}$ & 4\,dB \\
-Mobility model & --- & random waypoint \\
-Node speed & --- & $U(1,5)$\,m/s \\
-Pause time & --- & 2.0\,s \\
-Traffic & --- & 10 CBR flows, 12\,pkt/s (50-node campaign: 14) \\
-Packet size & --- & 512\,B \\
-Beacon interval & --- & 1.0\,s \\
-PHY data rate & --- & DSSS 1\,Mbps \\
+Mobility model & -- & random waypoint \\
+Node speed & -- & $U(1,5)$\,m/s \\
+Pause time & -- & 2.0\,s \\
+Traffic & -- & 10 CBR flows, 12\,pkt/s (50-node campaign: 14) \\
+Packet size & -- & 512\,B \\
+Beacon interval & -- & 1.0\,s \\
+PHY data rate & -- & DSSS 1\,Mbps \\
 Simulation duration & $T$ & 400\,s \\
-Attack start & --- & $t = 30$\,s \\
+Attack start & -- & $t = 30$\,s \\
 Per-axis position offset (A1) & $\delta$ & 300\,m \\
-Measured mean displacement (A1) & --- & 267\,m \\
+Measured mean displacement (A1) & -- & 267\,m \\
 Drop probability (A2) & $p$ & 0.6 \\
-Hybrid scaling (A3) & --- & $\delta/2$, $p/2$ \\
-Runs executed & --- & 780 (Table~\ref{tab:campaign}) \\
+Hybrid scaling (A3) & -- & $\delta/2$, $p/2$ \\
+Runs executed & -- & 780 (Table~\ref{tab:campaign}) \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -54,20 +54,20 @@ tuned per scenario.}
 \toprule
 Parameter & Symbol & Value \\
 \midrule
-Observation window / step & --- & 10\,s / 5\,s \\
+Observation window / step & -- & 10\,s / 5\,s \\
 Branch weights & $\omega_B$, $\omega_L$ & 1.0, 1.0 \\
 Confidence half-weight, localisation & $n^L_{1/2}$ & 5 \\
 Confidence half-weight, behaviour & $n^B_{1/2}$ & 45 \\
 Minimum peer set & $n_{min}$ & 8 \\
-Minimum transit packets, behaviour & --- & 5 \\
+Minimum transit packets, behaviour & -- & 5 \\
 Trust weights & $w_D$, $w_I$, $w_H$ & 0.5, 0.2, 0.3 \\
-Trim fraction / recommender cap & --- / $\kappa$ & 0.2 / 0.3 \\
+Trim fraction / recommender cap & -- / $\kappa$ & 0.2 / 0.3 \\
 History decay, falling / rising & $\lambda_\downarrow$ / $\lambda_\uparrow$ & 0.5 / 0.9 \\
 Observer agreement & $a_{min}$ & 0.5 \\
 Malicious threshold & $\tau_M$ & 0.40 ($|Z| = 1.354$) \\
 Normal threshold & $\tau_N$ & 0.70 ($|Z| = 0.845$) \\
 Persistence / clearing persistence & $K$ / $K_c$ & 3 / 12 windows \\
-Minimum observers & --- & 3 \\
+Minimum observers & -- & 3 \\
 Single-branch override & $\tau_X$ & 0.10 ($|Z| = 2.146$) \\
 Bounded transform & $\phi$ & $\exp(-Z^2/2)$, Eq.~\eqref{eq:phi} \\
 \bottomrule
@@ -93,7 +93,7 @@ observer measures. No true position enters the detector.
 The full-intensity attack magnitudes are large. A position offset of
 $\delta = 300$\,m in a $500 \times 500$\,m field is a very large lie, and a
 drop probability of $p = 0.6$ is an aggressive grey hole. Both were chosen to
-establish the mechanism rather than to represent a realistic adversary;
+establish the mechanism, and they do not represent a realistic adversary;
 Section~\ref{sec:sweep} sweeps the hybrid attack down to a displacement of
 3.75\,m and a drop probability of 0.75\%.
 
@@ -153,7 +153,7 @@ original campaign, in which isolation is enforced by the simulator. Coverage,
 detection latency, false positives and cumulative false isolation come from
 the 30-seed campaign. For the latter, each isolation policy is applied to the
 same per-window verdict stream offline: $\Phi$ depends only on when each beacon
-is isolated and released, so one detection run per seed yields every policy's
+is isolated and released, so one detection run per seed gives every policy's
 $\Phi$ with the seeds paired across policies. The replay assumes that an
 isolation does not alter the verdicts issued after it. How far that assumption
 reaches differs by policy. D, D$_w$ and D$_1$ never release, so the
@@ -169,7 +169,7 @@ clean-network replay, so we tested it separately: for clean seeds 1--10 the
 replayed D$_1$ and E schedules were enforced in the simulator, the enforced
 traces were re-verified with the same calibration, and each policy's schedule
 was rebuilt from the verdicts produced under isolation (20 further runs).
-This is one step of a fixed-point check rather than a fully online detector,
+This is one step of a fixed-point check and not a fully online detector,
 and Section~\ref{sec:phi} reports the result. For E and E$'$ we then iterated
 the loop: each round enforces the schedule rebuilt from the previous round's
 enforced verdicts, for three rounds on the A2 and clean scenarios
@@ -254,7 +254,7 @@ distributions of $A_B$ and $A_L$ were calibrated on clean-network runs that
 are never used for testing: seeds 101--105 for the 30-seed and shadowing
 campaigns, recalibrated per channel. No threshold was chosen by reference to a
 result reported in this paper. Several simulator parameters are supplied at
-invocation rather than compiled in, so the released command lines, not the
-source defaults, define the experiment. Statistical intervals are percentile
+invocation instead of being compiled in, so the released command lines
+define the experiment and the source defaults do not. Statistical intervals are percentile
 bootstrap intervals over seeds (10{,}000 resamples), paired across policies
 where policies share seeds.

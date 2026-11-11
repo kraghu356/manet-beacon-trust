@@ -121,8 +121,7 @@ error, so the attack is undetectable for offsets comparable to that error; the
 detection floor is a property of the ranging channel and not of the fusion
 rule. Second, an attacker who could also manipulate the RSSI observed by its
 neighbours could suppress the residual. Our threat model does not include
-physical-layer power manipulation, and we flag it as a gap rather than a
-solved case.
+physical-layer power manipulation, and we leave it as an open gap.
 
 \subsection{Stage one: evidence fusion}
 
@@ -170,7 +169,7 @@ Z_{ij}(w) = \frac{\tilde\omega_B A_B(w) + \tilde\omega_L A_L(w)}
 \end{equation}
 A branch with no observations in a window has $c = 0$ and drops out, leaving
 the remaining branch unchanged; this is why the confidence factor appears
-inside the normalisation rather than outside it.
+inside the normalisation.
 
 Direct trust is the fused statistic mapped through the Gaussian kernel
 \begin{equation}
@@ -205,7 +204,7 @@ detector that applies the single-branch threshold to a convex combination
 therefore cannot confirm an attacker that both branches miss. Tables built
 this way will still show the fused row ahead of the weaker branch, because a
 mean of a strong score and a weak one exceeds the weak one; the apparent
-advantage is a property of the comparison, not of the mechanism.
+advantage comes from the comparison and not from the mechanism.
 
 The bound is a consequence of reusing $\tau$, not of averaging as such. For two
 independent standardised branches the arithmetic mean
@@ -294,7 +293,7 @@ T_{ij}(t) = \frac{w_D T^D_{ij}(t) + w_I T^I_{ij}(t) + w_H T^H_{ij}(t-1)}{w_D + w
 \end{equation}
 renormalised over whichever terms are defined in the window. Because $T^H$
 seeds from the combined value, it cannot be evaluated in isolation: a
-configuration weighting history alone yields no defined trust at any window.
+configuration weighting history alone produces no defined trust at any window.
 This constrains the ablation design of Section~\ref{sec:ablation}.
 
 \subsection{Confidence, state and confirmation}
@@ -310,7 +309,7 @@ verdict. The median prevents a single observer with an extreme value from
 moving the collapsed confidence. The confidence may optionally be smoothed,
 $\hat C_i(t) = \gamma C_i(t) + (1-\gamma)\hat C_i(t-1)$, though the evaluated
 configuration uses $\gamma = 1$, so temporal memory enters the decision through
-the persistence requirement rather than through smoothing. The verdict map is
+the persistence requirement and not through smoothing. The verdict map is
 \begin{equation}
 \label{eq:verdict}
 S_i(t) =
@@ -320,7 +319,7 @@ S_i(t) =
 \textsc{Confirmed}, & \hat C_i(t) \le \tau_M,
 \end{cases}
 \end{equation}
-with $0 \le \tau_M < \tau_N \le 1$. Confirmation additionally requires
+with $0 \le \tau_M < \tau_N \le 1$. Confirmation also requires
 persistence,
 \begin{equation}
 \label{eq:persist}
@@ -342,7 +341,7 @@ requiring majority agreement there would suppress the detection the
 architecture is meant to enable. The override is load-bearing for the coverage
 result: under A1 the behavioural branch contributes nothing, and confirmation
 proceeds on localisation evidence alone. The A1 and A2 results should be
-attributed to fusion together with this override, not to fusion by itself.
+attributed to fusion together with this override.
 
 \textbf{Asymmetric clearing.} Leaving the confirmed state requires $K_c = 12$
 consecutive clean windows against the $K = 3$ required to enter it, a four-fold

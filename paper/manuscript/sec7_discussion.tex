@@ -4,7 +4,7 @@
 \subsection{Interpretation}
 
 The coverage result is structural, following from what each evidence class can
-physically observe rather than from a threshold setting, and it was obtained
+physically observe, and it was obtained
 with calibration held fixed across all scenarios. The implication for the
 literature is narrow but practical. An accuracy reported against
 localisation-visible attacks is an accuracy over that subset of the attack
@@ -30,7 +30,7 @@ missing evidence: under plain E a forwarding attacker is re-admitted once its
 isolation silences its behavioural branch. Release is as consequential a
 decision as isolation, and in our data the safe release rule made isolation on
 confirmation close to permanent. Where attack is frequent and beacon redundancy high,
-immediate isolation may be preferable. We present the trade rather than a
+immediate isolation may be preferable. We present the trade-off without declaring a
 winner, and suggest that $\Phi$ or a comparable measure be reported routinely:
 a mechanism's false-positive rate says nothing about how long its errors
 persist.
@@ -54,7 +54,7 @@ shadowing. In the sparse and 50-node networks the behaviour-only detector's
 false isolation rose to 11--24\% of honest-beacon service while the
 pipeline's stayed at 0--3\%, plausibly because of its confidence weighting
 and peer-relative scoring;
-there the benefit of fusion appears in $\Phi$, not in detection. Branch sensitivity to
+there the benefit of fusion appears in $\Phi$ and not in detection. Branch sensitivity to
 a given attack family can be measured before fusion is applied, and no system
 we surveyed reports checking it. An adaptive adversary could exploit this by
 concentrating its misbehaviour on one axis, which is a further reason to
@@ -85,7 +85,7 @@ localisation error.
 \textbf{Construct validity.} Behavioural monitoring is node-global rather than
 per-observer, so indirect trust operates on a coarser behavioural signal than
 the model specifies. This weakens the aggregation ablation: the null may
-reflect the implementation rather than the design. $\Phi$ for the 30-seed
+reflect the implementation and not the design. $\Phi$ for the 30-seed
 campaign is computed by applying each policy offline to the same verdict
 stream, which assumes that an isolation does not change later verdicts. For
 the never-releasing policies the first isolation time is exact and only later
@@ -164,7 +164,7 @@ onset, and the gap held when the schedules were enforced. Releasing a beacon
 when its verdict clears re-admitted forwarding attackers, whose behavioural
 evidence disappears while they are isolated; requiring that evidence to return
 before release prevented every re-admission and raised false isolation only to
-5.0\%. Both results held under 4 and 8\,dB shadowing, where the price moved to
+5.0\%. Both results held under 4 and 8\,dB shadowing, with the price moving to
 latency: forwarding attacks took a median of 125--155\,s to confirm. Every weighted
 Stouffer detector has a fusion-only region, but an attack family scaled in
 intensity reaches it only when the branches' detection thresholds for that

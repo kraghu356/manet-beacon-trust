@@ -47,7 +47,7 @@ campaign.
 A single-evidence detector therefore has a region of the attack space it
 cannot observe, and an adversary who knows which evidence is collected may
 choose to occupy it. This follows from what each evidence class can physically
-observe rather than from any threshold setting.
+observe, and no threshold setting changes it.
 
 The scope of the claim is narrow. Table~\ref{tab:coverage} establishes that
 collecting both classes covers both attacks. It does not establish that
@@ -81,7 +81,7 @@ weight at $n_{1/2} = 45$ observations against 5 for localisation
 \eqref{eq:conf}. A2 is observable only through the behavioural branch, so its
 confidence factor climbs an order of magnitude more slowly and confirmation
 waits on the accumulation of transit packets. A1 and A3 are observable through
-localisation, where a handful of beacon receptions suffice. The constants were
+localisation, for which a handful of beacon receptions suffice. The constants were
 fixed during calibration and not adjusted afterwards.
 
 \subsection{Sensitivity to evidence orientation}
@@ -135,8 +135,8 @@ crosses the threshold at
 f_F = \frac{\sqrt{\tilde\omega_B^{2} + \tilde\omega_L^{2}}}
            {\tilde\omega_B/\theta_B + \tilde\omega_L/\theta_L},
 \end{equation}
-and the family passes through a fusion-only region --- an intensity at which
-fusion confirms and neither branch does --- precisely when
+and the family passes through a fusion-only region (an intensity at which
+fusion confirms and neither branch does) precisely when
 \begin{equation}
 \label{eq:region}
 f_F < \min(\theta_B, \theta_L).
@@ -158,7 +158,7 @@ $r < \tilde\omega_w / \bigl(\sqrt{\tilde\omega_s^2 + \tilde\omega_w^2} -
 \tilde\omega_s\bigr)$, which falls below $1+\sqrt{2}$ when the less sensitive
 branch carries more weight (1.618 at twice the weight).
 
-The condition concerns the attack family, not the detector, and the
+The condition concerns the attack family and not the detector, and the
 distinction matters for how it is used. Write each branch's anomaly in units
 of the decision threshold, $u = A_L/\theta$ and $v = A_B/\theta$, so that a
 branch confirms alone when its coordinate reaches 1. With equal effective
@@ -193,10 +193,10 @@ confirmed 15 of 90 on the clean network and 35 of 180 under attack; the
 localisation branch alone confirmed none. False confirmations are therefore a
 property of the behavioural branch, whose peer-relative score fires whenever a
 beacon's forwarding departs from its contemporaneous neighbours for benign
-reasons such as mobility, and fusion with a silent localisation branch damps
-rather than removes them. With three monitored beacons per run, one false
+reasons such as mobility. Fusion with a silent localisation branch damps
+these confirmations without removing them. With three monitored beacons per run, one false
 positive moves per-run accuracy by 33 percentage points, which is why we
-report counts rather than accuracy.
+report counts instead of accuracy.
 
 \subsection{Attack-intensity sweeps}
 \label{sec:sweep}
@@ -308,7 +308,7 @@ $\theta_L = 36.7$\,m. With $\theta_B = 19.7$\,m the ratio falls to $r = 1.87$
 resample.
 
 The outcome changed as the condition predicts. Fusion never confirmed fewer
-attackers than the disjunctive rule, and at $f = 0.15$, where the behavioural
+attackers than the disjunctive rule. At $f = 0.15$, at which the behavioural
 branch alone confirmed 6 of 10, fusion confirmed 7: one seed in which neither
 branch crossed its threshold but their combined evidence did. One seed is weak
 evidence and we do not report it as a fusion benefit. What the two sweeps
@@ -346,16 +346,16 @@ the seeds. 30 seeds at 0\,dB and 20 under shadowing.}
 \toprule
 $\sigma_{sh}$ & Method & A1 & A2 & A3 & FI & $\bar\Phi$ & Latency A1 / A2 / A3 \\
 \midrule
-0\,dB & LND & 30/30 & 2/30 & 30/30 & 3/90 & 0.003 & 10 / --- / 15 \\
-      & WD & 1/30 & 30/30 & 30/30 & 4/90 & 0.031 & --- / 20 / 40 \\
+0\,dB & LND & 30/30 & 2/30 & 30/30 & 3/90 & 0.003 & 10 / -- / 15 \\
+      & WD & 1/30 & 30/30 & 30/30 & 4/90 & 0.031 & -- / 20 / 40 \\
       & LND+WD & 30/30 & 30/30 & 30/30 & 7/90 & 0.034 & 10 / 20 / 15 \\
       & Pipeline & 30/30 & 30/30 & 30/30 & 9/90 & 0.050 & 15 / 27.5 / 15 \\
-4\,dB & LND & 20/20 & 1/20 & 20/20 & 2/60 & 0.005 & 15 / --- / 22.5 \\
-      & WD & 4/20 & 20/20 & 13/20 & 7/60 & 0.050 & --- / 60 / 270 \\
+4\,dB & LND & 20/20 & 1/20 & 20/20 & 2/60 & 0.005 & 15 / -- / 22.5 \\
+      & WD & 4/20 & 20/20 & 13/20 & 7/60 & 0.050 & -- / 60 / 270 \\
       & LND+WD & 20/20 & 20/20 & 20/20 & 8/60 & 0.054 & 15 / 60 / 22.5 \\
       & Pipeline & 20/20 & 20/20 & 20/20 & 6/60 & 0.045 & 15 / 125 / 20 \\
-8\,dB & LND & 20/20 & 0/20 & 20/20 & 1/60 & 0.000 & 20 / --- / 65 \\
-      & WD & 0/20 & 20/20 & 3/20 & 0/60 & 0.000 & --- / 120 / --- \\
+8\,dB & LND & 20/20 & 0/20 & 20/20 & 1/60 & 0.000 & 20 / -- / 65 \\
+      & WD & 0/20 & 20/20 & 3/20 & 0/60 & 0.000 & -- / 120 / -- \\
       & LND+WD & 20/20 & 20/20 & 20/20 & 1/60 & 0.000 & 20 / 120 / 65 \\
       & Pipeline & 20/20 & 20/20 & 19/20 & 0/60 & 0.000 & 22.5 / 150 / 155 \\
 \bottomrule
@@ -391,7 +391,7 @@ also waits for its confidence weight to saturate, which a reputation
 threshold does not. In this network, therefore, the pipeline's detection is
 matched by two calibrated classical detectors run in parallel.
 Sections~\ref{sec:sparse} and~\ref{sec:scale} show that this does not carry
-over to a sparse or a larger network, where the same disjunction pays several
+over to a sparse or a larger network; there the same disjunction pays several
 times the pipeline's false isolation.
 
 \subsection{Localisation error}
@@ -431,7 +431,7 @@ elsewhere is attributable to the attack. A2 produces 0.04\,m, indistinguishable
 from clean: A2 is a pure forwarding attack with no positional signature, exactly
 as A1 is a pure positional attack with no forwarding signature. A3's attacker
 error of 146.02\,m against A1's 267.25\,m confirms the half-intensity
-construction, the ratio being 0.55 rather than 0.50 because clamping binds less
+construction. The ratio is 0.55 instead of 0.50 because clamping binds less
 often at the smaller offset.
 
 The substantive result is the ``all'' row. Under A1 the mean error across all
@@ -462,13 +462,13 @@ isolation.}
 \toprule
 Attack & Policy & Isolation time & $R_{TH}$ & Recovery time \\
 \midrule
-A1 & C & --- & 0.97 & --- \\
+A1 & C & -- & 0.97 & -- \\
    & D & 20.0 & 0.92 & 5.2 \\
    & E & 45.0 & 0.95 & 44.8 \\
-A2 & C & --- & 0.93 & --- \\
+A2 & C & -- & 0.93 & -- \\
    & D & 20.0 & 0.94 & 6.2 \\
    & E & 54.0 & 0.90 & 25.6 \\
-A3 & C & --- & 0.93 & --- \\
+A3 & C & -- & 0.93 & -- \\
    & D & 20.0 & 0.95 & 4.2 \\
    & E & 45.0 & 0.94 & 35.0 \\
 \bottomrule
@@ -561,13 +561,13 @@ Network & Policy & Honest isolated & $\Phi$ & 95\% CI & $\Phi - \Phi_E$ [95\% CI
 Clean & D     & 90/90 & 1052 & [1025, 1077] & 1005 [964, 1044] \\
       & D$_w$ & 90/90 & 1018 & [994, 1039]  & 971 [933, 1006] \\
       & D$_1$ & 88/90 & 897  & [843, 950]   & 851 [785, 911] \\
-      & E     & 9/90  & 47   & [18, 79]     & --- \\
+      & E     & 9/90  & 47   & [18, 79]     & -- \\
 A1    & D$_1$ & 59/60 & 611  & [573, 648]   & 565 [519, 609] \\
-      & E     & 8/60  & 47   & [18, 79]     & --- \\
+      & E     & 8/60  & 47   & [18, 79]     & -- \\
 A2    & D$_1$ & 58/60 & 587  & [532, 638]   & 557 [499, 612] \\
-      & E     & 7/60  & 30   & [10, 54]     & --- \\
+      & E     & 7/60  & 30   & [10, 54]     & -- \\
 A3    & D$_1$ & 59/60 & 586  & [526, 639]   & 571 [514, 625] \\
-      & E     & 6/60  & 15   & [2, 31]      & --- \\
+      & E     & 6/60  & 15   & [2, 31]      & -- \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -742,8 +742,8 @@ Table~\ref{tab:ablation} and Fig.~\ref{fig:ablation} report the second stage
 ablated across its components. History-only is not an admissible configuration,
 since $T^H$ seeds from the combined value. The three configurations are
 identical in every cell. The components are not inert in the underlying
-computation: on A2 seed~1, direct-only aggregation yields mean trust 0.7148
-with 50 window-level confirmations, while direct plus indirect yields 0.7548
+computation: on A2 seed~1, direct-only aggregation gives mean trust 0.7148
+with 50 window-level confirmations, while direct plus indirect gives 0.7548
 with 70. But the differences never cross the persistence gate, so no target's
 final verdict changes. $T^H$ is an exponentially weighted average of direct
 trust and $T^I$ a trimmed mean of peers' direct trust: both are smoothed
@@ -776,15 +776,15 @@ $\sigma_{sh}$ & Attack & Beh. & Loc. & Confirmed & Latency (s) & $\bar\Phi$ E / 
 0\,dB & A1 & 3/30 & 30/30 & 30/30 & 15.0 [15.0--15.0] & 0.058 / 0.764 \\
       & A2 & 30/30 & 0/30 & 30/30 & 27.5 [15.0--52.5] & 0.037 / 0.734 \\
       & A3 & 30/30 & 30/30 & 30/30 & 15.0 [15.0--15.0] & 0.018 / 0.732 \\
-      & Clean & --- & --- & --- & --- & 0.039 / 0.748 \\
+      & Clean & -- & -- & -- & -- & 0.039 / 0.748 \\
 4\,dB & A1 & 5/20 & 20/20 & 20/20 & 15.0 [15.0--15.0] & 0.016 / 0.694 \\
       & A2 & 20/20 & 1/20 & 20/20 & 125.0 [57.5--212.5] & 0.011 / 0.686 \\
       & A3 & 20/20 & 20/20 & 20/20 & 20.0 [15.0--32.5] & 0.008 / 0.658 \\
-      & Clean & --- & --- & --- & --- & 0.024 / 0.688 \\
+      & Clean & -- & -- & -- & -- & 0.024 / 0.688 \\
 8\,dB & A1 & 0/20 & 20/20 & 20/20 & 22.5 [20.0--40.0] & 0.000 / 0.622 \\
       & A2 & 20/20 & 3/20 & 20/20 & 150.0 [101.2--215.0] & 0.036 / 0.514 \\
       & A3 & 14/20 & 18/20 & 19/20 & 155.0 [70.0--212.5] & 0.026 / 0.491 \\
-      & Clean & --- & --- & --- & --- & 0.000 / 0.602 \\
+      & Clean & -- & -- & -- & -- & 0.000 / 0.602 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -882,8 +882,8 @@ is the trade $\Phi$ was introduced to expose. One caveat applies to the
 sparse calibration: every usable honest behavioural window in the calibration
 runs forwarded all its transit packets, so the robust scale of the
 behavioural statistic collapsed to its floor. That made the branch maximally
-sensitive whenever it had evidence, which reinforces rather than explains
-its low detection rate, but a calibration with more behavioural samples is
+sensitive whenever it had evidence, which cannot explain its low detection
+rate, but a calibration with more behavioural samples is
 needed before the sparse behavioural figures are relied on.
 
 \subsection{A larger network with two attackers}
@@ -909,8 +909,8 @@ the pipeline).}
 Method & A1 & A2 & A3 & Latency A1 / A2 / A3 & FI & $\bar\Phi$ \\
 \midrule
 Pipeline & 10/10 & 10/10 & 10/10 & 15 / 27.5 / 15 & 5/60 & 0.026 \\
-LND & 10/10 & 0/10 & 10/10 & 11.3 / --- / 17.5 & 2/60 & 0.005 \\
-WD & 0/10 & 9/10 & 9/10 & --- / 20 / 67.5 & 7/60 & 0.108 \\
+LND & 10/10 & 0/10 & 10/10 & 11.3 / -- / 17.5 & 2/60 & 0.005 \\
+WD & 0/10 & 9/10 & 9/10 & -- / 20 / 67.5 & 7/60 & 0.108 \\
 LND+WD & 9/10 & 9/10 & 9/10 & 12.5 / 20 / 15 & 9/60 & 0.113 \\
 Policy D$_1$ & & & & & 60/60 & 0.742 \\
 Policy D & & & & & 60/60 & 0.901 \\

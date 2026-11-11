@@ -70,7 +70,7 @@ for malicious node detection~\cite{dhand2025secure}, feature-optimisation and
 classification pipelines to intruder isolation~\cite{kavitha2019india}, and
 reinforcement learning to reputation-driven route
 selection~\cite{ryu2023reputation}. The attraction is that the decision
-boundary is fitted rather than assumed, which matters when the relationship
+boundary is fitted from data, which matters when the relationship
 between evidence and misbehaviour is not monotone or not separable by a
 threshold.
 
@@ -80,7 +80,7 @@ trace is identical to the clean-network trace in every seed, so the
 behavioural evidence stream contains no information about the attack. No
 estimator recovers signal from an identical trace, and a learned model
 restricted to that evidence class would fail exactly as the statistical one
-does. Evidence coverage is a property of what is collected, not of how it is
+does. Evidence coverage depends on what is collected, and not on how it is
 combined. A learned rule could contribute at the combination stage; it
 cannot address a limitation upstream of it.
 
@@ -101,7 +101,7 @@ accuracy~\cite{tomic2026voting}. Both assume static anchors and a single
 snapshot of ranging evidence, and neither uses forwarding behaviour or models
 a reversible decision.
 
-Position falsification is also studied in vehicular networks, where
+Position falsification is also studied in vehicular networks. There,
 misbehaviour detection checks the plausibility of the positions vehicles
 broadcast. The VeReMi dataset made such detectors comparable on a common set
 of falsification attacks~\cite{vanderheijden2018veremi}, and recent detectors
@@ -119,17 +119,17 @@ and Liu, Ning and Du detect malicious beacons by the inconsistency between
 measured and declared range, revoking a beacon once a base station has
 received enough independent alerts~\cite{liu2005detecting}. Our localisation
 branch uses the same residual as the last of these. What differs is the
-setting --- mobile beacons and commodity 802.11 RSSI rather than static
-beacons or UWB ranging --- and the decision rule: our confirmation is
+setting (mobile beacons and commodity 802.11 RSSI, against static beacons
+or UWB ranging in those works) and the decision rule: our confirmation is
 reversible, and we measure what a false confirmation costs while it
 persists.
 
 The two lines overlap less than their subject matter suggests, and the gap
-is visible in the evaluations rather than in the methods: a trust-routing
+shows up in the evaluations more than in the methods: a trust-routing
 paper does not typically test an attacker whose only misbehaviour is
 positional, and a beacon-security paper does not typically test one whose
 only misbehaviour is in forwarding. This is an observation about the papers
-we surveyed, not a systematic survey finding.
+we surveyed; we did not conduct a systematic survey.
 
 \subsection{EMBN-MANET}
 
@@ -197,8 +197,8 @@ either column but the observation that the columns are disjoint and that a
 beacon can misbehave in whichever one is not being watched. The final column
 is the metric introduced in Section~\ref{sec:framework}; we are not aware of
 prior work in this area that reports the persistence of false exclusions
-rather than their rate, though we offer that as a gap in our reading, not an
-exhaustive search.
+as opposed to their rate, though this reflects our reading of the literature
+and is not an exhaustive search.
 
 Reported detection accuracy in this field is conditioned on an attack model,
 a topology, a mobility regime, a traffic load and an attacker density, all
