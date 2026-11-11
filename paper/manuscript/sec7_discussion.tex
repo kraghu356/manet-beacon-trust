@@ -61,7 +61,7 @@ the paper cannot convert one into the other; doing so needs the node density
 around each beacon and the localisation algorithm in use. Second, the
 pipeline falsely confirmed about one honest beacon in ten in the dense
 network, and under E$'$ such isolations were almost never reversed. A
-long-running deployment would lose beacons slowly, so it needs a deliberate
+long-running deployment would lose beacons slowly, so it needs a planned
 path back, such as the probationary release of Section~\ref{sec:future}.
 
 The release finding is not specific to our pipeline. Any scheme that
@@ -91,9 +91,9 @@ false isolation rose to 11--24\% of honest-beacon service while the
 pipeline's stayed at 0--3\%, for two different reasons. In the sparse network
 the pipeline's peer-relative behavioural scoring avoided the false alarms
 even without fusion. At 50 nodes its behavioural branch alone raised more
-false alarms than the baseline, and fusion removed most of them. Fusion's
-benefit, where it appears, is the suppression of single-branch false alarms,
-and it is paid for with sensitivity near the threshold. Branch sensitivity to
+false alarms than the baseline, and fusion removed most of them. When fusion
+helps, it does so by suppressing single-branch false alarms, and it pays for
+this with sensitivity near the threshold. Branch sensitivity to
 a given attack family can be measured before fusion is applied, and no system
 we surveyed reports checking it. An adaptive adversary could exploit this by
 concentrating its misbehaviour on one axis, which is a further reason to

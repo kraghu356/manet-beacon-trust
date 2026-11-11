@@ -502,7 +502,7 @@ alone is enough to isolate nearly every honest beacon. Under attack the same
 ordering holds, and every paired interval excludes zero. Replaying the
 original campaign's five clean seeds under that campaign's own calibration
 gives D 1054 and E 49 node-seconds, inside the corresponding 30-seed
-intervals. This is a check on calibration, not on the replay itself: both
+intervals. This checks the calibration and not the replay itself: both
 figures are computed offline.
 
 The replay itself was tested on clean seeds 1--10 by enforcing the replayed
@@ -741,9 +741,9 @@ The single-branch rows locate the cause. The pipeline's own behavioural
 branch, used alone, also confirmed no honest beacon, so fusion played no part
 in the sparse result. What separates it from WD is how the behavioural
 evidence is scored: against the beacon's neighbours in the same window, and
-weighted by sample count, where WD thresholds an absolute forwarding ratio.
-The pipeline's behavioural branch is in effect a peer-relative behaviour-only
-detector, and in the sparse network it avoided the false isolation that the
+weighted by sample count. WD instead thresholds an absolute forwarding ratio.
+The pipeline's behavioural branch therefore works as a peer-relative
+behaviour-only detector, and in the sparse network it avoided the false isolation that the
 absolute-ratio detector incurred, at the price of confirming the forwarding
 attacker less often. The paired difference in clean-network $\Phi$ between the pipeline and LND+WD
 was $-287$ node-seconds (95\% CI $[-446, -149]$), and the pipeline's $\Phi$
