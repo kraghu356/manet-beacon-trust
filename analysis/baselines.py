@@ -33,7 +33,7 @@ import re
 import numpy as np
 import pandas as pd
 
-from .features import WindowSpec, load_beacon_rx, load_behaviour, window_localization
+from .features import run_finished, WindowSpec, load_beacon_rx, load_behaviour, window_localization
 from .phi import bootstrap_ci, paired_diff_ci
 
 SPEC = WindowSpec(10.0, 5.0)
@@ -134,7 +134,7 @@ def main(argv=None) -> int:
     rows = []
     for brx in sorted(glob.glob(os.path.join(a.runs, "**", "*-run1-beacon_rx.csv"), recursive=True)):
         m = pat.search(os.path.basename(brx))
-        if not m:
+        if not m or not run_finished(brx):
             continue
         gt = pd.read_csv(brx, usecols=["beacon_id", "is_attacker"])
         att = gt.loc[gt.is_attacker == 1, "beacon_id"].unique()
@@ -159,7 +159,7 @@ def main(argv=None) -> int:
             r = []
             for brx in sorted(glob.glob(os.path.join(a.runs, "**", "*-run1-beacon_rx.csv"), recursive=True)):
                 m = pat.search(os.path.basename(brx))
-                if not m:
+                if not m or not run_finished(brx):
                     continue
                 gt = pd.read_csv(brx, usecols=["beacon_id", "is_attacker"])
                 att = gt.loc[gt.is_attacker == 1, "beacon_id"].unique()

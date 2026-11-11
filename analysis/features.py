@@ -8,6 +8,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+import os
+
 import numpy as np
 import pandas as pd
 
@@ -153,3 +155,10 @@ def build_evidence(
     ev["is_attacker"] = ev["is_attacker"].fillna(0).astype(int)
     ev["transit_rx"] = ev["transit_rx"].fillna(0).astype(int)
     return ev.sort_values(["time_s", "target", "observer"]).reset_index(drop=True)
+
+def run_finished(brx: str) -> bool:
+    """False for a run the campaign scripts started but did not finish: its
+    directory has a sim.log but no .done marker, and its traces may be truncated."""
+    d = os.path.dirname(brx)
+    return not (os.path.exists(os.path.join(d, "sim.log"))
+                and not os.path.exists(os.path.join(d, ".done")))

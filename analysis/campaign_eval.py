@@ -25,7 +25,7 @@ import pandas as pd
 
 from .calibrate import calibrate
 from .decide import DecisionParams, confirmation_summary, decide
-from .features import WindowSpec, build_evidence, load_beacon_rx, load_behaviour
+from .features import run_finished, WindowSpec, build_evidence, load_beacon_rx, load_behaviour
 from .make_schedules import _write, build_schedules
 from .phi import bootstrap_ci, paired_diff_ci, phi_for_run
 from .trust import TrustParams, compute_trust
@@ -69,7 +69,7 @@ def main(argv=None) -> int:
     for brx in sorted(glob.glob(os.path.join(args.runs, "**", "*-run1-beacon_rx.csv"),
                             recursive=True)):
         m = pat.search(os.path.basename(brx))
-        if not m:
+        if not m or not run_finished(brx):
             continue
         atk, seed = m["atk"], int(m["seed"])
         ev = _evidence(brx)
