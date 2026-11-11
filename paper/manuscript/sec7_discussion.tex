@@ -189,39 +189,19 @@ mistakes last.
 \subsection{Future work}
 \label{sec:future}
 
-\textbf{Complete baselines.} Full implementations of EMBN-MANET and of a
-behavioural trust-routing scheme, including their response mechanisms, on the
-same topology and traces.
-
-\textbf{Scale and topology.} Networks of 100 nodes and more, enforced
-isolation in sparse topologies where it can affect delivery, varied mobility
-speeds, and colluding or adaptive attackers.
-
-\textbf{Fusion-rule comparison.} Bounded rules (arithmetic and geometric mean),
-calibrated statistical rules (Stouffer, Fisher, Dempster--Shafer) and learned
-rules (regularised logistic regression, gradient-boosted trees) compared on
-identical oriented evidence, in configurations chosen on both sides of the
-bound~\eqref{eq:ratio}, with folds partitioned by seed.
-
-\textbf{Aggregation in its intended regime.} Noisy observers, conflicting
-observers and malicious recommenders, which is where indirect and historical
-trust are designed to matter.
-
-\textbf{Post-isolation localisation error.} Splitting localisation error at the
-isolation timestamp would give direct evidence that isolation restores a
-degraded service, which throughput cannot show for A1.
-
-\textbf{Online closed-loop evaluation.} The policies here were evaluated by
-replay, one-step enforcement and a three-round iterated loop. Running the detector inside the
-simulator, so that each isolation and release feeds back into later
-verdicts, would test E$'$ and the replay assumption directly, and would allow
-probationary release, in which a released beacon is re-isolated on its first
-malicious window.
-
-\textbf{Faster behavioural confirmation under shadowing.} The latency cost of
-forwarding attacks under shadowing comes from the behavioural branch's slow
-confidence saturation and widened peer distribution; adaptive half-weights or
-a second behavioural observable could reduce it.
+Three directions follow from these results. The first is to run the detector
+inside the simulator, so that every isolation and release feeds back into
+later verdicts. That would test the evidence-aware release rule without the
+replay assumption, and it would allow a probationary release in which a
+released beacon is isolated again on its first malicious window. The second
+is to test the findings in harder settings: networks of 100 nodes or more,
+trace-based mobility, colluding or adaptive attackers, and enforced
+isolation in sparse topologies, where isolation is most likely to affect
+delivery. Full implementations of EMBN-MANET and of a behavioural
+trust-routing scheme belong in the same study. The third is to speed up
+behavioural confirmation, which dominated latency under shadowing. A second
+behavioural observable, or a confidence weight that adapts to the channel,
+could shorten the time to confirm forwarding attacks.
 
 \section*{Acknowledgements}
 
