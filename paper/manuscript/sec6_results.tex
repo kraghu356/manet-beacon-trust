@@ -84,35 +84,6 @@ waits on the accumulation of transit packets. A1 and A3 are observable through
 localisation, for which a handful of beacon receptions suffice. The constants were
 fixed during calibration and not adjusted afterwards.
 
-\subsection{Sensitivity to evidence orientation}
-\label{sec:orientation}
-
-The sign convention of~\eqref{eq:orient} deserves its own analysis, because
-getting it wrong produces a detector that passes the tests most papers run and
-fails the one they do not. The transform~\eqref{eq:phi} is even, but fusion
-happens before $\phi$, so it is the summed statistic that is folded, not the
-individual branches.
-
-Suppose the two statistics were summed without orientation, for a beacon whose
-behavioural anomaly reaches $|z_B| = 3$ and whose localisation anomaly reaches
-$z_L = 3$ at full intensity, with equal weights. Under A1, $z_B \approx 0$ and
-the misoriented fusion gives $Z = +2.12$, hence $T^D = 0.10$: confirmed. Under
-A2, $z_L \approx 0$ and $Z = -2.12$, which because $\phi$ is even also gives
-$T^D = 0.10$: confirmed. Both single-axis attacks are caught. Under a hybrid
-attack at half intensity, however, $z_B \approx -1.5$ and $z_L \approx +1.5$,
-and
-\begin{equation}
-\label{eq:cancel}
-Z = \frac{(-1.5) + (+1.5)}{\sqrt2} = 0, \qquad T^D = \phi(0) = 1.0.
-\end{equation}
-The attacker's two misbehaviours cancel exactly, and a node misbehaving on both
-axes receives perfect trust. A detector with this defect is blind to hybrid
-attacks in proportion to how evenly the attacker balances the two axes, and an
-adversary aware of the defect could balance them deliberately. With
-\eqref{eq:orient} applied, the same attacker gives
-$Z = \bigl((+1.5) + (+1.5)\bigr)/\sqrt2 = 2.12$, recovering the full-intensity
-single-axis statistic from two half-intensity observations.
-
 \subsection{Attack intensity and the fusion region}
 \label{sec:region}
 
@@ -294,7 +265,12 @@ behavioural branch is anomalous and the localisation branch sits at its null,
 equal-weight Stouffer combination computes $(A_B + 0)/\sqrt2$, attenuating a
 live branch by 29\%, because a branch with adequate sample count carries
 confidence weight whether or not it carries signal. Disjunction is immune,
-since it never mixes the two.
+since it never mixes the two. The same attenuation works in the opposite
+direction for honest beacons: a benign behavioural deviation that would cross
+the threshold alone is also scaled by $1/\sqrt2$ when the localisation branch
+is at its null. Equal-weight fusion therefore trades sensitivity near the
+threshold for suppression of single-branch false alarms. Sections~\ref{sec:fp},
+\ref{sec:sparse} and~\ref{sec:scale} measure the second side of that trade.
 
 \subsubsection{Second pairing: the condition predicts the outcome}
 
@@ -394,54 +370,6 @@ Sections~\ref{sec:sparse} and~\ref{sec:scale} show that this does not carry
 over to a sparse or a larger network; there the same disjunction pays several
 times the pipeline's false isolation.
 
-\subsection{Localisation error}
-\label{sec:locerr}
-
-Throughput is uninformative for A1, since the attack has no packet-level
-footprint. The service A1 degrades is localisation, so we report the
-displacement between the position a beacon advertises and its true position,
-which is the error a consumer of the localisation service inherits
-(Table~\ref{tab:locerr}).
-
-\begin{table}[!t]
-\caption{Localisation error in metres, means across five seeds of the original
-campaign. ``Attacker'' covers receptions from the compromised beacon; ``all''
-covers every monitored beacon, of which two of three are honest.}
-\label{tab:locerr}
-\centering
-\small
-\begin{tabular}{@{}llrrrr@{}}
-\toprule
-Scenario & Scope & RMSE & MAE & Median & P95 \\
-\midrule
-Clean & all & 0.05 & 0.02 & 0.00 & 0.06 \\
-A1 & attacker & 267.25 & 265.42 & 271.41 & 299.23 \\
-   & all & 145.27 & 78.78 & 0.01 & 288.77 \\
-A2 & attacker & 0.03 & 0.01 & 0.00 & 0.05 \\
-   & all & 0.04 & 0.01 & 0.00 & 0.05 \\
-A3 & attacker & 146.02 & 145.81 & 145.91 & 150.01 \\
-   & all & 77.88 & 41.66 & 0.01 & 150.00 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-The clean-network figure of 0.05\,m RMSE confirms that honest beacons advertise
-their true positions to within numerical precision, so any error observed
-elsewhere is attributable to the attack. A2 produces 0.04\,m, indistinguishable
-from clean: A2 is a pure forwarding attack with no positional signature, exactly
-as A1 is a pure positional attack with no forwarding signature. A3's attacker
-error of 146.02\,m against A1's 267.25\,m confirms the half-intensity
-construction. The ratio is 0.55 instead of 0.50 because clamping binds less
-often at the smaller offset.
-
-The substantive result is the ``all'' row. Under A1 the mean error across all
-monitored beacons is 145.27\,m while the median is 0.01\,m. Two of three beacons
-are honest and contribute essentially zero error, while the third contributes
-the full displacement. A localisation consumer drawing on the affected beacon
-inherits an error more than three orders of magnitude above the clean-network floor, and
-averaging over honest neighbours does not conceal it, since trilateration
-depends on all contributing anchors.
-
 \subsection{Isolation policy under attack}
 \label{sec:policy}
 
@@ -514,28 +442,6 @@ intended as a summary recovery metric, proved unusable: it returns non-zero
 values on clean runs, because the baseline window is short relative to the
 throughput variance of a mobile topology. Correcting it requires a later attack
 start and a wider baseline window.
-
-\subsection{Mechanism cost}
-
-\begin{figure}[!t]
-\centering
-\includegraphics[width=0.8\textwidth]{fig7_mechanism}
-\caption{Isolation mechanism accounting in one illustrative enforced run (A2,
-seed 1), not an aggregate. Policy D suppresses more attacker drops but blocks
-more than twice as many frames and performs three times as many isolation
-events as policy E.}
-\label{fig:mechanism}
-\end{figure}
-
-Fig.~\ref{fig:mechanism} decomposes what each policy does within a single run.
-The counters were logged per run but not aggregated across the campaign, so the
-figure illustrates the accounting without establishing a general magnitude.
-Both policies suppress attacker drops substantially relative to the control:
-from 750 packets under C to 69 under D and 111 under E. Frames blocked by the
-enforcement mechanism itself differ by more than a factor of two, 3381 under D
-against 1566 under E, tracking isolation-event counts of 72 and 24. The counter
-separates the mechanism's benefit from its cost within a run, which aggregate
-PDR does not.
 
 \subsection{Cumulative false isolation}
 \label{sec:phi}
@@ -707,50 +613,6 @@ The A2 throughput and recovery rows of Table~\ref{tab:policy} were produced
 by a schedule that never released the attacker. They are the rows E$'$ would
 produce, not those of E in a closed loop.
 
-\subsection{Aggregation ablation}
-\label{sec:ablation}
-
-\begin{table}[!t]
-\caption{Aggregation ablation, original campaign. Confirmations out of 15
-target-seeds per cell.}
-\label{tab:ablation}
-\centering
-\small
-\begin{tabular}{@{}lcccc@{}}
-\toprule
-Configuration & A1 & A2 & A3 & Clean \\
-\midrule
-Direct only & 6/15 & 5/15 & 6/15 & 1/15 \\
-Direct + indirect & 6/15 & 5/15 & 6/15 & 1/15 \\
-Direct + indirect + historical & 6/15 & 5/15 & 6/15 & 1/15 \\
-\bottomrule
-\end{tabular}
-\par\smallskip\footnotesize
-Counts include false confirmations: A1 6/15 is the attacker in five seeds plus
-one honest beacon.
-\end{table}
-
-\begin{figure}[!t]
-\centering
-\includegraphics[width=0.62\textwidth]{fig9_ablation}
-\caption{Aggregation ablation. The three configurations are identical in every
-cell: adding indirect and historical trust changes no verdict.}
-\label{fig:ablation}
-\end{figure}
-
-Table~\ref{tab:ablation} and Fig.~\ref{fig:ablation} report the second stage
-ablated across its components. History-only is not an admissible configuration,
-since $T^H$ seeds from the combined value. The three configurations are
-identical in every cell. The components are not inert in the underlying
-computation: on A2 seed~1, direct-only aggregation gives mean trust 0.7148
-with 50 window-level confirmations, while direct plus indirect gives 0.7548
-with 70. But the differences never cross the persistence gate, so no target's
-final verdict changes. $T^H$ is an exponentially weighted average of direct
-trust and $T^I$ a trimmed mean of peers' direct trust: both are smoothed
-functions of the same underlying signal, and they would be expected to diverge
-only where direct trust is noisy and observers disagree, a regime our topology
-does not produce often enough to matter.
-
 \subsection{Robustness to shadowing}
 \label{sec:shadow}
 
@@ -840,7 +702,9 @@ usable in every window. Table~\ref{tab:sparse} gives the result.
 \caption{Sparse topology (25 nodes, $1000 \times 1000$\,m, 10 seeds).
 Detection counts attackers isolated after onset (for the pipeline, confirmed);
 latency is the median in seconds; FI and $\bar\Phi$ are for the clean network
-(E$'$ for the pipeline).}
+(E$'$ for the pipeline). The single-branch rows count confirmations by each of
+the pipeline's branches on its own, with FI the honest beacons it falsely
+confirmed.}
 \label{tab:sparse}
 \centering
 \small
@@ -851,6 +715,8 @@ Method & A1 & A2 & A3 & FI & $\bar\Phi$ \\
 \midrule
 Pipeline & 10/10 & 4/10 & 10/10 & 0/30 & 0.000 \\
 \quad latency & 62.5 & 132.5 & 62.5 & & \\
+\quad behaviour branch only & 0/10 & 4/10 & 4/10 & 0/30 & -- \\
+\quad localisation branch only & 10/10 & 0/10 & 10/10 & 0/30 & -- \\
 LND & 10/10 & 0/10 & 10/10 & 0/30 & 0.000 \\
 WD & 8/10 & 9/10 & 9/10 & 16/30 & 0.239 \\
 LND+WD & 10/10 & 9/10 & 10/10 & 16/30 & 0.239 \\
@@ -869,8 +735,17 @@ confidence weight stays low. The behaviour-only reputation baseline, which
 has no confidence weighting, isolated the A2 attacker in 9 of 10 seeds, but
 on the clean network it also isolated 16 of 30 honest node-seeds and withdrew
 23.9\% of honest-beacon service, because broken routes in a sparse network
-look like dropped packets. The disjunction inherited both properties. The
-paired difference in clean-network $\Phi$ between the pipeline and LND+WD
+look like dropped packets. The disjunction inherited both properties.
+
+The single-branch rows locate the cause. The pipeline's own behavioural
+branch, used alone, also confirmed no honest beacon, so fusion played no part
+in the sparse result. What separates it from WD is how the behavioural
+evidence is scored: against the beacon's neighbours in the same window, and
+weighted by sample count, where WD thresholds an absolute forwarding ratio.
+The pipeline's behavioural branch is in effect a peer-relative behaviour-only
+detector, and in the sparse network it avoided the false isolation that the
+absolute-ratio detector incurred, at the price of confirming the forwarding
+attacker less often. The paired difference in clean-network $\Phi$ between the pipeline and LND+WD
 was $-287$ node-seconds (95\% CI $[-446, -149]$), and the pipeline's $\Phi$
 was lower under every attack as well (CIs excluding zero).
 
@@ -878,13 +753,8 @@ The comparison of Section~\ref{sec:baselines} therefore depends on the
 topology. In the small dense network the disjunction matched the pipeline's
 false isolation and was faster; in the sparse one it detected the forwarding
 attacker more often but at roughly a quarter of honest-beacon service, which
-is the trade $\Phi$ was introduced to expose. One caveat applies to the
-sparse calibration: every usable honest behavioural window in the calibration
-runs forwarded all its transit packets, so the robust scale of the
-behavioural statistic collapsed to its floor. That made the branch maximally
-sensitive whenever it had evidence, which cannot explain its low detection
-rate, but a calibration with more behavioural samples is
-needed before the sparse behavioural figures are relied on.
+is the trade $\Phi$ was introduced to expose. Section~\ref{sec:threats}
+records a caveat on the sparse behavioural calibration.
 
 \subsection{A larger network with two attackers}
 \label{sec:scale}
@@ -899,7 +769,8 @@ result.
 Detection counts runs in which both attackers were isolated after onset;
 latency is the median over runs of the mean time to confirm the two
 attackers, in seconds; FI and $\bar\Phi$ are for the clean network (E$'$ for
-the pipeline).}
+the pipeline). The single-branch rows count confirmations by each of the
+pipeline's branches on its own.}
 \label{tab:scale}
 \centering
 \small
@@ -909,6 +780,8 @@ the pipeline).}
 Method & A1 & A2 & A3 & Latency A1 / A2 / A3 & FI & $\bar\Phi$ \\
 \midrule
 Pipeline & 10/10 & 10/10 & 10/10 & 15 / 27.5 / 15 & 5/60 & 0.026 \\
+\quad behaviour branch only & 0/10 & 10/10 & 10/10 & & 16/60 & -- \\
+\quad localisation branch only & 10/10 & 0/10 & 10/10 & & 0/60 & -- \\
 LND & 10/10 & 0/10 & 10/10 & 11.3 / -- / 17.5 & 2/60 & 0.005 \\
 WD & 0/10 & 9/10 & 9/10 & -- / 20 / 67.5 & 7/60 & 0.108 \\
 LND+WD & 9/10 & 9/10 & 9/10 & 12.5 / 20 / 15 & 9/60 & 0.113 \\
@@ -937,11 +810,20 @@ difference excluded zero. Immediate isolation was as costly as in the small
 network, with D$_1$ withdrawing 72--74\% of honest-beacon service, and the
 gap to E$'$ exceeded 1100 node-seconds under every scenario.
 
+Here the cause is different from the sparse network. The pipeline's
+behavioural branch alone falsely confirmed 16 of 60 honest node-seeds, more
+than WD's 7, and the fused pipeline confirmed 5. The reduction from 16 to 5
+is the attenuation of Section~\ref{sec:sweep} acting on honest beacons: a
+benign behavioural deviation is scaled down by a localisation branch at its
+null. Both counts come from the same topology and the same six-observer
+median, so the observer count cannot explain the difference. At 50 nodes the
+pipeline's lower $\Phi$ is therefore a benefit of fusion, and the dense
+network shows the same effect on a smaller scale (15 of 90 honest node-seeds
+for the behavioural branch alone against 9 fused).
+
 Taken with Section~\ref{sec:sparse}, this bounds the baseline comparison of
 Section~\ref{sec:baselines}. Only in the small dense network did two
 classical detectors run side by side match the fused pipeline. In the sparse
-network and in the larger one, the behaviour-only reputation detector, which
-has no confidence weighting or peer-relative scoring, paid for its
-sensitivity in false isolation, and the pipeline's lower $\Phi$ is the
-measured benefit of combining the evidence.
+network the advantage came from peer-relative scoring of behaviour, and at 50
+nodes from fusion suppressing single-branch false alarms.
 

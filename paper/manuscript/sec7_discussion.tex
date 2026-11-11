@@ -30,10 +30,46 @@ missing evidence: under plain E a forwarding attacker is re-admitted once its
 isolation silences its behavioural branch. Release is as consequential a
 decision as isolation, and in our data the safe release rule made isolation on
 confirmation close to permanent. Where attack is frequent and beacon redundancy high,
-immediate isolation may be preferable. We present the trade-off without declaring a
-winner, and suggest that $\Phi$ or a comparable measure be reported routinely:
-a mechanism's false-positive rate says nothing about how long its errors
+immediate isolation may be preferable. Table~\ref{tab:guide} summarises
+these conditions. We present the trade-off without declaring a winner, and
+suggest that $\Phi$ or a comparable measure be reported routinely: a
+mechanism's false-positive rate says nothing about how long its errors
 persist.
+
+\begin{table}[!t]
+\caption{Isolation policy by operating condition, as suggested by the results.}
+\label{tab:guide}
+\centering
+\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{4.4cm}>{\raggedright\arraybackslash}p{2.2cm}>{\raggedright\arraybackslash}p{5.4cm}@{}}
+\toprule
+Condition & Policy & Basis in the results \\
+\midrule
+Attacks rare, few redundant beacons & E$'$ & About 4--5\% of honest-beacon service withdrawn; attacker active for the confirmation delay \\
+Attacks frequent, many redundant beacons & D$_1$ & Removes attackers soonest; withdraws about 60--75\% of honest-beacon service \\
+Forwarding-only attackers expected & E$'$, not E & E re-admits forwarding attackers once isolation silences their evidence \\
+Sparse network & E$'$ with peer-relative behavioural scoring & No false isolation observed, but forwarding attackers confirmed in 4 of 10 seeds \\
+Heavy shadowing & E$'$ & False isolation stays low; expect 2--3\,min to confirm forwarding attacks \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Two practical limits apply to this guidance. First, $\Phi$ counts lost
+beacon service time, not metres of localisation error. Our runs did not
+recompute the position estimates of nodes near a wrongly isolated beacon, so
+the paper cannot convert one into the other; doing so needs the node density
+around each beacon and the localisation algorithm in use. Second, the
+pipeline falsely confirmed about one honest beacon in ten in the dense
+network, and under E$'$ such isolations were almost never reversed. A
+long-running deployment would lose beacons slowly, so it needs a deliberate
+path back, such as the probationary release of Section~\ref{sec:future}.
+
+The release finding is not specific to our pipeline. Any scheme that
+restores trust as bad evidence fades has the same exposure, because an
+isolated node produces no evidence at all. CONFIDANT's re-integration of
+nodes whose reputation recovers over time~\cite{buchegger2002confidant} is an
+example: a forwarding attacker excluded from routes stops generating the
+observations that would keep its reputation low.
 
 \subsection{Limits of the evidence}
 
@@ -52,9 +88,12 @@ dense network, two calibrated single-evidence detectors run in parallel
 matched the fused pipeline on every attack evaluated and were faster under
 shadowing. In the sparse and 50-node networks the behaviour-only detector's
 false isolation rose to 11--24\% of honest-beacon service while the
-pipeline's stayed at 0--3\%, plausibly because of its confidence weighting
-and peer-relative scoring;
-there the benefit of fusion appears in $\Phi$ and not in detection. Branch sensitivity to
+pipeline's stayed at 0--3\%, for two different reasons. In the sparse network
+the pipeline's peer-relative behavioural scoring avoided the false alarms
+even without fusion. At 50 nodes its behavioural branch alone raised more
+false alarms than the baseline, and fusion removed most of them. Fusion's
+benefit, where it appears, is the suppression of single-branch false alarms,
+and it is paid for with sensitivity near the threshold. Branch sensitivity to
 a given attack family can be measured before fusion is applied, and no system
 we surveyed reports checking it. An adaptive adversary could exploit this by
 concentrating its misbehaviour on one axis, which is a further reason to
@@ -101,8 +140,16 @@ detector but is not one, and it covers E and E$'$ on two scenarios. E$'$ was eva
 issued before isolation; its schedule is exact for beacons confirmed on
 behaviour, which it never releases, and inherits the replay assumption for
 beacons confirmed on localisation alone. E$'$ was designed after the
-enforced runs were examined, so its evaluation is not blind to that
-finding.
+enforced runs were examined, so its evaluation on the original and 30-seed
+campaigns is not blind to that finding. The sparse and 50-node campaigns were
+run after E$'$ was fixed, and its results there (no attacker released, clean
+false isolation of 0 and 2.6\%) are out-of-sample evidence. The sparse
+behavioural calibration is a separate caveat: every usable honest behavioural
+window in its calibration runs forwarded all of its transit packets, so the
+robust scale of the behavioural statistic collapsed to its floor. This makes
+the branch maximally sensitive whenever it has evidence, so it cannot explain
+the low sparse detection rate, but the sparse behavioural figures should be
+read with that calibration in mind.
 
 \textbf{Internal validity.} The recovery baseline window is short relative to
 throughput variance, which is why we exclude throughput debt. Detection
@@ -145,7 +192,12 @@ continuous throughput measures is claimed. The sparse and 50-node campaigns use 
 intervals are wide and two of the 50-node comparisons reach zero. The sweeps
 use ten seeds per level,
 so the one-seed fusion gain in the second pairing is reported as consistent
-with the condition, not as a measured benefit.
+with the condition, not as a measured benefit. The paper reports about forty
+paired intervals without correcting for multiplicity. The central comparisons,
+between the immediate policies and E or E$'$, have lower bounds hundreds of
+node-seconds from zero and survive any reasonable correction; the intervals
+that only just exclude or touch zero (several baseline comparisons at 50
+nodes) should be read as indicative.
 
 \section{Conclusion}
 \label{sec:conclusion}
@@ -229,6 +281,11 @@ for every campaign are available at
 simulator traces are available from the corresponding author
 on reasonable request. No third-party dataset was used: every data point in
 this paper was generated by the authors' simulations.
+
+\textbf{Use of AI tools.} An AI assistant (Claude, Anthropic) was used to
+help draft and edit the text and the analysis code. The authors checked all
+content, results and references and take full responsibility for the
+manuscript.
 
 \textbf{Ethics approval.} Not applicable. This study involves neither human
 participants nor animals.

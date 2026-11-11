@@ -111,10 +111,13 @@ on the same traces.
       and confirmed attackers as fast or faster, as the fusion condition
       predicts. In the sparse and 50-node networks the same disjunction
       withdrew 11--24\% of honest-beacon service on a clean network against
-      0--3\% for the pipeline, so the benefit of combining evidence appears
-      in $\Phi$ and not in detection speed. In the sparse network that
-      benefit came with a cost: the pipeline confirmed the forwarding
-      attacker in only 4 of 10 seeds.
+      0--3\% for the pipeline. The pipeline's single-branch results show
+      why: in the sparse network its peer-relative scoring of behaviour
+      avoided the false alarms, and at 50 nodes fusion suppressed false
+      alarms raised by its own behavioural branch. Fusion thus trades
+      sensitivity near the threshold for fewer false isolations. In the
+      sparse network the pipeline paid for this by confirming the
+      forwarding attacker in only 4 of 10 seeds.
 
 \item \textbf{Bounding results.} Localisation error shows that the two
       attack classes are disjoint in both evidence directions; detection and
@@ -133,4 +136,5 @@ Section~\ref{sec:framework} develops the model in full.
 Section~\ref{sec:method} describes the simulation campaign.
 Section~\ref{sec:results} reports results, Section~\ref{sec:discussion}
 interprets them, Section~\ref{sec:threats} states threats to validity, and
-Section~\ref{sec:conclusion} concludes.
+Section~\ref{sec:conclusion} concludes. Appendix~\ref{sec:appendix}
+reports secondary results.

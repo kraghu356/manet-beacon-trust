@@ -1,0 +1,153 @@
+\appendix
+\section{Secondary results}
+\label{sec:appendix}
+
+This appendix reports results that support the main text but carry none of its claims.
+
+\subsection{Sensitivity to evidence orientation}
+\label{sec:orientation}
+
+The sign convention of~\eqref{eq:orient} deserves its own analysis, because
+getting it wrong produces a detector that passes the tests most papers run and
+fails the one they do not. The transform~\eqref{eq:phi} is even, but fusion
+happens before $\phi$, so it is the summed statistic that is folded, not the
+individual branches.
+
+Suppose the two statistics were summed without orientation, for a beacon whose
+behavioural anomaly reaches $|z_B| = 3$ and whose localisation anomaly reaches
+$z_L = 3$ at full intensity, with equal weights. Under A1, $z_B \approx 0$ and
+the misoriented fusion gives $Z = +2.12$, hence $T^D = 0.10$: confirmed. Under
+A2, $z_L \approx 0$ and $Z = -2.12$, which because $\phi$ is even also gives
+$T^D = 0.10$: confirmed. Both single-axis attacks are caught. Under a hybrid
+attack at half intensity, however, $z_B \approx -1.5$ and $z_L \approx +1.5$,
+and
+\begin{equation}
+\label{eq:cancel}
+Z = \frac{(-1.5) + (+1.5)}{\sqrt2} = 0, \qquad T^D = \phi(0) = 1.0.
+\end{equation}
+The attacker's two misbehaviours cancel exactly, and a node misbehaving on both
+axes receives perfect trust. A detector with this defect is blind to hybrid
+attacks in proportion to how evenly the attacker balances the two axes, and an
+adversary aware of the defect could balance them deliberately. With
+\eqref{eq:orient} applied, the same attacker gives
+$Z = \bigl((+1.5) + (+1.5)\bigr)/\sqrt2 = 2.12$, recovering the full-intensity
+single-axis statistic from two half-intensity observations.
+
+
+\subsection{Localisation error}
+\label{sec:locerr}
+
+Throughput is uninformative for A1, since the attack has no packet-level
+footprint. The service A1 degrades is localisation, so we report the
+displacement between the position a beacon advertises and its true position,
+which is the error a consumer of the localisation service inherits
+(Table~\ref{tab:locerr}).
+
+\begin{table}[!t]
+\caption{Localisation error in metres, means across five seeds of the original
+campaign. ``Attacker'' covers receptions from the compromised beacon; ``all''
+covers every monitored beacon, of which two of three are honest.}
+\label{tab:locerr}
+\centering
+\small
+\begin{tabular}{@{}llrrrr@{}}
+\toprule
+Scenario & Scope & RMSE & MAE & Median & P95 \\
+\midrule
+Clean & all & 0.05 & 0.02 & 0.00 & 0.06 \\
+A1 & attacker & 267.25 & 265.42 & 271.41 & 299.23 \\
+   & all & 145.27 & 78.78 & 0.01 & 288.77 \\
+A2 & attacker & 0.03 & 0.01 & 0.00 & 0.05 \\
+   & all & 0.04 & 0.01 & 0.00 & 0.05 \\
+A3 & attacker & 146.02 & 145.81 & 145.91 & 150.01 \\
+   & all & 77.88 & 41.66 & 0.01 & 150.00 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The clean-network figure of 0.05\,m RMSE confirms that honest beacons advertise
+their true positions to within numerical precision, so any error observed
+elsewhere is attributable to the attack. A2 produces 0.04\,m, indistinguishable
+from clean: A2 is a pure forwarding attack with no positional signature, exactly
+as A1 is a pure positional attack with no forwarding signature. A3's attacker
+error of 146.02\,m against A1's 267.25\,m confirms the half-intensity
+construction. The ratio is 0.55 instead of 0.50 because clamping binds less
+often at the smaller offset.
+
+The substantive result is the ``all'' row. Under A1 the mean error across all
+monitored beacons is 145.27\,m while the median is 0.01\,m. Two of three beacons
+are honest and contribute essentially zero error, while the third contributes
+the full displacement. A localisation consumer drawing on the affected beacon
+inherits an error more than three orders of magnitude above the clean-network floor, and
+averaging over honest neighbours does not conceal it, since trilateration
+depends on all contributing anchors.
+
+
+\subsection{Mechanism cost}
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=0.8\textwidth]{fig7_mechanism}
+\caption{Isolation mechanism accounting in one illustrative enforced run (A2,
+seed 1), not an aggregate. Policy D suppresses more attacker drops but blocks
+more than twice as many frames and performs three times as many isolation
+events as policy E.}
+\label{fig:mechanism}
+\end{figure}
+
+Fig.~\ref{fig:mechanism} decomposes what each policy does within a single run.
+The counters were logged per run but not aggregated across the campaign, so the
+figure illustrates the accounting without establishing a general magnitude.
+Both policies suppress attacker drops substantially relative to the control:
+from 750 packets under C to 69 under D and 111 under E. Frames blocked by the
+enforcement mechanism itself differ by more than a factor of two, 3381 under D
+against 1566 under E, tracking isolation-event counts of 72 and 24. The counter
+separates the mechanism's benefit from its cost within a run, which aggregate
+PDR does not.
+
+
+\subsection{Aggregation ablation}
+\label{sec:ablation}
+
+\begin{table}[!t]
+\caption{Aggregation ablation, original campaign. Confirmations out of 15
+target-seeds per cell.}
+\label{tab:ablation}
+\centering
+\small
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Configuration & A1 & A2 & A3 & Clean \\
+\midrule
+Direct only & 6/15 & 5/15 & 6/15 & 1/15 \\
+Direct + indirect & 6/15 & 5/15 & 6/15 & 1/15 \\
+Direct + indirect + historical & 6/15 & 5/15 & 6/15 & 1/15 \\
+\bottomrule
+\end{tabular}
+\par\smallskip\footnotesize
+Counts include false confirmations: A1 6/15 is the attacker in five seeds plus
+one honest beacon.
+\end{table}
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=0.62\textwidth]{fig9_ablation}
+\caption{Aggregation ablation. The three configurations are identical in every
+cell: adding indirect and historical trust changes no verdict.}
+\label{fig:ablation}
+\end{figure}
+
+Table~\ref{tab:ablation} and Fig.~\ref{fig:ablation} report the second stage
+ablated across its components. History-only is not an admissible configuration,
+since $T^H$ seeds from the combined value. The three configurations are
+identical in every cell. The components are not inert in the underlying
+computation: on A2 seed~1, direct-only aggregation gives mean trust 0.7148
+with 50 window-level confirmations, while direct plus indirect gives 0.7548
+with 70. But the differences never cross the persistence gate, so no target's
+final verdict changes. $T^H$ is an exponentially weighted average of direct
+trust and $T^I$ a trimmed mean of peers' direct trust: both are smoothed
+functions of the same underlying signal, and they would be expected to diverge
+only where direct trust is noisy and observers disagree, a regime our topology
+does not produce often enough to matter.
+
+
