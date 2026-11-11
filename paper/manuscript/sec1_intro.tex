@@ -40,27 +40,21 @@ And because a removed beacon is a beacon whose localisation service is lost
 to its neighbours, removal is not free: a verification mechanism that is too
 eager degrades exactly the service it exists to protect.
 
-\subsection{Research questions}
+\subsection{Problem statement}
 
-The study asks four questions, each answered by a part of Section~\ref{sec:results}.
-
-\begin{itemize}
-\item \textbf{RQ1, coverage.} Can a detector that uses one class of evidence
-      confirm beacons whose attack leaves no signature in that class, and
-      does collecting both behavioural and localisation evidence close the
-      gap? (Sections~\ref{sec:coverage}, \ref{sec:baselines}, \ref{sec:sparse}
-      and~\ref{sec:scale})
-\item \textbf{RQ2, cost of error.} How much honest-beacon service do
-      isolation policies withdraw, and how does waiting for confirmation
-      change that cost? (Sections~\ref{sec:policy} and~\ref{sec:phi})
-\item \textbf{RQ3, release.} Can an isolated beacon be released safely once
-      the evidence against it clears? (Section~\ref{sec:release})
-\item \textbf{RQ4, fusion.} When can fused evidence confirm an attacker that
-      neither branch confirms alone, and is a fused detector better than
-      classical single-evidence detectors run side by side?
-      (Sections~\ref{sec:region}, \ref{sec:sweep}, \ref{sec:baselines},
-      \ref{sec:sparse} and~\ref{sec:scale})
-\end{itemize}
+The paper addresses four questions. The first is whether a detector that
+uses one class of evidence can confirm beacons whose attack leaves no
+signature in that class, and whether collecting both behavioural and
+localisation evidence closes the gap (Sections~\ref{sec:coverage},
+\ref{sec:baselines}, \ref{sec:sparse} and~\ref{sec:scale}). The second is how
+much honest-beacon service isolation policies withdraw, and how waiting for
+confirmation changes that cost (Sections~\ref{sec:policy}
+and~\ref{sec:phi}). The third is whether an isolated beacon can be released
+safely once the evidence against it clears (Section~\ref{sec:release}). The
+fourth is when fused evidence can confirm an attacker that neither branch
+confirms alone, and whether a fused detector is better than classical
+single-evidence detectors run side by side (Sections~\ref{sec:region},
+\ref{sec:sweep}, \ref{sec:baselines}, \ref{sec:sparse} and~\ref{sec:scale}).
 
 \subsection{Contributions}
 
@@ -73,7 +67,7 @@ simultaneous attackers, and two re-implemented literature baselines evaluated
 on the same traces.
 
 \begin{enumerate}
-\item \textbf{Evidence coverage (RQ1).} We frame malicious-beacon
+\item \textbf{Evidence coverage.} We frame malicious-beacon
       verification as a question of evidence coverage rather than detection
       accuracy. Every detector restricted to one evidence class, including
       re-implemented localisation-only and behaviour-only baselines from the
@@ -84,7 +78,7 @@ on the same traces.
       is built from established components and is the vehicle for
       the study.
 
-\item \textbf{A measure of what false isolation costs (RQ2).} We introduce
+\item \textbf{A measure of what false isolation costs.} We introduce
       cumulative false isolation~$\Phi$, in node-seconds, and its normalised
       form~$\bar\Phi$, as complements to the false-positive rate, which says
       nothing about how long an error persists. Isolating only on
@@ -93,7 +87,7 @@ on the same traces.
       and the gap held when the schedules were enforced in the simulator,
       under shadowing and at 50 nodes.
 
-\item \textbf{Release is as consequential as isolation (RQ3).} Releasing
+\item \textbf{Release is as consequential as isolation.} Releasing
       an isolated beacon when its verdict clears re-admits forwarding
       attackers in a closed loop, because isolation removes the very traffic
       their behavioural evidence comes from. An evidence-aware release rule
@@ -101,7 +95,7 @@ on the same traces.
       showed that the advantage of confirmation-gated isolation comes from
       the gating itself.
 
-\item \textbf{When fusion helps (RQ4).} Every weighted Stouffer detector
+\item \textbf{When fusion helps.} Every weighted Stouffer detector
       has a fusion-only region, containing attackers whose two anomalies are
       each sub-threshold and of comparable size, and an attack family scaled
       in intensity passes through it only if the branches' detection
@@ -111,7 +105,7 @@ on the same traces.
       We also make explicit, for trust fusion, the calibration requirement on
       which any such test depends~\cite{stouffer1949,whitlock2005weighted}.
 
-\item \textbf{An honest comparison with classical detectors (RQ4).} In the
+\item \textbf{Comparison with classical detectors.} In the
       small dense network a calibrated disjunction of the two literature
       baselines matched the fused pipeline's coverage and false isolation
       and confirmed attackers as fast or faster, as the fusion condition
