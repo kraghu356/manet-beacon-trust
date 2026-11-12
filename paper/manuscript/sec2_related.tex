@@ -57,10 +57,19 @@ trust state. Chatzidakis and Hadjiefthymiades~\cite{chatzidakis2022trust}
 make this explicit, proposing a mechanism that identifies malicious nodes,
 alerts the network, and subsequently restores trust when a node resumes
 healthy behaviour or when an earlier classification proves incorrect. We
-adopt the possibility of restoration, and Section~\ref{sec:release} shows
-that it is harder to use safely than it appears: an isolated node cannot
-display the healthy behaviour that restoration waits for, so a rule that
-restores trust when bad evidence stops can re-admit an attacker.
+adopt the possibility of restoration. That restoration can be abused is
+known. OCEAN removes a node from its faulty list after a fixed period of
+observed inactivity, and its authors note that a shorter timeout gives
+misbehaving nodes more chances~\cite{bansal2003ocean}; Sen's survey makes the
+general point that redemption by reputation fading or timeout lets a
+malicious node re-enter and attack again~\cite{sen2010survey}; and on--off
+attacks exploit trust that recovers while an attacker behaves well for a
+while~\cite{sun2006attacks}. In each case the attacker either waits out a
+timer or acts to rebuild its score. Section~\ref{sec:release} shows a
+passive route that needs neither: when trust fuses several evidence
+classes, isolating a forwarding attacker removes the transit traffic its
+behavioural evidence comes from, the remaining class reports it as normal,
+and a rule that restores trust when bad evidence stops re-admits it.
 
 \subsection{Learned trust models}
 

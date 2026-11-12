@@ -67,9 +67,14 @@ path back, such as the probationary release of Section~\ref{sec:future}.
 The release finding is not specific to our pipeline. Any scheme that
 restores trust as bad evidence fades has the same exposure, because an
 isolated node produces no evidence at all. CONFIDANT's re-integration of
-nodes whose reputation recovers over time~\cite{buchegger2002confidant} is an
-example: a forwarding attacker excluded from routes stops generating the
-observations that would keep its reputation low.
+nodes whose reputation recovers over time~\cite{buchegger2002confidant} and
+OCEAN's faulty-list timeout~\cite{bansal2003ocean} are examples: a forwarding
+attacker excluded from routes stops generating the observations that would
+keep its reputation low. Earlier critiques of redemption assumed that the
+attacker waits out a timer or behaves well to rebuild its
+score~\cite{sen2010survey,sun2006attacks}; here re-admission needs no action
+by the attacker at all, which is why a defence against on--off behaviour
+does not by itself prevent it.
 
 \subsection{Limits of the evidence}
 

@@ -87,16 +87,19 @@ on the same traces.
       and the gap held when the schedules were enforced in the simulator,
       under shadowing and at 50 nodes.
 
-\item \textbf{Release is as consequential as isolation.} Releasing
-      an isolated beacon when its verdict clears re-admits forwarding
-      attackers in a closed loop, because isolation removes the very traffic
-      their behavioural evidence comes from. An evidence-aware release rule
+\item \textbf{Release is as consequential as isolation.} Timed
+      redemption is known to let attackers back in~\cite{bansal2003ocean,sen2010survey}.
+      We show that release is unsafe even without a timer or any action by
+      the attacker: releasing an isolated beacon when its verdict clears
+      re-admits forwarding attackers in a closed loop, because isolation
+      removes the very traffic their behavioural evidence comes from. An evidence-aware release rule
       prevented every re-admission at a small cost in false isolation, and
       showed that the advantage of confirmation-gated isolation comes from
       the gating itself.
 
-\item \textbf{When fusion helps.} Every weighted Stouffer detector
-      has a fusion-only region, containing attackers whose two anomalies are
+\item \textbf{When fusion helps.} As an explanatory tool rather than a
+      new result in fusion theory, we note that every weighted Stouffer
+      detector has a fusion-only region, containing attackers whose two anomalies are
       each sub-threshold and of comparable size, and an attack family scaled
       in intensity passes through it only if the branches' detection
       thresholds for that family lie within a factor of
