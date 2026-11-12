@@ -20,8 +20,8 @@ the strongest immediate policy, with every paired interval excluding zero; the
 ordering held under attack, under shadowing and when the schedules were
 enforced. With evidence-aware release, its cost is the time an attacker
 remains active before confirmation: a median of 15\,s for attacks with a localisation
-signature and 27.5\,s for selective forwarding, rising to medians of 125--155\,s for
-forwarding attacks under shadowing. Whether that trade is favourable depends on
+signature and 27.5\,s for selective forwarding, rising to medians of
+125--150\,s for selective forwarding under shadowing. Whether that trade is favourable depends on
 the prior probability of attack and on what a wrongly removed beacon costs the
 network. Where attack is rare and beacon coverage sparse, gating is preferable,
 since $\Phi$ accumulates continuously while attacker exposure is bounded by the
@@ -104,7 +104,8 @@ we surveyed reports checking it. An adaptive adversary could exploit this by
 concentrating its misbehaviour on one axis, which is a further reason to
 keep a single-branch path to confirmation alongside the fused statistic.
 
-The aggregation stage changed no verdict anywhere. It belongs in the framework
+The aggregation stage changed no verdict in the ablation
+(Appendix~\ref{sec:ablation}). It belongs in the framework
 as an unevaluated robustness extension, not as a validated component: a system
 using only direct per-observer trust would reproduce every reported finding.
 It remains because our campaign barely samples the conditions it exists to
@@ -222,7 +223,8 @@ when its verdict clears re-admitted forwarding attackers, whose behavioural
 evidence disappears while they are isolated; requiring that evidence to return
 before release prevented every re-admission and raised false isolation only to
 5.0\%. Both results held under 4 and 8\,dB shadowing, with the price moving to
-latency: forwarding attacks took a median of 125--155\,s to confirm. Every weighted
+latency: selective forwarding took a median of 125--150\,s to confirm, and
+the hybrid attack 155\,s at 8\,dB. Every weighted
 Stouffer detector has a fusion-only region, but an attack family scaled in
 intensity reaches it only when the branches' detection thresholds for that
 family lie within a factor of $1+\sqrt2$, and across two sweeps that condition
@@ -239,7 +241,7 @@ no verdict, and neither isolation policy produced a throughput difference
 exceeding its confidence interval.
 
 We report these outcomes together because the negative ones bound the positive
-ones. In a literature where reported accuracies cluster above 95\%, the more
+ones. In a literature where reported accuracies cluster between 90 and 99\%, the more
 informative questions are which attacks a detector can see and how long its
 mistakes last.
 

@@ -144,8 +144,8 @@ identical in every cell. The components are not inert in the underlying
 computation: on A2 seed~1, direct-only aggregation gives mean trust 0.7148
 with 50 window-level confirmations, while direct plus indirect gives 0.7548
 with 70. But the differences never cross the persistence gate, so no target's
-final verdict changes. $T^H$ is an exponentially weighted average of direct
-trust and $T^I$ a trimmed mean of peers' direct trust: both are smoothed
+final verdict changes. $T^H$ is an exponentially weighted average of combined
+trust, itself dominated by direct trust, and $T^I$ a trimmed mean of peers' direct trust: both are smoothed
 functions of the same underlying signal, and they would be expected to diverge
 only where direct trust is noisy and observers disagree, a regime our topology
 does not produce often enough to matter.

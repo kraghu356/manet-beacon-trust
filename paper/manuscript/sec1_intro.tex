@@ -9,7 +9,7 @@ consult, no stable membership, and no reliable way to tell a node that is
 failing from a node that is lying.
 
 Beacon nodes deserve separate treatment within this problem. A beacon
-advertises position information that neighbouring nodes consume in order to
+advertises position information that neighbouring nodes consume to
 localise themselves. A compromised beacon therefore corrupts the position
 estimates of nodes it never exchanged data traffic with, and the corruption
 propagates through the localisation computation, not through the
@@ -36,7 +36,7 @@ all produce observations that resemble attack. A verification stage
 separating detection from confirmation therefore has a plausible role, a
 need also identified in work on trust change and revision~\cite{chatzidakis2022trust}
 and on verification supported by observable evidence~\cite{li2019dapv,ryu2023reputation}.
-And because a removed beacon is a beacon whose localisation service is lost
+Because a removed beacon is a beacon whose localisation service is lost
 to its neighbours, removal is not free: a verification mechanism that is too
 eager degrades exactly the service it exists to protect.
 
@@ -73,7 +73,8 @@ on the same traces.
       re-implemented localisation-only and behaviour-only baselines from the
       literature, was blind to the attack outside that class, in the small,
       sparse and 50-node networks alike; collecting both classes confirmed
-      every attacker in the dense networks. The verification pipeline that
+      the attacker in 209 of 210 attacked runs of the dense network and
+      both attackers in every run at 50 nodes. The verification pipeline that
       fuses the two classes into per-observer trust and a three-state verdict
       is built from established components and is the vehicle for
       the study.
@@ -97,13 +98,13 @@ on the same traces.
       showed that the advantage of confirmation-gated isolation comes from
       the gating itself.
 
-\item \textbf{When fusion helps.} As an explanatory tool rather than a
-      new result in fusion theory, we note that every weighted Stouffer
+\item \textbf{When fusion helps.} Every weighted Stouffer
       detector has a fusion-only region, containing attackers whose two anomalies are
       each sub-threshold and of comparable size, and an attack family scaled
       in intensity passes through it only if the branches' detection
       thresholds for that family lie within a factor of
-      $1+\sqrt{2}\approx 2.414$. The condition is checkable before any
+      $1+\sqrt{2}\approx 2.414$. We offer this as an explanatory tool rather
+      than a new result in fusion theory. The condition is checkable before any
       fusion experiment and predicted the outcome of two intensity sweeps.
       We also make explicit, for trust fusion, the calibration requirement on
       which any such test depends~\cite{stouffer1949,whitlock2005weighted}.
@@ -122,13 +123,15 @@ on the same traces.
       sparse network the pipeline paid for this by confirming the
       forwarding attacker in only 4 of 10 seeds.
 
-\item \textbf{Bounding results.} Localisation error shows that the two
+\item \textbf{Bounding results.} Localisation error
+      (Appendix~\ref{sec:locerr}) shows that the two
       attack classes are disjoint in both evidence directions; detection and
       the false-isolation result survive 4 and 8\,dB shadowing at a cost in
-      latency for forwarding attacks; and we report negative results in the
-      body of the paper: the trust aggregation stage changed no verdict, and
-      neither isolation policy produced a throughput advantage surviving its
-      confidence interval.
+      latency for forwarding attacks; and we report two negative results:
+      the trust aggregation stage changed no verdict
+      (Appendix~\ref{sec:ablation}), and neither isolation policy produced a
+      throughput advantage surviving its confidence interval
+      (Section~\ref{sec:policy}).
 \end{enumerate}
 
 \subsection{Organisation}

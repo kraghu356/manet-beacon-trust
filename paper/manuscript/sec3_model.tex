@@ -4,9 +4,9 @@
 \subsection{Network model}
 
 The network is a dynamic graph $G(t) = (V, E(t))$ over $N$ mobile nodes with
-time-varying wireless links. A subset $\mathcal{B} \subseteq V$ are beacon
+time-varying wireless links. A subset $\mathcal{B} \subseteq V$ consists of beacon
 nodes advertising position information usable by neighbours for
-localisation. A subset $\mathcal{B}_m \subseteq \mathcal{B}$ are compromised.
+localisation. A subset $\mathcal{B}_m \subseteq \mathcal{B}$ is compromised.
 Each monitored beacon $i$ carries a state
 \begin{equation}
 \label{eq:state}
@@ -15,9 +15,8 @@ S_i(t) \in \{\textsc{Normal}, \textsc{Suspicious}, \textsc{Confirmed}\}.
 The intermediate state exists so that a single anomalous observation does
 not directly authorise removal.
 
-The pipeline both raises suspicion and decides what follows it; the
-contribution concerns the second step, the verification and response that
-follow a first suspicion. Attackers are insiders
+The pipeline both raises suspicion and decides what to do about it; our
+contribution concerns the second step, verification and response. Attackers are insiders
 holding valid credentials, so cryptographic authentication does not resolve
 the problem: an authenticated node can still lie.
 

@@ -185,7 +185,7 @@ $|Z| = 0.845$, two-sided null tail probabilities of 0.176 and 0.398.
 Two properties of~\eqref{eq:phi} matter. It is even in $Z$, so a deviation in
 either direction reduces trust equally; this is deliberate, since a beacon
 forwarding implausibly more traffic than its peers is as anomalous as one
-forwarding less. And because $\phi$ is applied after fusion rather than before
+forwarding less. Because $\phi$ is applied after fusion rather than before
 it, the two-sidedness does not rescue a sign error: it is the fused $Z$ that is
 folded, not the individual branches.
 
@@ -292,7 +292,7 @@ resulting combination.
 T_{ij}(t) = \frac{w_D T^D_{ij}(t) + w_I T^I_{ij}(t) + w_H T^H_{ij}(t-1)}{w_D + w_I + w_H},
 \end{equation}
 renormalised over whichever terms are defined in the window. Because $T^H$
-seeds from the combined value, it cannot be evaluated in isolation: a
+seeds from the combined value, it cannot be evaluated on its own: a
 configuration weighting history alone produces no defined trust at any window.
 This constrains the ablation design of Section~\ref{sec:ablation}.
 
@@ -331,14 +331,14 @@ least a fraction $a_{min} = 0.5$ of observers holding a defined opinion, and no
 fewer than three observers, must place the target below $\tau_M$ in the same
 window.
 
-Two further rules complete the decision logic.
+Three further rules complete the decision logic.
 
 \textbf{Single-branch override.} An observer whose direct trust falls below
 $\tau_X = 0.10$, corresponding to $|Z| \ge 2.146$, can confirm a target without
 satisfying the agreement fraction. An attack visible to only one evidence class
 produces one branch far into its tail while the other stays at the null, and
 requiring majority agreement there would suppress the detection the
-architecture is meant to enable. The override is load-bearing for the coverage
+architecture is meant to enable. The override is essential to the coverage
 result: under A1 the behavioural branch contributes nothing, and confirmation
 proceeds on localisation evidence alone. The A1 and A2 results should be
 attributed to fusion together with this override.
@@ -388,7 +388,7 @@ and we report the throughput recovery ratio
 \label{eq:recov}
 R_{TH} = \frac{TH_{after}}{TH_{normal}},
 \end{equation}
-for which a well-behaved mechanism gives $R \to 1$.
+for which a well-behaved mechanism gives $R_{TH} \to 1$.
 
 Finally we define a false-isolation cost that we believe is under-reported in
 this literature. Let $H$ be the set of honest beacons and $\iota_i(t)$ the

@@ -183,7 +183,7 @@ Fig.~\ref{fig:sweep} shows both.
 \centering
 \includegraphics[width=\textwidth]{fig4_sweep}
 \caption{Attacker detection across the two intensity sweeps, ten seeds per
-point. Left: the branches' 50\% thresholds lie 3.63 apart, beyond the
+point. Left: the branches' 50\% thresholds lie a factor of 3.63 apart, beyond the
 $1+\sqrt2$ bound, and fusion falls below the disjunctive rule near the
 behavioural threshold. Right: halving the drop rate moves the behavioural
 curve and brings the ratio to 1.87, inside the bound, and fusion matches or
@@ -278,8 +278,8 @@ The ratio depends on how the sweep couples the two intensities, and the second
 sweep tests whether~\eqref{eq:ratio} predicts the consequence. The behavioural
 curve moved exactly as drop probability dictates: 3, 6 and 8 of 10 at drops of
 1.5, 2.25 and 3\% in both sweeps, so behavioural detection depends on the drop
-rate alone. Localisation, which depends on displacement alone, stayed at
-$\theta_L = 36.7$\,m. With $\theta_B = 19.7$\,m the ratio falls to $r = 1.87$
+rate alone. Localisation, which depends on displacement alone, stayed close
+to its primary-sweep value, at $\theta_L = 36.7$\,m. With $\theta_B = 19.7$\,m the ratio falls to $r = 1.87$
 (bootstrap 95\% interval [1.41, 2.21]), inside the equal-weight bound in every
 resample.
 
@@ -367,8 +367,8 @@ also waits for its confidence weight to saturate, which a reputation
 threshold does not. In this network, therefore, the pipeline's detection is
 matched by two calibrated classical detectors run in parallel.
 Sections~\ref{sec:sparse} and~\ref{sec:scale} show that this does not carry
-over to a sparse or a larger network; there the same disjunction pays several
-times the pipeline's false isolation.
+over to a sparse or a larger network; there the same disjunction withdrew
+11--24\% of honest-beacon service against 0--3\% for the pipeline.
 
 \subsection{Isolation policy under attack}
 \label{sec:policy}
@@ -606,7 +606,7 @@ cost in false isolation was small. On the clean network $\bar\Phi$ rose from
 3.9\% to 5.0\% (paired increase 13 node-seconds, 95\% CI [2, 28]), and E$'$
 withdrew at most 7.5\% of honest-beacon service in any condition. The gap to
 D$_1$ remained between 372 and 837 node-seconds, with every interval
-excluding zero. The small cost has a revealing cause: 46 of the 50 honest
+excluding zero. The small cost has a simple cause: 46 of the 50 honest
 beacons that E$'$ isolated across the three channels were never released, so
 E$'$ amounts to near-permanent isolation on confirmation. Its advantage over
 the immediate policies therefore comes from confirmation gating, not from

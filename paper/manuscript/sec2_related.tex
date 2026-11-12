@@ -36,7 +36,7 @@ recommendations from other nodes are weighted and filtered, since a
 recommender may itself be
 adversarial~\cite{singh2020self,rajeswari2021efficient,pari2023hybrid}.
 
-Our work sits in the second and third of these but differs in what it
+Our work addresses the second and third axes but differs in what it
 optimises. A recent systematic review of malicious-node handling in wireless
 multi-hop networks found that more than 90\% of the surveyed studies address
 detection and very few address removal~\cite{pourdehghan2025review}. Almost all of the above evaluate the trust mechanism by its
@@ -57,8 +57,8 @@ trust state. Chatzidakis and Hadjiefthymiades~\cite{chatzidakis2022trust}
 make this explicit, proposing a mechanism that identifies malicious nodes,
 alerts the network, and subsequently restores trust when a node resumes
 healthy behaviour or when an earlier classification proves incorrect. We
-adopt the possibility of restoration. That restoration can be abused is
-known. OCEAN removes a node from its faulty list after a fixed period of
+adopt the possibility of restoration, which is known to be open to abuse.
+OCEAN removes a node from its faulty list after a fixed period of
 observed inactivity, and its authors note that a shorter timeout gives
 misbehaving nodes more chances~\cite{bansal2003ocean}; Sen's survey makes the
 general point that redemption by reputation fading or timeout lets a
@@ -95,7 +95,7 @@ cannot address a limitation upstream of it.
 
 \subsection{Localisation-centred beacon security}
 
-The second line is beacon-specific, using ranging measurements and geometric
+The second of the two lines identified above is beacon-specific, using ranging measurements and geometric
 consistency to determine whether an advertised position is
 plausible~\cite{kuriakose2023embn,liu2008attack}. Robustness here usually
 means tolerating a bounded number of lying beacons rather than identifying
@@ -214,9 +214,10 @@ a topology, a mobility regime, a traffic load and an attacker density, all
 of which vary across papers. It also saturates: when published figures
 cluster between 90\% and 99\%, a difference of one percentage point carries
 less information than the differences in evaluation conditions that
-produced it. Our own results show why. Every configuration tested, including
-both single-evidence ones, achieves perfect recall against the attack its
-evidence can observe and near zero against the attack it cannot. An accuracy
+produced it. Our own results show why. In the dense network every configuration
+tested, including both single-evidence ones, achieved perfect recall against
+the attack its evidence can observe and near zero against the attack it
+cannot. An accuracy
 figure drawn from the first case alone would be correct and uninformative.
 The informative axis is coverage. We compare against EMBN-MANET on it
 analytically, and Section~\ref{sec:baselines} measures it for re-implemented
