@@ -1,0 +1,200 @@
+\section{Related Work}
+\label{sec:related}
+
+\subsection{Trust-based detection and routing}
+
+Trust management in MANETs has developed along two largely separate lines.
+The first evaluates node reliability from forwarding behaviour, reputation
+and recommendation, and uses the resulting score to steer route
+selection~\cite{cai2019evolutionary,xia2013trust,sirajuddin2021tbsmr,singh2020self}.
+Its foundations are the watchdog and pathrater of Marti
+et al.~\cite{marti2000mitigating}, which overhear whether a neighbour forwards
+what it receives, and CONFIDANT~\cite{buchegger2002confidant}, which turns
+such observations into a Bayesian reputation and isolates nodes whose
+reputation falls below a threshold.
+Approaches in this line combine direct observation with neighbour
+recommendation~\cite{singh2020self,sanchez2015model} and, more recently,
+with learned models~\cite{dhand2025secure,mahamune2024trust}. The recurring
+design questions are how to weight one's own observations against those of
+others, how to age evidence, and how to resist a recommender that lies.
+
+Three design axes recur. The first is what the trust score is computed
+from. Early work used packet-forwarding ratio and drop
+behaviour~\cite{xia2013trust,sanchez2015model}. Later schemes added energy,
+mobility and link stability~\cite{veeraiah2021trust,thirunavukkarasu2022cluster},
+and recent ones learn the score from features using gradient boosting or
+neural models~\cite{ryu2023reputation,dhand2025secure}. The second is what
+the score is used for. Most schemes feed it into route selection, either by
+penalising low-trust hops in a single-path
+protocol~\cite{pathan2018efficient,pari2023enhanced} or by distributing
+traffic across trust-weighted multiple
+paths~\cite{sirajuddin2021tbsmr,srilakshmi2021improved,srilakshmi2022secure}.
+A smaller group treats trust as an admission-control question,
+authenticating or excluding nodes before they
+participate~\cite{tu2021active,lwin2020blockchain}. The third is how
+recommendations from other nodes are weighted and filtered, since a
+recommender may itself be
+adversarial~\cite{singh2020self,rajeswari2021efficient,pari2023hybrid}.
+
+Our work addresses the second and third axes but differs in what it
+optimises. A recent systematic review of malicious-node handling in wireless
+multi-hop networks found that more than 90\% of the surveyed studies address
+detection and very few address removal~\cite{pourdehghan2025review}. Almost all of the above evaluate the trust mechanism by its
+effect on delivery ratio, throughput and delay, which measures the benefit
+of excluding attackers. Far fewer measure the cost of excluding honest nodes
+by mistake, and fewer still measure how long such an exclusion persists.
+Schemes that also address energy and route
+stability~\cite{thirunavukkarasu2022cluster,ponguwala2019e2sr} make the cost
+side explicit for energy but not for availability. We argue in
+Section~\ref{sec:framework} that a cumulative false-isolation measure
+belongs alongside the false-positive rate, and Section~\ref{sec:results}
+shows the two can differ by more than an order of magnitude for the same
+detector.
+
+A consistent finding across this line is that static thresholds produce
+false positives under changing topology, which motivates dynamic or adaptive
+trust state. Chatzidakis and Hadjiefthymiades~\cite{chatzidakis2022trust}
+make this explicit, proposing a mechanism that identifies malicious nodes,
+alerts the network, and subsequently restores trust when a node resumes
+healthy behaviour or when an earlier classification proves incorrect. We
+adopt the possibility of restoration, which is known to be open to abuse.
+OCEAN removes a node from its faulty list after a fixed period of
+observed inactivity, and its authors note that a shorter timeout gives
+misbehaving nodes more chances~\cite{bansal2003ocean}; Sen's survey makes the
+general point that redemption by reputation fading or timeout lets a
+malicious node re-enter and attack again~\cite{sen2010survey}; and on--off
+attacks exploit trust that recovers while an attacker behaves well for a
+while~\cite{sun2006attacks}. In each case the attacker either waits out a
+timer or acts to rebuild its score. Section~\ref{sec:release} shows a
+passive route that needs neither: when trust fuses several evidence
+classes, isolating a forwarding attacker removes the transit traffic its
+behavioural evidence comes from, the remaining class reports it as normal,
+and a rule that restores trust when bad evidence stops re-admits it.
+
+\subsection{Learned trust models}
+
+A recent line of work replaces hand-specified trust arithmetic with learned
+models: gradient-boosted trees for trust-value estimation~\cite{dhand2025secure},
+feature optimisation and classification for intruder
+isolation~\cite{kavitha2019india}, and reinforcement learning for
+reputation-driven route selection~\cite{ryu2023reputation}. A learned rule
+cannot repair the coverage failure reported in Section~\ref{sec:results}.
+Under the false-location attack the delivered-throughput trace is identical to
+the clean-network trace in every seed, so behavioural evidence carries no
+information about the attack, and no estimator restricted to that class can
+recover it. Evidence coverage depends on what is collected, not on how it is
+combined.
+
+\subsection{Localisation-centred beacon security}
+
+The second of the two lines identified above is beacon-specific, using ranging measurements and geometric
+consistency to determine whether an advertised position is
+plausible~\cite{kuriakose2023embn,liu2008attack}. Robustness here usually
+means tolerating a bounded number of lying beacons rather than identifying
+them individually, and the classical results bound achievable localisation
+error as a function of the fraction of compromised anchors. Recent work
+continues this line for static sensor networks: BO-MAP combines clustering
+with probabilistic analysis to predict and isolate malicious
+anchors~\cite{sreeja2024bomap}, and Tomic et al.\ detect spoofing anchors by
+voting over anchor-pair intersections, deliberately excluding no anchor
+because a wrongly removed honest anchor degrades
+accuracy~\cite{tomic2026voting}. Both assume static anchors and a single
+snapshot of ranging evidence, and neither uses forwarding behaviour or models
+a reversible decision.
+
+Position falsification is also studied in vehicular networks. There,
+misbehaviour detection checks the plausibility of the positions vehicles
+broadcast. The VeReMi dataset made such detectors comparable on a common set
+of falsification attacks~\cite{vanderheijden2018veremi}, and recent detectors
+learn from message sequences, for example with federated
+Transformers~\cite{khan2026mofed}. The evidence class is the same as our
+localisation branch, but these systems detect misbehaving senders and leave
+revocation to a credential authority. They neither combine positional with
+forwarding evidence nor measure what a wrongful revocation costs.
+
+Secure localisation has a longer history in sensor networks. SeRLoc bounds a
+node's position using directional beacons without range
+measurements~\cite{lazos2004serloc}; verifiable multilateration rejects
+position claims inconsistent with distance bounds~\cite{capkun2006secure};
+and Liu, Ning and Du detect malicious beacons by the inconsistency between
+measured and declared range, revoking a beacon once a base station has
+received enough independent alerts~\cite{liu2005detecting}. Our localisation
+branch uses the same residual as the last of these. What differs is the
+setting (mobile beacons and commodity 802.11 RSSI, against static beacons
+or UWB ranging in those works) and the decision rule: our confirmation is
+reversible, and we measure what a false confirmation costs while it
+persists.
+
+The two lines overlap less than their subject matter suggests: in the papers
+we surveyed (not a systematic survey), a trust-routing paper rarely tests an
+attacker whose only misbehaviour is positional, and a beacon-security paper
+rarely tests one whose only misbehaviour is in forwarding.
+
+\subsection{EMBN-MANET}
+
+EMBN-MANET~\cite{kuriakose2023embn} is the recent work closest to ours. It
+detects beacons that spoof their coordinates in a UWB-based mobile ad hoc
+network: a $k$-polytopes procedure over RSSI and trilateration residuals gives
+a probable location $T_{loc}$, which is compared with the location $F_{loc}$ a
+suspect beacon shares, and a beacon whose reputation crosses a threshold is
+excluded from coordinating localisation. Identification is complete when fewer
+than four malicious beacons share a neighbourhood and exceeds 85\% above that
+count; the authors address static beacons and name mobile beacons as future
+work. Four differences follow. Its evidence is entirely localisation-derived,
+so a beacon that advertises correct coordinates while dropping transit
+traffic is outside what it can observe. Its response excludes a beacon from
+localisation coordination, not from forwarding, so it makes no claim about
+route continuity and none of our isolation policies implements it. Its
+beacons are static and ours are mobile. Its accuracy figure depends on
+attacker density, and we quote it as such.
+
+\begin{table}[!t]
+\caption{Evidence classes and observable attack surface by approach family.
+Entries are read from published descriptions, not measured.}
+\label{tab:families}
+\centering
+\footnotesize
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+Approach & Loc.\ evid. & Beh.\ evid. & Rec.\ trust & Mob.\ beac. & FI metric \\
+\midrule
+Localisation-centred~\cite{kuriakose2023embn,liu2005detecting,liu2008attack} & \checkmark & & & & \\
+Behavioural trust~\cite{xia2013trust,sanchez2015model} & & \checkmark & \checkmark & \checkmark & \\
+Multipath trust~\cite{sirajuddin2021tbsmr,srilakshmi2021improved} & & \checkmark & \checkmark & \checkmark & \\
+Learned trust~\cite{ryu2023reputation,dhand2025secure} & & \checkmark & & \checkmark & \\
+Admission control~\cite{tu2021active,lwin2020blockchain} & & \checkmark & \checkmark & \checkmark & \\
+This work & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark \\
+\bottomrule
+\end{tabular}
+\par\smallskip\footnotesize
+Loc./Beh.\ evid.: localisation and behavioural evidence. Rec.\ trust:
+recommendation-based trust. Mob.\ beac.: mobile beacons. FI metric: reports
+a false-isolation cost measure.
+\end{table}
+
+\subsection{Structured comparison and basis for comparison}
+
+Alongside the measured baselines of Section~\ref{sec:baselines}, we give a
+structured qualitative comparison. Table~\ref{tab:families} states, for each family of
+approach, which evidence classes it observes and which attack classes
+therefore fall inside its scope. Localisation-centred beacon security
+observes the evidence class that the false-location attack disturbs and not
+the class that selective forwarding disturbs; behavioural trust schemes
+observe the converse. Our contribution is not a better detector within
+either column but the observation that the columns are disjoint and that a
+beacon can misbehave in whichever one is not being watched. The final column
+is the metric introduced in Section~\ref{sec:framework}; we are not aware of
+prior work in this area that reports the persistence of false exclusions
+as opposed to their rate, though this reflects our reading of the literature
+and is not an exhaustive search.
+
+Reported detection accuracy in this field is conditioned on the attack model,
+topology, mobility, traffic and attacker density, and it saturates: when
+published figures cluster between 90\% and 99\%, a one-point difference
+carries less information than the differences in evaluation conditions. In
+our dense network every configuration, including both single-evidence ones,
+achieved perfect recall against the attack its evidence can observe and near
+zero against the other, so an accuracy figure drawn from the first case alone
+would be correct and uninformative. The informative axis is coverage, which we
+compare against EMBN-MANET analytically and measure for re-implemented
+decision rules of both families in Section~\ref{sec:baselines}.

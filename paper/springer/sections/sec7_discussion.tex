@@ -1,0 +1,232 @@
+\section{Discussion}
+\label{sec:discussion}
+
+\subsection{Interpretation}
+
+The coverage result is structural, following from what each evidence class can
+physically observe, and it was obtained
+with calibration held fixed across all scenarios. The implication for the
+literature is narrow but practical. An accuracy reported against
+localisation-visible attacks is an accuracy over that subset of the attack
+space. EMBN-MANET's threat model is confined to false-location behaviour by
+design, so its figure is correct within its scope and we do not dispute it.
+What we would ask of any such report is one additional line: which attack
+classes the evidence can observe at all.
+
+The isolation result is the paper's strongest: confirmation-gated isolation
+withdrew 3.9--5.0\% of honest-beacon service against 74.8\% for the strongest
+immediate policy, and the ordering held under attack, under shadowing and when
+enforced. Its cost is the time an attacker remains active before
+confirmation, a median of 15--27.5\,s, or 125--150\,s for selective forwarding
+under shadowing. Whether that trade is favourable depends on the prior
+probability of attack and the cost of a lost beacon: gating suits rare attacks
+and sparse beacon coverage, because $\Phi$ accumulates continuously while
+exposure is bounded by the confirmation delay, and immediate isolation suits
+frequent attacks and high redundancy (Table~\ref{tab:guide}). The bound on
+exposure holds only if release cannot be triggered by missing evidence, and in
+our data the safe release rule made isolation on confirmation close to
+permanent. We suggest that $\Phi$ or a comparable measure be reported
+routinely, since a false-positive rate says nothing about how long errors
+persist.
+
+\begin{table}[!t]
+\caption{Isolation policy by operating condition, as suggested by the results.}
+\label{tab:guide}
+\centering
+\footnotesize
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{4.4cm}>{\raggedright\arraybackslash}p{2.2cm}>{\raggedright\arraybackslash}p{5.4cm}@{}}
+\toprule
+Condition & Policy & Basis in the results \\
+\midrule
+Attacks rare, few redundant beacons & E$'$ & About 4--5\% of honest-beacon service withdrawn; attacker active for the confirmation delay \\
+Attacks frequent, many redundant beacons & K$_1$ (D$_1$) or K$_2$ & Removes attackers soonest; K$_2$ withdraws 22--24\% of honest-beacon service against 60--75\% for D$_1$ \\
+False isolation must be near zero & K$_4$ or K$_5$ & 0--0.8\% of honest-beacon service withdrawn, for 34--53\,s of attacker exposure \\
+Forwarding-only attackers expected & E$'$, not E & E re-admits forwarding attackers once isolation silences their evidence \\
+Sparse network & E$'$ with peer-relative behavioural scoring & No false isolation observed, but forwarding attackers confirmed in 4 of 10 seeds \\
+Heavy shadowing & E$'$ & False isolation stays low; expect 2--3\,min to confirm forwarding attacks \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Two practical limits apply to this guidance. First, $\Phi$ counts lost
+beacon service time, not metres of localisation error. Our runs did not
+recompute the position estimates of nodes near a wrongly isolated beacon, so
+the paper cannot convert one into the other; doing so needs the node density
+around each beacon and the localisation algorithm in use. Second, the
+pipeline falsely confirmed about one honest beacon in ten in the dense
+network, and under E$'$ such isolations were almost never reversed. A
+long-running deployment would lose beacons slowly, so it needs a planned
+path back, such as the probationary release of Section~\ref{sec:future}.
+
+The release finding is not specific to our pipeline. Any scheme that
+restores trust as bad evidence fades has the same exposure, because an
+isolated node produces no evidence at all. CONFIDANT's re-integration of
+nodes whose reputation recovers over time~\cite{buchegger2002confidant} and
+OCEAN's faulty-list timeout~\cite{bansal2003ocean} are examples: a forwarding
+attacker excluded from routes stops generating the observations that would
+keep its reputation low. Earlier critiques of redemption assumed that the
+attacker waits out a timer or behaves well to rebuild its
+score~\cite{sen2010survey,sun2006attacks}; here re-admission needs no action
+by the attacker at all, which is why a defence against on--off behaviour
+does not by itself prevent it.
+
+\subsection{Limits of the evidence}
+
+Whether fusion helped was decided by the attack family, not by the
+combination rule. The same detector diluted a disjunctive rule when the
+branches' sensitivity ratio was 3.63 and matched or slightly exceeded it at
+1.87, as the $1+\sqrt2$ bound predicts. The baseline comparison is the same
+result at the level of whole detectors: in the small dense network two
+calibrated single-evidence detectors run in parallel matched the pipeline,
+while in the sparse and 50-node networks they withdrew 11--24\% of
+honest-beacon service against 0--3\%, through peer-relative scoring in the
+first case and fusion in the second. When fusion helps, it does so by
+suppressing single-branch false alarms, at the price of sensitivity near the
+threshold. Branch sensitivity to an attack family can be measured before
+fusion is applied, and no system we surveyed reports checking it; because an
+adaptive adversary could concentrate its misbehaviour on one axis, a
+single-branch path to confirmation should stay alongside the fused statistic.
+
+The aggregation stage changed no verdict in the ablation (Online Resource~1,
+Sect.~S6), so a system using only direct per-observer trust would reproduce
+every reported finding. It remains as an unevaluated extension for conditions
+our campaign barely samples: observers who disagree, noisy direct trust and
+recommenders who lie. Neither isolation policy produced a defensible
+throughput benefit, possibly because AODV finds alternative routes readily in
+a dense 25-node topology~\cite{sirajuddin2021tbsmr,kavitha2019india,buksh2024trust};
+on our evidence the claim that isolation restores network performance is
+unsupported. Throughput says nothing about A1, which has no packet-level
+footprint; localisation error is the appropriate metric for that attack.
+
+\section{Threats to Validity}
+\label{sec:threats}
+
+\textbf{Construct validity.} The pipeline runs over logged simulator traces:
+recommendation messages were not simulated (Section~\ref{sec:cost}), only the
+resulting isolation schedules were enforced, and behavioural monitoring is
+node-global rather than per-observer, which may explain the null aggregation
+ablation. $\Phi$ for the 30-seed campaign assumes that an isolation does not
+change later verdicts. This is exact for the first isolation of a
+never-releasing policy but not for E's release times
+(Section~\ref{sec:release}). Enforced replay on ten clean seeds moved neither
+policy's $\Phi$ distinguishably from zero, and three closed-loop rounds left
+E$'$ at a fixed point; iteration approximates an online detector but is not
+one. E$'$ was designed after the enforced runs were examined, so only its
+sparse and 50-node results (no attacker released, clean false isolation of 0
+and 2.6\%) are out-of-sample. In the sparse calibration runs every usable
+honest behavioural window forwarded all its transit packets, so the
+behavioural scale collapsed to its floor; this makes the branch maximally
+sensitive and cannot explain the low sparse detection rate, but the sparse
+behavioural figures should be read with it in mind.
+
+\textbf{Internal validity.} Thresholds were calibrated on held-out clean runs
+and fixed, which avoids tuning to the test scenarios but gives no scenario its
+optimal operating point. The recovery baseline window is short relative to
+throughput variance, which is why throughput debt is excluded.
+
+\textbf{External validity.} Detection and the false-isolation result survive
+4--8\,dB shadowing, at a cost in latency for forwarding attacks, but the
+channel has no multipath or obstruction model. Attackers do not collude or
+adapt, mobility is synthetic, and only the hybrid attack's intensity is swept.
+The throughput nulls rest on the small dense field alone. Memory limited the
+network size: a 50-node run needs about 3\,GB, and a 100-node configuration
+did not fit. Three monitored beacons per run, six at 50 nodes, make
+rate-based metrics coarse. We do not claim generality beyond this
+configuration.
+
+\textbf{Comparative validity.} The baselines re-implement the evidence class
+and decision rule of Liu--Ning--Du alert counting and watchdog/CONFIDANT
+reputation on our counters and residual, with thresholds set by rules we
+chose; a different defensible rule would move their operating points. Policies
+D, D$_w$ and D$_1$ are our own constructions. In Section~\ref{sec:frontier}
+the persistence settings share D$_1$'s replay assumption, and baseline
+exposure in the sparse and 50-node networks is estimated from detection counts
+and latencies. The comparison with EMBN-MANET is analytical.
+
+\textbf{Statistical conclusion validity.} Coverage, latency, false positives
+and $\Phi$ rest on 30 seeds with paired bootstrap intervals; throughput,
+recovery, localisation error and the ablation on five; the sparse and 50-node
+campaigns and the sweeps on ten, so the one-seed fusion gain is reported as
+consistent with the condition, not as a benefit. About forty paired intervals
+are reported without multiplicity correction. The central comparisons
+(immediate policies against E or E$'$) lie hundreds of node-seconds from zero;
+intervals that only just exclude or touch zero, such as several 50-node
+baseline comparisons, are indicative.
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+Across 780 ns-3 runs, single-evidence detection of malicious beacons was blind
+to attacks outside its evidence class, and collecting both behavioural and
+localisation evidence removed the observed blind spots. Confirmation-gated
+isolation withdrew 3.9\% of honest-beacon service on a clean network against
+74.8\% for the strongest immediate policy, at a median cost of 15--27.5\,s of
+attacker activity, and the confirmation persistence alone traced the
+trade-off between the two. Releasing a beacon when its verdict clears
+re-admitted forwarding attackers, whose behavioural evidence disappears while
+they are isolated; requiring that evidence to return prevented every
+re-admission and raised false isolation only to 5.0\%. These results held
+under 4 and 8\,dB shadowing, with the price moving to latency. A condition on
+the branches' relative sensitivity predicted when Stouffer fusion diluted or
+matched a disjunctive rule, and explains why two calibrated literature
+baselines run side by side matched the pipeline in a small dense network but
+withdrew 11--24\% of honest-beacon service, against 0--3\%, in sparse and
+larger ones. The aggregation stage changed no verdict, and no isolation policy
+produced a measurable throughput gain. In a literature where reported
+accuracies cluster between 90 and 99\%, the more informative questions are
+which attacks a detector can see and how long its mistakes last.
+
+\subsection{Future work}
+\label{sec:future}
+
+Three directions follow from these results. The first is to run the detector
+inside the simulator, so that every isolation and release feeds back into
+later verdicts. That would test the evidence-aware release rule without the
+replay assumption, and it would allow a probationary release in which a
+released beacon is isolated again on its first malicious window. The second
+is to test the findings in harder settings: networks of 100 nodes or more,
+trace-based mobility, colluding or adaptive attackers, and enforced
+isolation in sparse topologies, where isolation is most likely to affect
+delivery. Full implementations of EMBN-MANET and of a behavioural
+trust-routing scheme belong in the same study. The third is to speed up
+behavioural confirmation, which dominated latency under shadowing. A second
+behavioural observable, or a confidence weight that adapts to the channel,
+could shorten the time to confirm forwarding attacks.
+
+\section*{Acknowledgements}
+
+The authors thank the developers and maintainers of the ns-3 network
+simulator~\cite{ns3}, whose simulator and AODV, IEEE 802.11 and propagation
+models this study builds on, and the developers of the open-source Python
+scientific stack used for the analysis.
+
+\section*{Declarations}
+
+\textbf{Funding.} No funding was received for this work.
+
+\textbf{Competing interests.} The authors declare no competing interests.
+
+\textbf{Author contributions.} A.V.\ designed and implemented the simulator,
+verification pipeline and experiments, and drafted the manuscript. D.V.C.\
+supervised the work, contributed to the experimental design and revised the
+manuscript. Both authors read and approved the final version.
+
+\textbf{Supplementary information.} Online Resource~1 contains the
+intensity-sweep tables, supplementary figures and secondary analyses cited in
+the text.
+
+\textbf{Data and code availability.} Simulation sources, the analysis
+pipeline, the scripts that run every campaign and regenerate every data
+figure, and the result tables, per-window verdicts and isolation schedules
+for every campaign are available at
+\url{https://github.com/kraghu356/manet-beacon-trust}. The raw per-run
+simulator traces are available from the corresponding author
+on reasonable request. No third-party dataset was used: every data point in
+this paper was generated by the authors' simulations.
+
+\textbf{Use of AI tools.} An AI assistant (Claude, Anthropic) was used for
+language editing and for help with the analysis code. The authors verified
+all content and take full responsibility for the manuscript.
+
+\textbf{Ethics approval.} Not applicable. This study involves neither human
+participants nor animals.

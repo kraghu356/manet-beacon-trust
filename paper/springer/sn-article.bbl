@@ -1,0 +1,705 @@
+%% BioMed_Central_Bib_Style_v1.01
+
+\begin{thebibliography}{41}
+% BibTex style file: bmc-mathphys.bst (version 2.1), 2014-07-24
+\ifx \bisbn   \undefined \def \bisbn  #1{ISBN #1}\fi
+\ifx \binits  \undefined \def \binits#1{#1}\fi
+\ifx \bauthor  \undefined \def \bauthor#1{#1}\fi
+\ifx \batitle  \undefined \def \batitle#1{#1}\fi
+\ifx \bjtitle  \undefined \def \bjtitle#1{#1}\fi
+\ifx \bvolume  \undefined \def \bvolume#1{\textbf{#1}}\fi
+\ifx \byear  \undefined \def \byear#1{#1}\fi
+\ifx \bissue  \undefined \def \bissue#1{#1}\fi
+\ifx \bfpage  \undefined \def \bfpage#1{#1}\fi
+\ifx \blpage  \undefined \def \blpage #1{#1}\fi
+\ifx \burl  \undefined \def \burl#1{\textsf{#1}}\fi
+\ifx \doiurl  \undefined \def \doiurl#1{\url{https://doi.org/#1}}\fi
+\ifx \betal  \undefined \def \betal{\textit{et al.}}\fi
+\ifx \binstitute  \undefined \def \binstitute#1{#1}\fi
+\ifx \binstitutionaled  \undefined \def \binstitutionaled#1{#1}\fi
+\ifx \bctitle  \undefined \def \bctitle#1{#1}\fi
+\ifx \beditor  \undefined \def \beditor#1{#1}\fi
+\ifx \bpublisher  \undefined \def \bpublisher#1{#1}\fi
+\ifx \bbtitle  \undefined \def \bbtitle#1{#1}\fi
+\ifx \bedition  \undefined \def \bedition#1{#1}\fi
+\ifx \bseriesno  \undefined \def \bseriesno#1{#1}\fi
+\ifx \blocation  \undefined \def \blocation#1{#1}\fi
+\ifx \bsertitle  \undefined \def \bsertitle#1{#1}\fi
+\ifx \bsnm \undefined \def \bsnm#1{#1}\fi
+\ifx \bsuffix \undefined \def \bsuffix#1{#1}\fi
+\ifx \bparticle \undefined \def \bparticle#1{#1}\fi
+\ifx \barticle \undefined \def \barticle#1{#1}\fi
+\bibcommenthead
+\ifx \bconfdate \undefined \def \bconfdate #1{#1}\fi
+\ifx \botherref \undefined \def \botherref #1{#1}\fi
+\ifx \url \undefined \def \url#1{\textsf{#1}}\fi
+\ifx \bchapter \undefined \def \bchapter#1{#1}\fi
+\ifx \bbook \undefined \def \bbook#1{#1}\fi
+\ifx \bcomment \undefined \def \bcomment#1{#1}\fi
+\ifx \oauthor \undefined \def \oauthor#1{#1}\fi
+\ifx \citeauthoryear \undefined \def \citeauthoryear#1{#1}\fi
+\ifx \endbibitem  \undefined \def \endbibitem {}\fi
+\ifx \bconflocation  \undefined \def \bconflocation#1{#1}\fi
+\ifx \arxivurl  \undefined \def \arxivurl#1{\textsf{#1}}\fi
+\csname PreBibitemsHook\endcsname
+
+%%% 1
+\bibitem[\protect\citeauthoryear{Liu et~al.}{2005}]{liu2005detecting}
+\begin{bchapter}
+\bauthor{\bsnm{Liu}, \binits{D.}},
+\bauthor{\bsnm{Ning}, \binits{P.}},
+\bauthor{\bsnm{Du}, \binits{W.}}:
+\bctitle{Detecting malicious beacon nodes for secure location discovery in
+  wireless sensor networks}.
+In: \bbtitle{Proceedings of the 25th IEEE International Conference on
+  Distributed Computing Systems (ICDCS)},
+pp. \bfpage{609}--\blpage{619}
+(\byear{2005}).
+\doiurl{10.1109/ICDCS.2005.21}
+\end{bchapter}
+\endbibitem
+
+%%% 2
+\bibitem[\protect\citeauthoryear{Kuriakose et~al.}{2023}]{kuriakose2023embn}
+\begin{barticle}
+\bauthor{\bsnm{Kuriakose}, \binits{J.}},
+\bauthor{\bsnm{Joshi}, \binits{S.}},
+\bauthor{\bsnm{Bairwa}, \binits{A.K.}}:
+\batitle{{EMBN-MANET}: A method to eliminating malicious beacon nodes in
+  ultra-wideband ({UWB}) based mobile ad-hoc network}.
+\bjtitle{Ad Hoc Networks}
+\bvolume{140},
+\bfpage{103063}
+(\byear{2023})
+\doiurl{10.1016/j.adhoc.2022.103063}
+\end{barticle}
+\endbibitem
+
+%%% 3
+\bibitem[\protect\citeauthoryear{Chatzidakis and
+  Hadjiefthymiades}{2022}]{chatzidakis2022trust}
+\begin{barticle}
+\bauthor{\bsnm{Chatzidakis}, \binits{M.}},
+\bauthor{\bsnm{Hadjiefthymiades}, \binits{S.}}:
+\batitle{A trust change detection mechanism in mobile ad-hoc networks}.
+\bjtitle{Computer Communications}
+\bvolume{187},
+\bfpage{155}--\blpage{163}
+(\byear{2022})
+\doiurl{10.1016/j.comcom.2022.02.007}
+\end{barticle}
+\endbibitem
+
+%%% 4
+\bibitem[\protect\citeauthoryear{Li et~al.}{2019}]{li2019dapv}
+\begin{barticle}
+\bauthor{\bsnm{Li}, \binits{T.}},
+\bauthor{\bsnm{Ma}, \binits{J.}},
+\bauthor{\bsnm{Pei}, \binits{Q.}},
+\bauthor{\bsnm{Song}, \binits{H.}},
+\bauthor{\bsnm{Shen}, \binits{Y.}},
+\bauthor{\bsnm{Sun}, \binits{C.}}:
+\batitle{{DAPV}: Diagnosing anomalies in {MANETs} routing with provenance and
+  verification}.
+\bjtitle{IEEE Access}
+\bvolume{7},
+\bfpage{35302}--\blpage{35316}
+(\byear{2019})
+\doiurl{10.1109/ACCESS.2019.2903150}
+\end{barticle}
+\endbibitem
+
+%%% 5
+\bibitem[\protect\citeauthoryear{Ryu and Kim}{2023}]{ryu2023reputation}
+\begin{barticle}
+\bauthor{\bsnm{Ryu}, \binits{J.}},
+\bauthor{\bsnm{Kim}, \binits{S.}}:
+\batitle{Reputation-based opportunistic routing protocol using {Q}-learning for
+  {MANET} attacked by malicious nodes}.
+\bjtitle{IEEE Access}
+\bvolume{11},
+\bfpage{47701}--\blpage{47711}
+(\byear{2023})
+\doiurl{10.1109/ACCESS.2023.3242608}
+\end{barticle}
+\endbibitem
+
+%%% 6
+\bibitem[\protect\citeauthoryear{Bansal and Baker}{2003}]{bansal2003ocean}
+\begin{botherref}
+\oauthor{\bsnm{Bansal}, \binits{S.}},
+\oauthor{\bsnm{Baker}, \binits{M.}}:
+Observation-based Cooperation Enforcement in Ad Hoc Networks.
+arXiv preprint cs/0307012
+(2003).
+\doiurl{10.48550/arXiv.cs/0307012}
+\end{botherref}
+\endbibitem
+
+%%% 7
+\bibitem[\protect\citeauthoryear{Sen}{2010}]{sen2010survey}
+\begin{botherref}
+\oauthor{\bsnm{Sen}, \binits{J.}}:
+A Survey on Reputation and Trust-Based Systems for Wireless Communication
+  Networks.
+arXiv preprint arXiv:1012.2529
+(2010).
+\doiurl{10.48550/arXiv.1012.2529}
+\end{botherref}
+\endbibitem
+
+%%% 8
+\bibitem[\protect\citeauthoryear{Stouffer et~al.}{1949}]{stouffer1949}
+\begin{bbook}
+\bauthor{\bsnm{Stouffer}, \binits{S.A.}},
+\bauthor{\bsnm{Suchman}, \binits{E.A.}},
+\bauthor{\bsnm{DeVinney}, \binits{L.C.}},
+\bauthor{\bsnm{Star}, \binits{S.A.}},
+\bauthor{\bsnm{Williams}, \binits{R.M.}}:
+\bbtitle{The American Soldier: Adjustment During Army Life}.
+\bpublisher{Princeton University Press},
+\blocation{Princeton, NJ}
+(\byear{1949})
+\end{bbook}
+\endbibitem
+
+%%% 9
+\bibitem[\protect\citeauthoryear{Whitlock}{2005}]{whitlock2005weighted}
+\begin{barticle}
+\bauthor{\bsnm{Whitlock}, \binits{M.C.}}:
+\batitle{Combining probability from independent tests: the weighted {Z}-method
+  is superior to {Fisher's} approach}.
+\bjtitle{Journal of Evolutionary Biology}
+\bvolume{18}(\bissue{5}),
+\bfpage{1368}--\blpage{1373}
+(\byear{2005})
+\doiurl{10.1111/j.1420-9101.2005.00917.x}
+\end{barticle}
+\endbibitem
+
+%%% 10
+\bibitem[\protect\citeauthoryear{Cai et~al.}{2019}]{cai2019evolutionary}
+\begin{barticle}
+\bauthor{\bsnm{Cai}, \binits{R.J.}},
+\bauthor{\bsnm{Li}, \binits{X.J.}},
+\bauthor{\bsnm{Chong}, \binits{P.H.J.}}:
+\batitle{An evolutionary self-cooperative trust scheme against routing
+  disruptions in {MANETs}}.
+\bjtitle{IEEE Transactions on Mobile Computing}
+\bvolume{18}(\bissue{1}),
+\bfpage{42}--\blpage{55}
+(\byear{2019})
+\doiurl{10.1109/TMC.2018.2828814}
+\end{barticle}
+\endbibitem
+
+%%% 11
+\bibitem[\protect\citeauthoryear{Xia et~al.}{2013}]{xia2013trust}
+\begin{barticle}
+\bauthor{\bsnm{Xia}, \binits{H.}},
+\bauthor{\bsnm{Jia}, \binits{Z.}},
+\bauthor{\bsnm{Li}, \binits{X.}},
+\bauthor{\bsnm{Ju}, \binits{L.}},
+\bauthor{\bsnm{Sha}, \binits{E.H.-M.}}:
+\batitle{Trust prediction and trust-based source routing in mobile ad hoc
+  networks}.
+\bjtitle{Ad Hoc Networks}
+\bvolume{11}(\bissue{7}),
+\bfpage{2096}--\blpage{2114}
+(\byear{2013})
+\doiurl{10.1016/j.adhoc.2012.02.009}
+\end{barticle}
+\endbibitem
+
+%%% 12
+\bibitem[\protect\citeauthoryear{Sirajuddin et~al.}{2021}]{sirajuddin2021tbsmr}
+\begin{barticle}
+\bauthor{\bsnm{Sirajuddin}, \binits{M.}},
+\bauthor{\bsnm{Rupa}, \binits{C.}},
+\bauthor{\bsnm{Iwendi}, \binits{C.}},
+\bauthor{\bsnm{Biamba}, \binits{C.}}:
+\batitle{{TBSMR}: A trust-based secure multipath routing protocol for enhancing
+  the {QoS} of the mobile ad hoc network}.
+\bjtitle{Security and Communication Networks}
+\bvolume{2021},
+\bfpage{5521713}
+(\byear{2021})
+\doiurl{10.1155/2021/5521713}
+\end{barticle}
+\endbibitem
+
+%%% 13
+\bibitem[\protect\citeauthoryear{Singh and Gill}{2020}]{singh2020self}
+\begin{barticle}
+\bauthor{\bsnm{Singh}, \binits{P.}},
+\bauthor{\bsnm{Gill}, \binits{N.S.}}:
+\batitle{Self-observation and recommendation based trust model with defense
+  scheme for wireless ad hoc network}.
+\bjtitle{Journal of High Speed Networks}
+\bvolume{26}(\bissue{1}),
+\bfpage{41}--\blpage{54}
+(\byear{2020})
+\doiurl{10.3233/JHS-200629}
+\end{barticle}
+\endbibitem
+
+%%% 14
+\bibitem[\protect\citeauthoryear{Marti et~al.}{2000}]{marti2000mitigating}
+\begin{bchapter}
+\bauthor{\bsnm{Marti}, \binits{S.}},
+\bauthor{\bsnm{Giuli}, \binits{T.J.}},
+\bauthor{\bsnm{Lai}, \binits{K.}},
+\bauthor{\bsnm{Baker}, \binits{M.}}:
+\bctitle{Mitigating routing misbehavior in mobile ad hoc networks}.
+In: \bbtitle{Proceedings of the 6th Annual International Conference on Mobile
+  Computing and Networking (MobiCom)},
+pp. \bfpage{255}--\blpage{265}
+(\byear{2000}).
+\doiurl{10.1145/345910.345955}
+\end{bchapter}
+\endbibitem
+
+%%% 15
+\bibitem[\protect\citeauthoryear{Buchegger and
+  Le~Boudec}{2002}]{buchegger2002confidant}
+\begin{bchapter}
+\bauthor{\bsnm{Buchegger}, \binits{S.}},
+\bauthor{\bsnm{Le~Boudec}, \binits{J.-Y.}}:
+\bctitle{Performance analysis of the {CONFIDANT} protocol}.
+In: \bbtitle{Proceedings of the 3rd ACM International Symposium on Mobile Ad
+  Hoc Networking and Computing (MobiHoc)},
+pp. \bfpage{226}--\blpage{236}
+(\byear{2002}).
+\doiurl{10.1145/513800.513828}
+\end{bchapter}
+\endbibitem
+
+%%% 16
+\bibitem[\protect\citeauthoryear{S{\'a}nchez-Casado
+  et~al.}{2015}]{sanchez2015model}
+\begin{barticle}
+\bauthor{\bsnm{S{\'a}nchez-Casado}, \binits{L.}},
+\bauthor{\bsnm{Maci{\'a}-Fern{\'a}ndez}, \binits{G.}},
+\bauthor{\bsnm{Garc{\'i}a-Teodoro}, \binits{P.}},
+\bauthor{\bsnm{Mag{\'a}n-Carri{\'o}n}, \binits{R.}}:
+\batitle{A model of data forwarding in {MANETs} for lightweight detection of
+  malicious packet dropping}.
+\bjtitle{Computer Networks}
+\bvolume{87},
+\bfpage{44}--\blpage{58}
+(\byear{2015})
+\doiurl{10.1016/j.comnet.2015.05.012}
+\end{barticle}
+\endbibitem
+
+%%% 17
+\bibitem[\protect\citeauthoryear{Dhand et~al.}{2025}]{dhand2025secure}
+\begin{barticle}
+\bauthor{\bsnm{Dhand}, \binits{G.}},
+\bauthor{\bsnm{Rao}, \binits{M.}},
+\bauthor{\bsnm{Chaudhary}, \binits{P.}},
+\bauthor{\bsnm{Sheoran}, \binits{K.}}:
+\batitle{A secure routing and malicious node detection in mobile ad hoc network
+  using trust value evaluation with improved {XGBoost} mechanism}.
+\bjtitle{Journal of Network and Computer Applications}
+\bvolume{235},
+\bfpage{104093}
+(\byear{2025})
+\doiurl{10.1016/j.jnca.2024.104093}
+\end{barticle}
+\endbibitem
+
+%%% 18
+\bibitem[\protect\citeauthoryear{Mahamune and
+  Chandane}{2024}]{mahamune2024trust}
+\begin{barticle}
+\bauthor{\bsnm{Mahamune}, \binits{A.A.}},
+\bauthor{\bsnm{Chandane}, \binits{M.M.}}:
+\batitle{Trust-based co-operative routing for secure communication in mobile ad
+  hoc networks}.
+\bjtitle{Digital Communications and Networks}
+\bvolume{10}(\bissue{4}),
+\bfpage{1079}--\blpage{1087}
+(\byear{2024})
+\doiurl{10.1016/j.dcan.2023.01.005}
+\end{barticle}
+\endbibitem
+
+%%% 19
+\bibitem[\protect\citeauthoryear{Veeraiah et~al.}{2021}]{veeraiah2021trust}
+\begin{barticle}
+\bauthor{\bsnm{Veeraiah}, \binits{N.}},
+\bauthor{\bsnm{Khalaf}, \binits{O.I.}},
+\bauthor{\bsnm{Prasad}, \binits{C.V.P.R.}},
+\bauthor{\bsnm{Alotaibi}, \binits{Y.}},
+\bauthor{\bsnm{Alsufyani}, \binits{A.}},
+\bauthor{\bsnm{Alghamdi}, \binits{S.A.}},
+\bauthor{\bsnm{Alsufyani}, \binits{N.}}:
+\batitle{Trust aware secure energy efficient hybrid protocol for {MANET}}.
+\bjtitle{IEEE Access}
+\bvolume{9},
+\bfpage{120996}--\blpage{121005}
+(\byear{2021})
+\doiurl{10.1109/ACCESS.2021.3108807}
+\end{barticle}
+\endbibitem
+
+%%% 20
+\bibitem[\protect\citeauthoryear{Thirunavukkarasu
+  et~al.}{2022}]{thirunavukkarasu2022cluster}
+\begin{barticle}
+\bauthor{\bsnm{Thirunavukkarasu}, \binits{V.}},
+\bauthor{\bsnm{Kumar}, \binits{A.S.}},
+\bauthor{\bsnm{Prakasam}, \binits{P.}}:
+\batitle{Cluster and angular based energy proficient trusted routing protocol
+  for mobile ad-hoc network}.
+\bjtitle{Peer-to-Peer Networking and Applications}
+\bvolume{15}(\bissue{5}),
+\bfpage{2240}--\blpage{2252}
+(\byear{2022})
+\doiurl{10.1007/s12083-022-01340-5}
+\end{barticle}
+\endbibitem
+
+%%% 21
+\bibitem[\protect\citeauthoryear{Pathan et~al.}{2018}]{pathan2018efficient}
+\begin{barticle}
+\bauthor{\bsnm{Pathan}, \binits{M.S.}},
+\bauthor{\bsnm{Zhu}, \binits{N.}},
+\bauthor{\bsnm{He}, \binits{J.}},
+\bauthor{\bsnm{Zardari}, \binits{Z.A.}},
+\bauthor{\bsnm{Memon}, \binits{M.Q.}},
+\bauthor{\bsnm{Hussain}, \binits{M.I.}}:
+\batitle{An efficient trust-based scheme for secure and quality of service
+  routing in {MANETs}}.
+\bjtitle{Future Internet}
+\bvolume{10}(\bissue{2}),
+\bfpage{16}
+(\byear{2018})
+\doiurl{10.3390/fi10020016}
+\end{barticle}
+\endbibitem
+
+%%% 22
+\bibitem[\protect\citeauthoryear{Pari and Sudharson}{2023}]{pari2023enhanced}
+\begin{barticle}
+\bauthor{\bsnm{Pari}, \binits{S.N.}},
+\bauthor{\bsnm{Sudharson}, \binits{K.}}:
+\batitle{An enhanced trust-based secure route protocol for malicious node
+  detection}.
+\bjtitle{Intelligent Automation and Soft Computing}
+\bvolume{35}(\bissue{2}),
+\bfpage{2541}--\blpage{2554}
+(\byear{2023})
+\doiurl{10.32604/iasc.2023.030284}
+\end{barticle}
+\endbibitem
+
+%%% 23
+\bibitem[\protect\citeauthoryear{Srilakshmi
+  et~al.}{2021}]{srilakshmi2021improved}
+\begin{barticle}
+\bauthor{\bsnm{Srilakshmi}, \binits{U.}},
+\bauthor{\bsnm{Veeraiah}, \binits{N.}},
+\bauthor{\bsnm{Alotaibi}, \binits{Y.}},
+\bauthor{\bsnm{Alghamdi}, \binits{S.A.}},
+\bauthor{\bsnm{Khalaf}, \binits{O.I.}},
+\bauthor{\bsnm{Subbayamma}, \binits{B.V.}}:
+\batitle{An improved hybrid secure multipath routing protocol for {MANET}}.
+\bjtitle{IEEE Access}
+\bvolume{9},
+\bfpage{163043}--\blpage{163053}
+(\byear{2021})
+\doiurl{10.1109/ACCESS.2021.3133882}
+\end{barticle}
+\endbibitem
+
+%%% 24
+\bibitem[\protect\citeauthoryear{Srilakshmi
+  et~al.}{2022}]{srilakshmi2022secure}
+\begin{barticle}
+\bauthor{\bsnm{Srilakshmi}, \binits{U.}},
+\bauthor{\bsnm{Alghamdi}, \binits{S.A.}},
+\bauthor{\bsnm{Vuyyuru}, \binits{V.A.}},
+\bauthor{\bsnm{Veeraiah}, \binits{N.}},
+\bauthor{\bsnm{Alotaibi}, \binits{Y.}}:
+\batitle{A secure optimization routing algorithm for mobile ad hoc networks}.
+\bjtitle{IEEE Access}
+\bvolume{10},
+\bfpage{14260}--\blpage{14269}
+(\byear{2022})
+\doiurl{10.1109/ACCESS.2022.3144679}
+\end{barticle}
+\endbibitem
+
+%%% 25
+\bibitem[\protect\citeauthoryear{Tu et~al.}{2021}]{tu2021active}
+\begin{barticle}
+\bauthor{\bsnm{Tu}, \binits{J.}},
+\bauthor{\bsnm{Tian}, \binits{D.}},
+\bauthor{\bsnm{Wang}, \binits{Y.}}:
+\batitle{An active-routing authentication scheme in {MANET}}.
+\bjtitle{IEEE Access}
+\bvolume{9},
+\bfpage{34276}--\blpage{34286}
+(\byear{2021})
+\doiurl{10.1109/ACCESS.2021.3054891}
+\end{barticle}
+\endbibitem
+
+%%% 26
+\bibitem[\protect\citeauthoryear{Lwin et~al.}{2020}]{lwin2020blockchain}
+\begin{barticle}
+\bauthor{\bsnm{Lwin}, \binits{M.T.}},
+\bauthor{\bsnm{Yim}, \binits{J.}},
+\bauthor{\bsnm{Ko}, \binits{Y.-B.}}:
+\batitle{Blockchain-based lightweight trust management in mobile ad-hoc
+  networks}.
+\bjtitle{Sensors}
+\bvolume{20}(\bissue{3}),
+\bfpage{698}
+(\byear{2020})
+\doiurl{10.3390/s20030698}
+\end{barticle}
+\endbibitem
+
+%%% 27
+\bibitem[\protect\citeauthoryear{Rajeswari
+  et~al.}{2021}]{rajeswari2021efficient}
+\begin{barticle}
+\bauthor{\bsnm{Rajeswari}, \binits{A.R.}},
+\bauthor{\bsnm{Ganapathy}, \binits{S.}},
+\bauthor{\bsnm{Kulothungan}, \binits{K.}},
+\bauthor{\bsnm{Kannan}, \binits{A.}}:
+\batitle{An efficient trust-based secure energy-aware clustering to mitigate
+  trust distortion attack in mobile ad-hoc network}.
+\bjtitle{Concurrency and Computation: Practice and Experience}
+\bvolume{33}(\bissue{13}),
+\bfpage{6223}
+(\byear{2021})
+\doiurl{10.1002/cpe.6223}
+\end{barticle}
+\endbibitem
+
+%%% 28
+\bibitem[\protect\citeauthoryear{Pari and Sudharson}{2023}]{pari2023hybrid}
+\begin{barticle}
+\bauthor{\bsnm{Pari}, \binits{S.N.}},
+\bauthor{\bsnm{Sudharson}, \binits{K.}}:
+\batitle{Hybrid trust based reputation mechanism for discovering malevolent
+  node in {MANET}}.
+\bjtitle{Computer Systems Science and Engineering}
+\bvolume{44}(\bissue{3}),
+\bfpage{2775}--\blpage{2789}
+(\byear{2023})
+\doiurl{10.32604/csse.2023.029345}
+\end{barticle}
+\endbibitem
+
+%%% 29
+\bibitem[\protect\citeauthoryear{Pourdehghan and
+  Derakhshanfard}{2025}]{pourdehghan2025review}
+\begin{botherref}
+\oauthor{\bsnm{Pourdehghan}, \binits{S.}},
+\oauthor{\bsnm{Derakhshanfard}, \binits{N.}}:
+Malicious Node Aware Wireless Multi Hop Networks: A Systematic Review of the
+  Literature and Recommendations for Future Research.
+arXiv:2506.05742
+(2025).
+\doiurl{10.48550/arXiv.2506.05742}
+\end{botherref}
+\endbibitem
+
+%%% 30
+\bibitem[\protect\citeauthoryear{Ponguwala and Rao}{2019}]{ponguwala2019e2sr}
+\begin{barticle}
+\bauthor{\bsnm{Ponguwala}, \binits{M.}},
+\bauthor{\bsnm{Rao}, \binits{S.}}:
+\batitle{{E2-SR}: A novel energy-efficient secure routing scheme to protect
+  {MANET-IoT}}.
+\bjtitle{IET Communications}
+\bvolume{13}(\bissue{19}),
+\bfpage{3207}--\blpage{3216}
+(\byear{2019})
+\doiurl{10.1049/iet-com.2019.0039}
+\end{barticle}
+\endbibitem
+
+%%% 31
+\bibitem[\protect\citeauthoryear{Sun et~al.}{2006}]{sun2006attacks}
+\begin{bchapter}
+\bauthor{\bsnm{Sun}, \binits{Y.L.}},
+\bauthor{\bsnm{Han}, \binits{Z.}},
+\bauthor{\bsnm{Yu}, \binits{W.}},
+\bauthor{\bsnm{Liu}, \binits{K.J.R.}}:
+\bctitle{Attacks on trust evaluation in distributed networks}.
+In: \bbtitle{Proceedings of the 40th Annual Conference on Information Sciences
+  and Systems (CISS)},
+pp. \bfpage{1461}--\blpage{1466}
+(\byear{2006})
+\end{bchapter}
+\endbibitem
+
+%%% 32
+\bibitem[\protect\citeauthoryear{Kavitha et~al.}{2019}]{kavitha2019india}
+\begin{barticle}
+\bauthor{\bsnm{Kavitha}, \binits{T.}},
+\bauthor{\bsnm{Geetha}, \binits{K.}},
+\bauthor{\bsnm{Muthaiah}, \binits{R.}}:
+\batitle{{INDIA}: Intruder node detection and isolation action in mobile ad hoc
+  networks using feature optimization and classification approach}.
+\bjtitle{Journal of Medical Systems}
+\bvolume{43}(\bissue{6}),
+\bfpage{179}
+(\byear{2019})
+\doiurl{10.1007/s10916-019-1309-2}
+\end{barticle}
+\endbibitem
+
+%%% 33
+\bibitem[\protect\citeauthoryear{Liu et~al.}{2008}]{liu2008attack}
+\begin{barticle}
+\bauthor{\bsnm{Liu}, \binits{D.}},
+\bauthor{\bsnm{Ning}, \binits{P.}},
+\bauthor{\bsnm{Liu}, \binits{A.}},
+\bauthor{\bsnm{Wang}, \binits{C.}},
+\bauthor{\bsnm{Du}, \binits{W.K.}}:
+\batitle{Attack-resistant location estimation in wireless sensor networks}.
+\bjtitle{ACM Transactions on Information and System Security}
+\bvolume{11}(\bissue{4}),
+\bfpage{1}--\blpage{39}
+(\byear{2008})
+\doiurl{10.1145/1380564.1380570}
+\end{barticle}
+\endbibitem
+
+%%% 34
+\bibitem[\protect\citeauthoryear{Sreeja et~al.}{2024}]{sreeja2024bomap}
+\begin{barticle}
+\bauthor{\bsnm{Sreeja}, \binits{B.N.P.}},
+\bauthor{\bsnm{Sundaram}, \binits{G.}},
+\bauthor{\bsnm{Rivera}, \binits{M.}},
+\bauthor{\bsnm{Wheeler}, \binits{P.}}:
+\batitle{Enhanced localization in wireless sensor networks using a
+  bat-optimized malicious anchor node prediction algorithm}.
+\bjtitle{Sensors}
+\bvolume{24}(\bissue{24}),
+\bfpage{7893}
+(\byear{2024})
+\doiurl{10.3390/s24247893}
+\end{barticle}
+\endbibitem
+
+%%% 35
+\bibitem[\protect\citeauthoryear{Tomic et~al.}{2026}]{tomic2026voting}
+\begin{barticle}
+\bauthor{\bsnm{Tomic}, \binits{S.}},
+\bauthor{\bsnm{Beko}, \binits{M.}},
+\bauthor{\bsnm{Vukobratovic}, \binits{D.}},
+\bauthor{\bsnm{Krco}, \binits{S.}}:
+\batitle{Voting mechanism for trustworthy localization in wireless sensor
+  networks}.
+\bjtitle{Frontiers in Sensors}
+\bvolume{7},
+\bfpage{1730414}
+(\byear{2026})
+\doiurl{10.3389/fsens.2026.1730414}
+\end{barticle}
+\endbibitem
+
+%%% 36
+\bibitem[\protect\citeauthoryear{van~der Heijden
+  et~al.}{2018}]{vanderheijden2018veremi}
+\begin{bchapter}
+\bauthor{\bsnm{Heijden}, \binits{R.W.}},
+\bauthor{\bsnm{Lukaseder}, \binits{T.}},
+\bauthor{\bsnm{Kargl}, \binits{F.}}:
+\bctitle{{VeReMi}: A dataset for comparable evaluation of misbehavior detection
+  in {VANETs}}.
+In: \bbtitle{Security and Privacy in Communication Networks (SecureComm 2018)}.
+\bsertitle{LNICST},
+vol. \bseriesno{254},
+pp. \bfpage{318}--\blpage{337}.
+\bpublisher{Springer}, \blocation{???}
+(\byear{2018}).
+\doiurl{10.1007/978-3-030-01701-9_18}
+\end{bchapter}
+\endbibitem
+
+%%% 37
+\bibitem[\protect\citeauthoryear{Khan et~al.}{2026}]{khan2026mofed}
+\begin{barticle}
+\bauthor{\bsnm{Khan}, \binits{F.M.}},
+\bauthor{\bsnm{Zeb}, \binits{A.}},
+\bauthor{\bsnm{Bacarra}, \binits{R.}},
+\bauthor{\bsnm{Alsayaydeh}, \binits{J.A.J.}},
+\bauthor{\bsnm{Hamzah}, \binits{R.A.B.}},
+\bauthor{\bsnm{Mahmud}, \binits{M.}}:
+\batitle{{MoFed-Guard}: A mobility-aware federated and explainable lightweight
+  transformer framework for misbehavior detection in {VANETs}}.
+\bjtitle{Frontiers in Artificial Intelligence}
+\bvolume{9},
+\bfpage{1949474}
+(\byear{2026})
+\doiurl{10.3389/frai.2026.1949474}
+\end{barticle}
+\endbibitem
+
+%%% 38
+\bibitem[\protect\citeauthoryear{Lazos and Poovendran}{2004}]{lazos2004serloc}
+\begin{bchapter}
+\bauthor{\bsnm{Lazos}, \binits{L.}},
+\bauthor{\bsnm{Poovendran}, \binits{R.}}:
+\bctitle{{SeRLoc}: Secure range-independent localization for wireless sensor
+  networks}.
+In: \bbtitle{Proceedings of the 3rd ACM Workshop on Wireless Security (WiSe)},
+pp. \bfpage{21}--\blpage{30}
+(\byear{2004}).
+\doiurl{10.1145/1023646.1023650}
+\end{bchapter}
+\endbibitem
+
+%%% 39
+\bibitem[\protect\citeauthoryear{{\v{C}}apkun and
+  Hubaux}{2006}]{capkun2006secure}
+\begin{barticle}
+\bauthor{\bsnm{{\v{C}}apkun}, \binits{S.}},
+\bauthor{\bsnm{Hubaux}, \binits{J.-P.}}:
+\batitle{Secure positioning in wireless networks}.
+\bjtitle{IEEE Journal on Selected Areas in Communications}
+\bvolume{24}(\bissue{2}),
+\bfpage{221}--\blpage{232}
+(\byear{2006})
+\doiurl{10.1109/JSAC.2005.861380}
+\end{barticle}
+\endbibitem
+
+%%% 40
+\bibitem[\protect\citeauthoryear{{nsnam}}{2026}]{ns3}
+\begin{botherref}
+\oauthor{\bsnm{{nsnam}}}:
+ns-3 network simulator, version 3.48.
+\url{https://www.nsnam.org}
+(2026)
+\end{botherref}
+\endbibitem
+
+%%% 41
+\bibitem[\protect\citeauthoryear{Buksh et~al.}{2024}]{buksh2024trust}
+\begin{barticle}
+\bauthor{\bsnm{Buksh}, \binits{W.}},
+\bauthor{\bsnm{Guo}, \binits{Y.}},
+\bauthor{\bsnm{Iqbal}, \binits{S.}},
+\bauthor{\bsnm{Qureshi}, \binits{K.N.}},
+\bauthor{\bsnm{Lloret}, \binits{J.}}:
+\batitle{Trust-oriented peered customized mechanism for malicious nodes
+  isolation for flying ad hoc networks}.
+\bjtitle{Transactions on Emerging Telecommunications Technologies}
+\bvolume{35}(\bissue{4}),
+\bfpage{4489}
+(\byear{2024})
+\doiurl{10.1002/ett.4489}
+\end{barticle}
+\endbibitem
+
+\end{thebibliography}
