@@ -128,8 +128,11 @@ localisation error.
 \section{Threats to Validity}
 \label{sec:threats}
 
-\textbf{Construct validity.} Behavioural monitoring is node-global rather than
-per-observer, so indirect trust operates on a coarser behavioural signal than
+\textbf{Construct validity.} The verification pipeline runs over logged
+simulator traces, so the recommendation messages a deployment would exchange
+were not simulated (Section~\ref{sec:cost}); only the resulting isolation
+schedules were enforced in the simulator. Behavioural monitoring is
+node-global rather than per-observer, so indirect trust operates on a coarser behavioural signal than
 the model specifies. This weakens the aggregation ablation: the null may
 reflect the implementation and not the design. $\Phi$ for the 30-seed
 campaign is computed by applying each policy offline to the same verdict

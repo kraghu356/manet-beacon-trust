@@ -373,6 +373,23 @@ Every subsequent route must satisfy $P \cap \mathcal{B}_{iso}(t) = \emptyset$.
 Enforcement is by a blacklist queueing discipline; route repair is performed by
 AODV.
 
+\subsection{Computational and communication cost}
+\label{sec:cost}
+
+In each 5\,s step an observer computes one fused statistic per beacon it
+hears, so Stage~1 costs $O(|\mathcal{B}|)$ per observer and
+$O(N|\mathcal{B}|)$ across the network. Indirect trust is a trimmed mean over
+the other observers of a beacon, and the median of~\eqref{eq:median} sorts the
+same set, so each beacon costs $O(|O_i| \log |O_i|)$ per window, with
+$|O_i| \le N-1$. With three to six monitored beacons and at most 50 nodes,
+this is a few hundred arithmetic operations per node per window. A deployment
+must also exchange recommendations. If each node broadcasts its direct trust
+in every monitored beacon once per step, the network carries $N$ short
+messages every 5\,s: 25 in the dense network, against about 600 data packets
+in the same interval. In this study the pipeline runs over the simulator's
+logged traces, so recommendation messages were not transmitted and their
+effect on delivery was not measured.
+
 \subsection{Evaluation quantities}
 
 Recovery time is $T_{rec} = T_{new\text{-}route} - T_{isolation}$. Standard
