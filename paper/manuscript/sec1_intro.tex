@@ -48,8 +48,8 @@ signature in that class, and whether collecting both behavioural and
 localisation evidence closes the gap (Sections~\ref{sec:coverage},
 \ref{sec:baselines}, \ref{sec:sparse} and~\ref{sec:scale}). The second is how
 much honest-beacon service isolation policies withdraw, and how waiting for
-confirmation changes that cost (Sections~\ref{sec:policy}
-and~\ref{sec:phi}). The third is whether an isolated beacon can be released
+confirmation changes that cost (Sections~\ref{sec:policy}, \ref{sec:phi}
+and~\ref{sec:frontier}). The third is whether an isolated beacon can be released
 safely once the evidence against it clears (Section~\ref{sec:release}). The
 fourth is when fused evidence can confirm an attacker that neither branch
 confirms alone, and whether a fused detector is better than classical
@@ -86,7 +86,10 @@ on the same traces.
       confirmation withdrew 3.9--5.0\% of honest-beacon service on a clean
       network against 74.8\% for the strongest immediate-isolation policy,
       and the gap held when the schedules were enforced in the simulator,
-      under shadowing and at 50 nodes.
+      under shadowing and at 50 nodes. Placing every policy and baseline
+      on the trade-off between false isolation and attacker exposure shows
+      that the confirmation persistence alone traces the frontier, from
+      75\% to zero false isolation for 9 to 53\,s of exposure.
 
 \item \textbf{Release is as consequential as isolation.} Timed
       redemption is known to let attackers back in~\cite{bansal2003ocean,sen2010survey}.

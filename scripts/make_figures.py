@@ -17,6 +17,7 @@ Inputs, all produced by the pipeline in this repository:
   Fig 8  cumulative false isol. results/tables/seeds30/phi_per_run.csv
   Fig 9  aggregation ablation   results/tables/agg_ablation_raw.csv
   Fig 10 shadowing              results/tables/{seeds30,shadow4,shadow8}/
+  Fig 11 trade-off frontier     results/tables/frontier/{seeds30,sparse,scale50}/frontier.csv
 """
 
 from __future__ import annotations
@@ -326,7 +327,47 @@ def fig_shadow(R, out):
     return save(fig, out, "fig10_shadowing")
 
 
-FIGS = [fig_coverage, fig_throughput, fig_sweep, fig_first_isolation, fig_recovery,
+# -------------------------------------------------------------------- Fig 11
+def fig_frontier(R, out):
+    """False isolation against attacker exposure, every policy and baseline."""
+    panels = [("seeds30", "Dense, 25 nodes"), ("sparse", "Sparse, 25 nodes"),
+              ("scale50", "50 nodes, two attackers")]
+    fig, axes = plt.subplots(1, 3, figsize=(10.5, 3.3), sharey=True)
+    for ax, (c, title) in zip(axes, panels):
+        s = pd.read_csv(os.path.join(R, "tables", "frontier", c, "frontier.csv")).set_index("policy")
+        y = lambda p: 100 * s.loc[p, "phi_bar_clean"]
+        x = lambda p: s.loc[p, "exposure_s"]
+        ks = [f"K{k}" for k in (1, 2, 3, 4, 5, 6, 8, 10) if f"K{k}" in s.index]
+        ax.plot([x(k) for k in ks], [y(k) for k in ks], "-o", color=C["fused"], ms=3.5, lw=1.2,
+                label="Pipeline, persistence $K$ (no release)")
+        for k in (ks[:1] if c == "sparse" else ks[:5]):
+            ax.annotate(k.replace("K", "$K$="), (x(k), y(k)), textcoords="offset points",
+                        xytext=(4, 3), fontsize=6.5, color=C["fused"])
+        for name, lab in (("LND+WD", "LND+WD"), ("LND", "LND"), ("WD", "WD")):
+            fam = [p for p in s.index if p == name or p.startswith(name + " ")]
+            fam = [p for p in fam if not (name != "LND+WD" and p.startswith("LND+WD"))]
+            col = {"LND+WD": "#444444", "LND": C["localization"], "WD": C["behaviour"]}[name]
+            fam = sorted(fam, key=x)
+            ax.plot([x(p) for p in fam], [y(p) for p in fam], "--s" if len(fam) > 1 else "s",
+                    color=col, ms=3.5, lw=0.9, label=lab + (" (threshold sweep)" if len(fam) > 1 else ""))
+        ax.plot(x("E"), y("E"), "^", color="#b5403a", ms=6, label="E (release when cleared)")
+        ax.plot(x("Ea"), y("Ea"), "*", color="k", ms=10, mfc="none", label="E$'$ (evidence-aware)")
+        ax.set_xscale("log")
+        ax.set_xlim(2, 450)
+        ax.set_yscale("symlog", linthresh=1.0)
+        ax.set_ylim(-0.1, 100)
+        ax.set_yticks([0, 1, 3, 10, 30, 100])
+        ax.set_yticklabels(["0", "1", "3", "10", "30", "100"])
+        ax.set_title(title)
+        ax.set_xlabel("Attacker exposure after onset (s)")
+        ax.grid(True, which="major", color="#eee", lw=0.6)
+    axes[0].set_ylabel("Clean-network false isolation $\\bar\\Phi$ (%, symlog)")
+    h, l = axes[0].get_legend_handles_labels()
+    fig.legend(h, l, loc="upper center", ncol=3, frameon=False, bbox_to_anchor=(0.5, -0.02))
+    return save(fig, out, "fig11_frontier")
+
+
+FIGS = [fig_frontier, fig_coverage, fig_throughput, fig_sweep, fig_first_isolation, fig_recovery,
         fig_phi, fig_ablation, fig_shadow]
 
 

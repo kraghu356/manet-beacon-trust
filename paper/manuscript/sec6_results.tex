@@ -846,3 +846,105 @@ classical detectors run side by side match the fused pipeline. In the sparse
 network the advantage came from peer-relative scoring of behaviour, and at 50
 nodes from fusion suppressing single-branch false alarms.
 
+\subsection{The trade-off between false isolation and attacker exposure}
+\label{sec:frontier}
+
+The comparisons above report false isolation and detection separately. A
+policy is better only if it improves one without worsening the other, so we
+place every policy and baseline on both axes at once. The vertical axis is
+clean-network $\bar\Phi$. The horizontal axis is attacker exposure: the
+post-onset time during which an attacker is not isolated, averaged over
+attackers and attacked runs, with an attacker that is never isolated counted
+as exposed for the remaining 370\,s. To trace the pipeline's own trade-off we
+vary one parameter, the persistence $K$: policy K$_k$ isolates on the first
+window that ends $k$ consecutive malicious windows and never releases, so
+K$_1$ is D$_1$ and K$_3$ isolates exactly when E does. These points are
+replayed from the existing verdict streams under the same assumption as
+D$_1$; no new simulation was run. In the dense network the two baselines are
+swept over their thresholds ($\tau'$ from 3 to 30 alerts, $\tau_W$ from the
+0.25th to the 10th percentile of clean reputations) on the raw traces; in the
+sparse and 50-node networks they appear at their calibrated operating points,
+with exposure estimated from their detection counts and latencies.
+Fig.~\ref{fig:frontier} shows the result and Table~\ref{tab:frontier} lists
+the points that matter.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\textwidth]{fig11_frontier}
+\caption{Clean-network false isolation against attacker exposure for every
+policy. Points towards the lower left are better on both axes. The green line
+is the pipeline with persistence $K$ from 1 to 10 and no release; the star is
+E$'$ and coincides with $K = 3$. Baselines are threshold sweeps in the dense
+network and calibrated operating points elsewhere. Policies D and D$_w$ lie
+above $K = 1$ and are omitted.}
+\label{fig:frontier}
+\end{figure}
+
+\begin{table}[!t]
+\caption{Selected points of Fig.~\ref{fig:frontier}. $\bar\Phi$ is clean-network
+false isolation; exposure is the mean post-onset time an attacker is not
+isolated, in seconds, over all attacked runs and for the forwarding-only
+attacker A2. A point is Pareto-optimal (P) if no other policy in the same
+network is at least as good on both axes and better on one.}
+\label{tab:frontier}
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llrrrc@{}}
+\toprule
+Network & Policy & $\bar\Phi$ (\%) & Exposure & Exposure A2 & P \\
+\midrule
+Dense & K$_1$ (= D$_1$) & 74.8 & 9.3 & 15.2 & \checkmark \\
+      & K$_2$ & 23.5 & 17.8 & 26.3 & \checkmark \\
+      & LND+WD, calibrated & 3.4 & 24.4 & 37.7 & \checkmark \\
+      & E$'$ (= K$_3$) & 5.0 & 27.4 & 41.7 & \\
+      & E & 3.9 & 30.6 & 51.2 & \\
+      & K$_4$ & 0.8 & 35.3 & 55.3 & \checkmark \\
+      & K$_5$ & 0.0 & 52.9 & 95.2 & \checkmark \\
+      & LND, calibrated & 0.3 & 133.9 & 364.0 & \\
+      & WD, calibrated & 3.1 & 150.3 & 37.7 & \\
+Sparse & LND+WD & 23.9 & 56.2 & 100.0 & \checkmark \\
+       & K$_1$ (= D$_1$) & 10.0 & 102.0 & 227.0 & \checkmark \\
+       & E$'$ (= K$_3$) & 0.0 & 135.3 & 284.0 & \checkmark \\
+       & E & 0.0 & 159.7 & 333.5 & \\
+50-node & K$_2$ & 22.2 & 15.0 & 23.5 & \checkmark \\
+        & E$'$ (= K$_3$) & 2.6 & 25.9 & 42.0 & \checkmark \\
+        & E & 2.4 & 32.1 & 60.5 & \checkmark \\
+        & LND+WD & 11.3 & 32.0 & 36.8 & \\
+        & K$_4$ & 0.8 & 33.8 & 54.5 & \checkmark \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Three results follow. First, persistence is a single dial that moves the
+pipeline along the whole frontier. In the dense network, raising $K$ from 1 to
+5 lowered clean-network false isolation from 74.8\% to zero while mean
+exposure rose from 9 to 53\,s, and the same shape appears in the 50-node
+network. The immediate and confirmation-gated policies of
+Section~\ref{sec:phi} are therefore not two designs but two settings of one
+parameter, and the steep part of the curve lies between $K = 1$ and $K = 3$:
+the second and third malicious windows remove most of the false isolation
+for about 18\,s of extra exposure.
+
+Second, which detector is on the frontier depends on the network, as
+Sections~\ref{sec:baselines}--\ref{sec:scale} found separately. In the dense
+network the calibrated LND+WD disjunction dominates E$'$ narrowly on point
+estimates (3.4\% against 5.0\% false isolation, 24.4 against 27.4\,s
+exposure; the paired false-isolation difference of Section~\ref{sec:baselines}
+includes zero), and the
+pipeline contributes the low-false-isolation end of the frontier ($K \ge 4$).
+At 50 nodes E$'$ dominates LND+WD on both axes. In the sparse network the two
+occupy opposite ends: LND+WD exposes attackers for less time but withdraws
+nearly a quarter of honest-beacon service, while E$'$ withdraws none. The
+single-evidence baselines are dominated everywhere, because the attack they
+cannot see leaves its attacker exposed for the whole run.
+
+Third, release adds exposure without buying much. At the same isolation rule,
+E exposed the forwarding attacker A2 for longer than E$'$ in every network
+(51.2 against 41.7\,s dense, 333.5 against 284.0\,s sparse, 60.5 against
+42.0\,s at 50 nodes) and lowered clean false isolation by at most 1.1
+percentage points. These E figures come from the offline replay; in the closed
+loop of Section~\ref{sec:release} E re-admits the A2 attacker in every seed,
+so its true exposure is larger. A deployment should therefore choose the
+persistence $K$ to suit the prior probability of attack and the cost of a lost
+beacon, and should not rely on release to correct an aggressive setting.

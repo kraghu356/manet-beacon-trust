@@ -46,7 +46,8 @@ persist.
 Condition & Policy & Basis in the results \\
 \midrule
 Attacks rare, few redundant beacons & E$'$ & About 4--5\% of honest-beacon service withdrawn; attacker active for the confirmation delay \\
-Attacks frequent, many redundant beacons & D$_1$ & Removes attackers soonest; withdraws about 60--75\% of honest-beacon service \\
+Attacks frequent, many redundant beacons & K$_1$ (D$_1$) or K$_2$ & Removes attackers soonest; K$_2$ withdraws 22--24\% of honest-beacon service against 60--75\% for D$_1$ \\
+False isolation must be near zero & K$_4$ or K$_5$ & 0--0.8\% of honest-beacon service withdrawn, for 34--53\,s of attacker exposure \\
 Forwarding-only attackers expected & E$'$, not E & E re-admits forwarding attackers once isolation silences their evidence \\
 Sparse network & E$'$ with peer-relative behavioural scoring & No false isolation observed, but forwarding attackers confirmed in 4 of 10 seeds \\
 Heavy shadowing & E$'$ & False isolation stays low; expect 2--3\,min to confirm forwarding attacks \\
@@ -186,7 +187,11 @@ those systems, and they use our simulator's node-global behavioural counters
 and our residual. Their thresholds were set on calibration seeds by rules we
 chose, and a different but equally defensible rule would move their operating
 points. Policies D, D$_w$ and D$_1$ are our own constructions, reasonable
-stand-ins for isolate-on-suspicion behaviour. The comparison against
+stand-ins for isolate-on-suspicion behaviour. In the trade-off of
+Section~\ref{sec:frontier}, the persistence settings share the replay
+assumption of D$_1$, and the baselines' exposure in the sparse and 50-node
+networks is estimated from their detection counts and median latencies rather
+than recomputed from raw traces. The comparison against
 EMBN-MANET itself remains analytical, resting on a reading of its evidence
 class and threat model.
 
@@ -229,7 +234,9 @@ Stouffer detector has a fusion-only region, but an attack family scaled in
 intensity reaches it only when the branches' detection thresholds for that
 family lie within a factor of $1+\sqrt2$, and across two sweeps that condition
 predicted whether fusion diluted ($r = 3.63$) or matched and marginally
-exceeded ($r = 1.87$) a disjunctive rule. Consistent with that condition, a
+exceeded ($r = 1.87$) a disjunctive rule. On the trade-off between false
+isolation and attacker exposure, the confirmation persistence alone moved
+the pipeline from 75\% to zero false isolation. Consistent with that condition, a
 calibrated disjunction of localisation-only and behaviour-only literature
 baselines matched the fused pipeline's coverage and false isolation and
 isolated attackers as fast or faster in the small dense network. In the
